@@ -29,6 +29,7 @@ end
 # KEY: the key itself (i.e., secret content)
 # KEY_NAME: the name of the key
 # KEY_PATH: the path where the key resides
+dot_profile_path = "#{app_user_home}/.profile"
 if node['cwb-server']['apply_secret_config']
   # SSH
   ssh = node['cwb-server']['ssh']
@@ -106,10 +107,23 @@ if node['cwb-server']['apply_secret_config']
                                             .instance_eval(&env_filter)
     end
   end
+  # Convenience for app user that wants to source the environment
+  template dot_profile_path do
+    source 'dot_profile.erb'
+    backup false
+    owner app_user
+    group app_user
+    mode 0600
+    variables(env: node['cwb-server']['env'])
+  end
 else
   secret_dirs = %w(.chef .ssh providers)
   secret_dirs.each do |dir|
     directory dir do
+      action :delete
+    end
+    file dot_profile_path do
+      backup false
       action :delete
     end
   end
