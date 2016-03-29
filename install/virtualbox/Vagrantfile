@@ -1,0 +1,144 @@
+require 'pathname'
+# For debugging via `binding.pry` http://pryrepl.org/
+#require 'pry'
+
+# Username to ssh into VM instances.
+# Might be `root` for debian images.
+SSH_USERNAME = 'ubuntu'
+# Must be IP here (used in Virtualbox config)
+CHEF_SERVER_IP = '33.33.33.10'
+CWB_SERVER_IP = '33.33.33.20'
+
+# Local paths
+FILE_DIR = Pathname.new(__FILE__).parent.expand_path
+REPO_ROOT = FILE_DIR.parent.parent.expand_path
+COOKBOOKS = File.join(REPO_ROOT, 'cookbooks')
+CWB_SERVER = File.join(COOKBOOKS, 'cwb-server')
+CWB_CHEF_SERVER = File.join(COOKBOOKS, 'cwb-chef-server')
+
+def ubuntu_box(config, version)
+  config.vm.box = "opscode-ubuntu-#{version}"
+  config.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-#{version}_chef-provisionerless.box"
+end
+
+VAGRANTFILE_API_VERSION = '2'
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  # Detect vagrant-omnibus plugin
+  if Vagrant.has_plugin?('vagrant-omnibus')
+    config.omnibus.chef_version = :latest
+  else
+    puts "FATAL: Vagrant-omnibus plugin not detected. Please install the plugin with\n
+                 `vagrant plugin install vagrant-omnibus`."
+    exit
+  end
+
+  # Detect vagrant-cachier plugin
+  if Vagrant.has_plugin?('vagrant-cachier')
+    config.cache.scope       = :box
+    config.cache.auto_detect = true
+  else
+    puts "WARN:  Vagrant-cachier plugin not detected. Continuing unoptimized.\n
+                 You may install it with: `vagrant plugin install vagrant-cachier`."
+  end
+
+  # Box
+  # Ubuntu >12.04 does not work with Chef server 11 and chef-server cookbook yet
+  ubuntu_box(config, '14.04')
+
+  # VM
+  config.ssh.forward_agent = true
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+
+  # Virtualbox
+  config.vm.provider :virtualbox do |vb|
+    vb.memory = 2000
+    vb.cpus = 2
+  end
+
+  ### Chef-Server
+  config.vm.define 'chef-server' do |chef_server|
+    # VM
+    chef_server.vm.hostname = 'chef-server' # MUST not contain spaces
+    chef_server.vm.network :private_network, ip: CHEF_SERVER_IP
+
+    # Chef solo provisioning via berks-vendored cookbooks
+    chef_server.vm.provision :chef_solo do |chef|
+      chef.cookbooks_path = "#{CWB_CHEF_SERVER}/berks-cookbooks"
+      chef.add_recipe 'cwb-chef-server'
+      chef.json = {
+          'chef-server' => {
+              # Current version as of 2016-03-28 is 12.4.1 (recommended with Ubuntu 14.04)
+              # See: https://downloads.chef.io/chef-server/
+              # Version 11 does not support 14.04: https://github.com/opscode-cookbooks/chef-server/issues/48
+              # Commonly used 11.1.6 on older CWB instances
+              'version' => '12.4.1', # or 'latest'
+              # Provide if cookbook service is not working correctly (i.e. cookbooks cannot be uploaded).
+              # Attempts to automatically detect public IP via Ohai/What's my ip query
+              # 'api_fqdn' => CHEF_SERVER_IP
+          }
+      }
+    end
+  end
+
+  ### CWB-Server
+  config.vm.define 'cwb-server', primary: true do |cwb_server|
+    # VM
+    cwb_server.vm.hostname = 'cwb-server' # MUST not contain spaces
+    cwb_server.vm.network :private_network, ip: CWB_SERVER_IP
+
+    # Chef solo provisioning via berks-vendored cookbooks
+    # Run `vendor_berks_cookbooks.sh` to pick up changes in the `cwb-server` cookbook
+    cwb_server.vm.provision :chef_solo do |chef|
+      chef.cookbooks_path = "#{CWB_SERVER}/berks-cookbooks"
+      chef.provisioning_path = '/etc/chef'
+      chef.add_recipe 'cwb-server'
+      # Convergence will currently fail on the first run because
+      # the freshly installed Ruby is not yet available in the path
+      chef.attempts = 2
+      chef.json =
+      {
+          'cwb-server' => {
+              'ssh' => {
+                  'key' => File.read('cloud-benchmarking.pem'),
+                  'key_name' => 'cloud-benchmarking'
+              },
+              'chef' => {
+                  'server_host' => CHEF_SERVER_IP,
+                  'node_name' => 'cwb-server',
+                  'client_key' => File.read('cwb-server.pem'),
+                  'client_key_name' => 'cwb-server',
+                  'validation_key' => File.read('chef-validator.pem'),
+                  'validation_key_name' => 'chef-validator',
+                  # VM provisioning
+                  'omnibus_chef_version' => '12.8.1'
+              },
+              'providers' => {
+                  'aws' => {
+                      'access_key' => 'my_aws_access_key',
+                      'secret_key' => 'my_aws_secret_key'
+                  }
+              },
+              'app' => {
+                  'user_password' => 'demo',
+                  # Determines how many benchmarks can be prepared, started, or released in parallel.
+                  # Keep in mind that workers are memory-intensive because the currently load the entire Rails environment.
+                  'num_workers' => 2
+              },
+              'nginx' => {
+                  # 'hostname' => 'PUBLIC_HOST_OR_IP'
+              },
+              'postgresql' => {
+                  # Optimize for non-dedicated database instance: https://github.com/hw-cookbooks/postgresql#config_pgtune
+                  'config_pgtune' => {
+                      'db_type' => 'desktop',
+                      # 'max_connections' => 5,
+                      # 'total_memory' => '256000kB'
+                  }
+              }
+          },
+          # For a list of time zones see: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+          'tz' => 'Europe/Zurich',
+      }
+    end
+  end
+end
