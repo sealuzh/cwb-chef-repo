@@ -1,4 +1,5 @@
 require 'pathname'
+require 'securerandom'
 # For debugging via `binding.pry` http://pryrepl.org/
 #require 'pry'
 
@@ -15,6 +16,20 @@ REPO_ROOT = FILE_DIR.parent.parent.expand_path
 COOKBOOKS = File.join(REPO_ROOT, 'cookbooks')
 CWB_SERVER = File.join(COOKBOOKS, 'cwb-server')
 CWB_CHEF_SERVER = File.join(COOKBOOKS, 'cwb-chef-server')
+
+# @param file [String] the path of the cache file
+# @param new_content [String] the content that should be cached into `file`
+# @return [String] if `file` exists: the content of the file
+#                  otherwise: `new_content` (will be saved to `file`)
+def read_or_cache(file, new_content)
+  content = File.read(file).strip # Ignore whitespace
+  if content.empty?
+    File.write(file, new_content)
+    new_content
+  else
+    content
+  end
+end
 
 def ubuntu_box(config, version)
   config.vm.box = "opscode-ubuntu-#{version}"
@@ -123,6 +138,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                       'access_key' => 'my_aws_access_key',
                       'secret_key' => 'my_aws_secret_key'
                   }
+              },
+              'env' => {
+                  # We do not want to invalidate the secret on every provisioning
+                  'SECRET_KEY_BASE' => read_or_cache('secret_key_base.env', SecureRandom.hex(64))
               },
               'app' => {
                   'user_password' => 'demo',
