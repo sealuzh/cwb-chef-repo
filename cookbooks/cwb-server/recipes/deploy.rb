@@ -40,7 +40,7 @@ deploy app['name'] do
     # Using different owners is useless because this resource enforces ownership
     # of the entire deployment directory recursively:
     # See https://github.com/chef/chef/blob/master/lib/chef/provider/deploy.rb#L277
-    %w(log storage vendor/bundle).each do |dir|
+    %w(log storage vendor/bundle public/assets).each do |dir|
       directory File.join(shared_path, dir) do
         owner new_resource.user
         group new_resource.group
