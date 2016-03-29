@@ -3,11 +3,11 @@ require 'pathname'
 #require 'pry'
 
 # Username to ssh into VM instances.
-# Might be `root` for debian images.
+# Might be `root` for debian images or `vagrant` for others.
 SSH_USERNAME = 'ubuntu'
-# Must be IP here (used in Virtualbox config)
+# Must be an IP here (used in Virtualbox config)
 CHEF_SERVER_IP = '33.33.33.10'
-CWB_SERVER_IP = '33.33.33.20'
+CWB_SERVER_IP  = '33.33.33.20'
 
 # Local paths
 FILE_DIR = Pathname.new(__FILE__).parent.expand_path
@@ -27,8 +27,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   if Vagrant.has_plugin?('vagrant-omnibus')
     config.omnibus.chef_version = :latest
   else
-    puts "FATAL: Vagrant-omnibus plugin not detected. Please install the plugin with\n
-                 `vagrant plugin install vagrant-omnibus`."
+    STDERR.puts 'FATAL: Vagrant-omnibus plugin not detected. Please install the plugin with
+                 `vagrant plugin install vagrant-omnibus`.'
     exit
   end
 
@@ -37,8 +37,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.cache.scope       = :box
     config.cache.auto_detect = true
   else
-    puts "WARN:  Vagrant-cachier plugin not detected. Continuing unoptimized.\n
-                 You may install it with: `vagrant plugin install vagrant-cachier`."
+    STDERR.puts 'WARN:  Vagrant-cachier plugin not detected. Continuing unoptimized.
+                 You may want to install it with: `vagrant plugin install vagrant-cachier`.'
   end
 
   # Box
@@ -75,6 +75,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
               # Provide if cookbook service is not working correctly (i.e. cookbooks cannot be uploaded).
               # Attempts to automatically detect public IP via Ohai/What's my ip query
               # 'api_fqdn' => CHEF_SERVER_IP
+              # List of commercial addons: https://github.com/chef-cookbooks/chef-server#attributes
+              # The management console (mange) is free up to 25 nodes
+              # 'addons' => %w(manage)
           }
       }
     end
@@ -98,6 +101,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       chef.json =
       {
           'cwb-server' => {
+              'dev' => {
+                  'tools' => %w(vim curl)
+              },
               'ssh' => {
                   'key' => File.read('cloud-benchmarking.pem'),
                   'key_name' => 'cloud-benchmarking'
@@ -126,14 +132,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
               },
               'nginx' => {
                   # 'hostname' => 'PUBLIC_HOST_OR_IP'
+              }
+          },
+          'postgresql' => {
+              'password' => {
+                  # Mandatory in Chef-Solo mode: https://github.com/hw-cookbooks/postgresql#chef-solo-note
+                  'postgres' => 'rootcloud'
               },
-              'postgresql' => {
-                  # Optimize for non-dedicated database instance: https://github.com/hw-cookbooks/postgresql#config_pgtune
-                  'config_pgtune' => {
-                      'db_type' => 'desktop',
-                      # 'max_connections' => 5,
-                      # 'total_memory' => '256000kB'
-                  }
+              # Optimize for non-dedicated database instance: https://github.com/hw-cookbooks/postgresql#config_pgtune
+              'config_pgtune' => {
+                  'db_type' => 'desktop',
+                  # 'max_connections' => 5,
+                  # 'total_memory' => '256000kB'
               }
           },
           # For a list of time zones see: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
