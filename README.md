@@ -3,7 +3,7 @@
 This Chef repo provides cookbooks to automatically install and configure
 [Cloud WorkBench](https://github.com/sealuzh/cloud-workbench).
 
-## Installation Requirements
+## Requirements
 
 > Interested in your own Cloud WorkBench installation?<br>
 > Feel free to contact us: leitner[AT]ifi.uzh.ch or joel.scheuner[AT]uzh.ch
@@ -28,7 +28,7 @@ This Chef repo provides cookbooks to automatically install and configure
     vagrant plugin install vagrant-omnibus vagrant-aws;
     ```
 
-## Initial Installation and Configuration
+## Installation
 1. Checkout repository.
 
     ```bash
@@ -66,21 +66,27 @@ This Chef repo provides cookbooks to automatically install and configure
     CWB_SERVER_IP=my_public_ip_for_cwb_server
     ```
 
-6. Once the Chef Server completed provisioning (may take 5-10 minutes) with
-   `INFO: Report handlers complete`, setup the Chef Server authentication:
-    1. Go to `https://CHEF_SERVER_IP` and accept the self-signed certificate (or [configure](https://docs.chef.io/server_security.html) the Chef server appropriately)
-    2. Login with the default username (`admin`) and password (`p@ssw0rd1`).
-       You may want to change the default password immediately.
-    3. Go to `https://CHEF_SERVER_IP/clients/new`, create a new client with the name `cwb-server` and enabled admin flag.
-    4. Copy the generated private key and paste it into `cwb-server.pem`
-    5. Restrict file permissions with:
+6. Once the Chef Server completed provisioning (may take 5-10 minutes) with<br>
+   `INFO: Report handlers complete`, setup the Chef Server:
+
+    1. Create the *cwb-server* admin user (replace `chefadmin` with a password of your choice)
+
+        ```bash
+        vagrant ssh chef-server --command 'sudo chef-server-ctl user-create cwb-server CWB Server cwb@server.com chefadmin' > cwb-server.pem
+        ```
+
+    2. Create the *chef-validator* organization
+
+        ```bash
+        vagrant ssh chef-server --command 'sudo chef-server-ctl org-create chef "CWB Chef" --association cwb-server' > chef-validator.pem
+        ```
+
+    3. Restrict file permissions with
 
         ```bash
         chmod 600 cwb-server.pem
         ```
 
-    6. Go to `https://CHEF_SERVER_IP/clients/chef-validator/edit`, enable *Private Key*, and click *Save Client*
-    7. Copy this private key and paste it into `chef-validator.pem`
 7. Configure Chef `knife` and Berkshelf `berks` tools
     1. Within `knife.rb`, update CHEF_SERVER_HOST, CWB_BENCHMARKS, CWB_CHEF_REPO, and ENVIRONMENT.
 
@@ -127,6 +133,9 @@ Simply reprovision the CWB Server:
 cd $HOME/git/cwb-chef-repo/install/aws/
 vagrant provision cwb-server
 ```
+
+> *Capistrano:* The current configuration needs to be slightly updated
+>               for the new installation procedure.
 
 ## Manage VMs
 
