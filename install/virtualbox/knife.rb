@@ -22,6 +22,7 @@ node_name                'cwb-server'
 client_key               "#{SECRETS_DIR}/cwb-server.pem"
 validation_client_name   'chef-validator'
 validation_key           "#{SECRETS_DIR}/chef-validator.pem"
-chef_server_url          "https://#{CHEF_SERVER_IP}:443"
+chef_server_url          "https://#{CHEF_SERVER_IP}:443/organizations/chef"
 syntax_check_cache_path  ENV['HOME'] + '/.chef/syntax_check_cache'
 cookbook_path            [CWB_BENCHMARKS]
+ssl_verify_mode          :verify_none # or load certificate `knife ssl fetch`
