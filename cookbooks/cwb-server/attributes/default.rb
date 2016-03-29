@@ -4,6 +4,7 @@ default['cwb-server']['dev']['tools'] = %w(vim curl)
 
 ### App
 default['cwb-server']['app']['name'] = 'cloud-workbench'
+default['cwb-server']['app']['user_password'] = 'demo'
 default['cwb-server']['app']['user'] = 'apps'
 default['cwb-server']['app']['deploy_user'] = 'deploy'
 default['cwb-server']['app']['dir'] = '/var/www/cloud-workbench'

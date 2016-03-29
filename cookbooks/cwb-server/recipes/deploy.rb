@@ -136,6 +136,13 @@ deploy app['name'] do
 
   ### Restart
   before_restart do
+    execute 'update cwb user password' do
+      command "bundle exec rake user:create[seal@uzh.ch,#{app['user_password']}]"
+      cwd release_path
+      user new_resource.user
+      environment new_resource.environment
+    end
+
     ruby_block 'grant app user ownership' do
       block do
         FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'storage'))
