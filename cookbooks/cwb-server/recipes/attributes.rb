@@ -31,6 +31,3 @@ node.default['vagrant']['plugins'] = [
   # Delete Chef client and node when destroying a VM
   { 'name' => 'vagrant-butcher', 'version' =>  '2.2.0' }
 ]  + node['cwb-server']['vagrant']['providers']
-
-### Save changes
-node.save
