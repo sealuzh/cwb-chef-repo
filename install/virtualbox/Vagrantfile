@@ -1,13 +1,13 @@
 require 'pathname'
 require 'securerandom'
 # For debugging via `binding.pry` http://pryrepl.org/
-#require 'pry'
+begin; require 'pry'; rescue LoadError; end
 
 # Username to ssh into VM instances.
 # Might be `root` for debian images or `vagrant` for others.
 SSH_USERNAME = 'ubuntu'
 # Must be an IP here (used in Virtualbox config)
-CHEF_SERVER_IP = '33.33.33.10'
+CHEF_SERVER_IP = ENV['CHEF_SERVER_IP'] || File.read('chef_server_ip.env').strip
 CWB_SERVER_IP  = '33.33.33.20'
 
 # Local paths
@@ -40,7 +40,7 @@ VAGRANTFILE_API_VERSION = '2'
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Detect vagrant-omnibus plugin
   if Vagrant.has_plugin?('vagrant-omnibus')
-    config.omnibus.chef_version = :latest
+    config.omnibus.chef_version = '12.8.1' # or :latest
   else
     STDERR.puts 'FATAL: Vagrant-omnibus plugin not detected. Please install the plugin with
                  `vagrant plugin install vagrant-omnibus`.'
@@ -57,7 +57,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   # Box
-  # Ubuntu >12.04 does not work with Chef server 11 and chef-server cookbook yet
   ubuntu_box(config, '14.04')
 
   # VM
@@ -85,7 +84,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
               # Current version as of 2016-03-28 is 12.4.1 (recommended with Ubuntu 14.04)
               # See: https://downloads.chef.io/chef-server/
               # Version 11 does not support 14.04: https://github.com/opscode-cookbooks/chef-server/issues/48
-              # Commonly used 11.1.6 on older CWB instances
+              # Commonly used 11.1.6 on older CWB instances (requires Ubuntu 12.04)
               'version' => '12.4.1', # or 'latest'
               # Provide if cookbook service is not working correctly (i.e. cookbooks cannot be uploaded).
               # Attempts to automatically detect public IP via Ohai/What's my ip query
