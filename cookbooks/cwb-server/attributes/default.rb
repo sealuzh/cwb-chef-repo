@@ -52,8 +52,6 @@ default['cwb-server']['nodejs']['setup_checksum'] = nil
 default['cwb-server']['db']['name'] = 'cloud_workbench_production'
 default['cwb-server']['db']['user'] = 'cloud'
 # Randomly generated if not provided
-default['cwb-server']['db']['root_password'] = nil
-# Randomly generated if not provided
 default['cwb-server']['db']['password'] = nil
 
 ### Environment variables

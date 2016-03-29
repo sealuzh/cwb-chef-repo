@@ -21,10 +21,12 @@ suites:
     attributes:
       # For a list of time zones see: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
       tz: Europe/Zurich
+      postgresql:
+        password:
+          postgres: rootcloud
       cwb-server:
         db:
           password: cloud
-          root_password: rootcloud
         providers:
           aws:
             access_key: my_aws_access_key

@@ -4,13 +4,9 @@ require 'securerandom'
 node.set['build-essential']['compile_time'] = true
 node.set['apt']['compile_time_update'] = true
 
-### PostgreSQL: https://supermarket.chef.io/cookbooks/postgresql#readme
-root_pw = node['cwb-server']['db']['root_password']
-node.default['postgresql']['password']['postgres'] = root_pw if root_pw
-
 ### App
 # Unless given, randomly generate a password for the database
-node.set_unless['cwb-server']['db']['password'] = SecureRandom.hex(64)
+node.set_unless['cwb-server']['db']['password'] = SecureRandom.hex(24)
 # Unless given, randomly generate secret key base (used for checking the integrity of signed cookies)
 node.set_unless['cwb-server']['env']['SECRET_KEY_BASE'] = SecureRandom.hex(64)
 
