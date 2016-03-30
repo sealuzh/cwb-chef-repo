@@ -11,12 +11,25 @@ node.set_unless['cwb-server']['db']['password'] = SecureRandom.hex(24)
 node.set_unless['cwb-server']['env']['SECRET_KEY_BASE'] = SecureRandom.hex(64)
 
 ## Nginx
-# TODO: Think about auto-detect IP/hostname here?!
-# TODO: Set `CWB_SERVER_HOST` env
 node.set_unless['cwb-server']['nginx']['hostname'] = '0.0.0.0'
 
-# Use larger bucket size as the default 64 bit may not work with long hostnames (e.g. aws domain names)
-# node.default['nginx']['server_names_hash_bucket_size'] = 128
+def detect_public_ip
+  cmd = Mixlib::ShellOut.new(node['cwb-server']['host_detection'])
+  cmd.run_command
+  cmd.stdout.strip
+rescue
+  default_ip = node['ipaddress'] || '33.33.33.20'
+  Chef::Log.warn("Could not detect public IP with `#{node['cwb-server']['host_detection']}`
+                  Using default IP #{default_ip}.")
+  default_ip
+end
+
+given = node['cwb-server']['env']['CWB_SERVER_HOST']
+if given.nil? || given.empty?
+  cwb_server_host = detect_public_ip
+  Chef::Log.info("Detected public IP #{cwb_server_host}")
+  node.set['cwb-server']['env']['CWB_SERVER_HOST'] = cwb_server_host
+end
 
 ### Vagrant: https://supermarket.chef.io/cookbooks/vagrant#readme
 node.default['vagrant']['version'] = '1.8.1'

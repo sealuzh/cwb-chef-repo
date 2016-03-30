@@ -35,6 +35,7 @@ describe 'cwb-server::secrets' do
     its(:content) { should match(%r{env GOOGLE_API_KEY_PATH='#{google_file}'}) }
     its(:content) { should match(/env AZURE_MGMT_CERTIFICATE_PATH='#{azure_file}'/) }
     its(:content) { should match(%r{env CHEF_SERVER_URL='https://33.33.33.10:443/organizations/chef'}) }
+    its(:content) { should match(/env CWB_SERVER_HOST='\d+\.\d+\.\d+.\d+'/) }
   end
 
   describe file(google_file) do

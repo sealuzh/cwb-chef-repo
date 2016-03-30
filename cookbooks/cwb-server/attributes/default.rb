@@ -64,6 +64,9 @@ default['cwb-server']['env']['SECRET_KEY_BASE'] = nil
 # Dynamic example: [node['cpu']['total'].to_i * 4, 8].min
 default['cwb-server']['env']['WEB_CONCURRENCY'] = 3
 
+default['cwb-server']['host_detection'] = 'wget -qO- http://ipecho.net/plain; echo'
+default['cwb-server']['env']['CWB_SERVER_HOST'] = nil
+
 ### Secrets
 default['cwb-server']['apply_secret_config'] = true
 
