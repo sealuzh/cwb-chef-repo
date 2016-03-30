@@ -9,9 +9,38 @@ directory app['dir'] do
   action :create
 end
 
-# MUST be evaluated outside of the deploy resource
+# TODO: Can we replace `bundle exec` with `bin/*` similarly?
+# Run bundler with a specific Ruby binary to overcome failure on initial provisioning
+# https://github.com/bundler/bundler/issues/2053#issuecomment-7827190
+# Example: `/opt/chef/embedded/bin/ruby -S bundle platform`
+def bundle(cmd, opts = {})
+  sudo = opts[:sudo]
+  ruby_bin = "#{node['cwb-server']['ruby']['dir']}/bin/ruby" # or '/usr/bin/ruby'
+  "#{sudo ? 'sudo' : ''} #{ruby_bin} -S bundle #{cmd}"
+end
+
+# These variables MUST be evaluated outside of the deploy resource
 # TODO: Replace with helper method
 env_variables = env.map { |k, v| "#{k}=#{v}" }.join("\n")
+# TODO: refactor into method `only_rails_env(env)`
+common_groups = %w(development test staging production doc)
+common_groups.delete(env['RAILS_ENV'])
+# Bundler options: http://bundler.io/v1.11/deploying.html
+# --deployment installs gems into `vendor/bundle` (encapsulate from system ruby)
+bundle_install = bundle("install --deployment --without #{common_groups.join(' ')}")
+
+migration_cmd = bundle('exec rake db:migrate --trace')
+precompile_assets = bundle('exec rake assets:precompile')
+update_pw_cmd = bundle("exec rake user:create[seal@uzh.ch,#{app['user_password']}]")
+# --log #{app['log_dir']} has no effect,
+# Upstarts logs to /var/log/upstart/APPNAME per convention
+foreman_opts = "--procfile Procfile_production \
+                --env .env \
+                --app #{app['name']} \
+                --concurrency web=1,job=#{app['num_workers']} \
+                --port #{app['port']} \
+                --user #{app['user']}"
+configure_upstart_cmd = bundle("exec foreman export upstart /etc/init #{foreman_opts}", sudo: true)
 deploy app['name'] do
   deploy_to app['dir']
   scm_provider Chef::Provider::Git
@@ -59,12 +88,6 @@ deploy app['name'] do
     # Inspired by: https://github.com/capistrano/bundler
     # TODO: Check whether log statements are shown at the right time
     Chef::Log.info 'Running bundle install'
-    # TODO: refactor into method `only_rails_env(env)`
-    common_groups = %w(development test staging production doc)
-    common_groups.delete(env['RAILS_ENV'])
-    # Bundler options: http://bundler.io/v1.11/deploying.html
-    # --deployment installs gems into `vendor/bundle` (encapsulate from system ruby)
-    bundle_install = "bundle install --deployment --without #{common_groups.join(' ')}"
     execute bundle_install do
       cwd release_path
       user new_resource.user
@@ -90,8 +113,7 @@ deploy app['name'] do
     'config/database.yml' => 'config/database.yml'
   )
   migrate true
-  # TODO: move to safer and revisioned binstubs for all `bundle exec` commands
-  migration_command 'bundle exec rake db:migrate --trace'
+  migration_command migration_cmd
   # TODO: refactor into `env_string_hash(envs)`
   # HOME must be set to deploy user for bundler
   environment(env.map { |k, v| [k.to_s, v.to_s] }.to_h.merge('HOME' => "/home/#{app['deploy_user']}"))
@@ -113,8 +135,8 @@ deploy app['name'] do
       mode '0755'
       action :create
     end
+
     Chef::Log.info('Precompiling assets')
-    precompile_assets = 'bundle exec rake assets:precompile'
     execute precompile_assets do
       cwd release_path
       user new_resource.user
@@ -137,7 +159,7 @@ deploy app['name'] do
   ### Restart
   before_restart do
     execute 'update cwb user password' do
-      command "bundle exec rake user:create[seal@uzh.ch,#{app['user_password']}]"
+      command update_pw_cmd
       cwd release_path
       user new_resource.user
       environment new_resource.environment
@@ -155,15 +177,7 @@ deploy app['name'] do
     current_release = release_path
     execute 'configure-upstart' do
       user new_resource.user
-      # --log #{app['log_dir']} has no effect,
-      # Upstarts logs to /var/log/upstart/APPNAME per convention
-      command "sudo bin/foreman export upstart /etc/init \
-                  --procfile Procfile_production \
-                  --env .env \
-                  --app #{app['name']} \
-                  --concurrency web=1,job=#{app['num_workers']} \
-                  --port #{app['port']} \
-                  --user #{app['user']}"
+      command configure_upstart_cmd
       cwd current_release
       action :run
     end
