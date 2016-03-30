@@ -84,7 +84,7 @@ default['cwb-server']['chef']['server_host'] = '33.33.33.10'
 server_host = node['cwb-server']['chef']['server_host']
 validation_key_name = node['cwb-server']['chef']['validation_key_name']
 # Infer organization from validation_key_name
-organisation = validation_key_name.tap{ |s| s.slice!('-validator') }
+organisation = validation_key_name.chomp('-validator')
 default['cwb-server']['chef']['server_url'] = "https://#{server_host}:443/organizations/#{organisation}"
 
 # Chef VM provisioning
