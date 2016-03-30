@@ -72,12 +72,17 @@ default['cwb-server']['ssh']['key'] = '-----BEGIN RSA PRIVATE KEY-----'
 default['cwb-server']['ssh']['key_name'] = 'cloud-benchmarking'
 
 # Chef
-default['cwb-server']['chef']['server_host'] = '33.33.33.10'
 default['cwb-server']['chef']['node_name'] = 'cwb-server'
 default['cwb-server']['chef']['client_key'] = '-----BEGIN RSA PRIVATE KEY-----'
 default['cwb-server']['chef']['client_key_name'] = 'cwb-server'
 default['cwb-server']['chef']['validation_key'] = '-----BEGIN RSA PRIVATE KEY-----'
 default['cwb-server']['chef']['validation_key_name'] = 'chef-validator'
+default['cwb-server']['chef']['server_host'] = '33.33.33.10'
+server_host = node['cwb-server']['chef']['server_host']
+validation_key_name = node['cwb-server']['chef']['validation_key_name']
+# Infer organization from validation_key_name
+organisation = validation_key_name.tap{ |s| s.slice!('-validator') }
+default['cwb-server']['chef']['server_url'] = "https://#{server_host}:443/organizations/#{organisation}"
 
 # Chef VM provisioning
 # Latest version known to work properly: '12.2.1'

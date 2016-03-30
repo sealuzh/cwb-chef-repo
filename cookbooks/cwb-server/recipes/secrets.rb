@@ -44,7 +44,7 @@ if node['cwb-server']['apply_secret_config']
   chef = node['cwb-server']['chef']
   chef_dir = "#{app_user_home}/.chef"
   create_dir chef_dir, app_user
-  default_env 'CHEF_SERVER_HOST', chef['server_host']
+  default_env 'CHEF_SERVER_URL', chef['server_url']
   default_env 'CHEF_NODE_NAME', chef['node_name']
   client_key_path = "#{chef_dir}/#{chef['client_key_name']}.pem"
   store_key client_key_path, chef['client_key'], app_user
