@@ -13,12 +13,12 @@ This Chef repo provides cookbooks to automatically install and configure
     * [vagrant-omnibus (1.4.1)](https://github.com/chef/vagrant-omnibus) for auto-installation via Chef
     * [vagrant-aws (0.7.0)](https://github.com/mitchellh/vagrant-aws) for deployment in the Amazon EC2 Cloud
       ([alternative providers](https://github.com/mitchellh/vagrant/wiki/Available-Vagrant-Plugins#providers) are available)
-* [Amazon EC2](https://aws.amazon.com/ec2/) account. Alternative providers are available (see above).
+* [Amazon EC2](https://aws.amazon.com/ec2/) account. Alternative providers are available (see Vagrant plugins).
   We have also deployed a CWB instance to OpenStack.
     * Both VMs (chef-server + cwb-server) must have a public IP address
     * Make sure you have created a private SSH key called `cloud-benchmarking` to
-      log into cloud VM instances and uploaded the corresponding public key to the cloud provider.
-    * Ensure that incoming and outgoing traffic is allowed for ssh (20), http (80), and https (433).
+      log into cloud VMs and uploaded the corresponding public key to the cloud provider.
+    * Ensure that incoming and outgoing traffic is allowed for ssh (22), http (80), and https (433).
       In Amazon EC2, you create a [security group](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-network-security.html)
       called `cwb-web`.
 
@@ -43,10 +43,15 @@ This Chef repo provides cookbooks to automatically install and configure
     cd install/virtualbox   # Virtualbox (only for local testing, unless you have public IPs)
     ```
 
-3. Complete the configurations in `Vagrantfile`.
+3. Configure `Vagrantfile` and
+   copy your private ssh key (for AWS) into `cloud-benchmarking.pem`.<br>
+   Find the *aws* config under `config.vm.provider :aws` (e.g., instance type)
+   Find the *cwb-server* config under `chef.json`
 
-    ```bash
-    vim Vagrantfile
+    ```
+    # For Amazon EC2
+    AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY'] || 'my_aws_access_key'
+    AWS_SECRET_KEY = ENV['AWS_SECRET_KEY'] || 'my_aws_secret_key'
     ```
 
 4. Start automated installation and configuration.
@@ -59,18 +64,19 @@ This Chef repo provides cookbooks to automatically install and configure
     vagrant up                         # Virtualbox (default provider)
     ```
 
-5. Update public IP of *chef-server* (assigned by your provider)
+5. Once the Chef Server completed provisioning (may take 5-10 minutes) with<br>
+   `INFO: Report handlers complete`,<br>
+   update the public IP of *chef-server* (assigned by your provider)
     * Automatic query
 
         ```bash
-        vagrant ssh chef-server --command 'wget -qO- http://ipecho.net/plain; echo' > chef_server_ip.env
+        vagrant ssh chef-server --command 'wget -qO- http://ipecho.net/plain; echo' | tee chef_server_ip.env
         ```
 
     * Manual lookup (e.g. in your [AWS Console](https://aws.amazon.com/console/)) and
       save it to the file *chef_server_ip.env*
 
-6. Once the Chef Server completed provisioning (may take 5-10 minutes) with<br>
-   `INFO: Report handlers complete`, setup the Chef Server:
+6. Setup the Chef Server
 
     1. Create the *cwb-server* admin user (replace `chefadmin` with a password of your choice)
 
@@ -93,15 +99,11 @@ This Chef repo provides cookbooks to automatically install and configure
 7. Configure Chef `knife` and Berkshelf `berks` tools
     1. Within `knife.rb`, update CWB_CHEF_REPO, CWB_BENCHMARKS, and ENVIRONMENT.
 
-        ```bash
-        vim knife.rb
-        ```
-
     2. Symlink `knife.rb` to `$HOME/.chef/knife.rb` and `config.json` to `$HOME/.berkshelf/config.json`
 
         ```bash
-        mkdir $HOME/.chef; ln -s "$(pwd -P)/knife.rb" $HOME/.chef/knife.rb;
-        mkdir $HOME/.berkshelf; ln -s "$(pwd -P)/config.json" $HOME/.berkshelf/config.json;
+        mkdir -p $HOME/.chef; ln -s "$(pwd -P)/knife.rb" $HOME/.chef/knife.rb;
+        mkdir -p $HOME/.berkshelf; ln -s "$(pwd -P)/config.json" $HOME/.berkshelf/config.json;
         ```
 
 8. Upload basic benchmark to the Chef Server
@@ -112,9 +114,9 @@ This Chef repo provides cookbooks to automatically install and configure
     berks install && berks upload;
     ```
 
-9. Once the CWB Server completed provisioning (may take 20-40 minutes
+9. Once the CWB Server completed provisioning (may take 10-30 minutes
    depending on the chosen instance), reprovision to successfully complete the
-   configuration (may take 2-5 minutes).
+   configuration (may take 1-5 minutes).
 
     ```bash
     cd $HOME/git/cwb-chef-repo/install/aws/
@@ -122,6 +124,11 @@ This Chef repo provides cookbooks to automatically install and configure
     ```
 
 10. Browser to `http://my_public_ip_of_cwb_server` and login with the default password `demo`
+
+    ```bash
+    # Query cwb-server IP
+    vagrant ssh cwb-server --command 'wget -qO- http://ipecho.net/plain; echo'
+    ```
 
 > *Next steps:*
 > 1) Create and run a sample benchmark
@@ -163,6 +170,14 @@ vagrant provision cwb-server
 vagrant provision chef-server
 ```
 
+Sync folders (i.e., update cookbooks)
+
+```bash
+vagrant rsync
+vagrant rsync cwb-server
+vagrant rsync chef-server
+```
+
 Halt (i.e., stop) VMs
 
 ```bash
@@ -190,7 +205,7 @@ This might be required after restarting an instance.
     * Automatic query
 
         ```bash
-        vagrant ssh chef-server --command 'wget -qO- http://ipecho.net/plain; echo' > chef_server_ip.env
+        vagrant ssh chef-server --command 'wget -qO- http://ipecho.net/plain; echo' | tee chef_server_ip.env
         ```
 
     * Manual lookup (e.g. in your [AWS Console](https://aws.amazon.com/console/)) and
