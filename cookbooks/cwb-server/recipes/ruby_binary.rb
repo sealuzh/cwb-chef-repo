@@ -11,7 +11,7 @@ remote_file cache_file do
   source ruby['source_url'] || default_source
   checksum ruby['checksum'] if ruby['checksum']
   action :create
-  notifies :run, "execute[unpack #{ruby_with_version}]"
+  notifies :run, "execute[unpack #{ruby_with_version}]", :immediately
 end
 
 bin_dir = File.join(ruby['dir'], 'bin')
@@ -19,49 +19,10 @@ execute "unpack #{ruby_with_version}" do
   command "tar xzf #{cache_file} -C #{ruby['dir']}"
   creates File.join(bin_dir, 'ruby')
   action :nothing
-  notifies :install, 'gem_package[bundler]'
+  notifies :install, 'gem_package[bundler]', :immediately
 end
 
 gem_package 'bundler' do
   gem_binary "#{bin_dir}/gem"
   action :nothing
 end
-
-# bundler_bin = File.join(bin_dir, 'bundle')
-# execute 'install bundler' do
-#   command 'gem install bundler'
-#   creates bundler_bin
-#   action :run
-#   not_if { ::File.exist?(bundler_bin) }
-# end
-
-# TODO: Consider installing into /usr/bin instead to avoid these path brittlness
-# TODO: verify whether this works => DOES NOT WORK: covered by `bundle` test running the first time after install !!!
-# Add to path for the current chef-client converge.
-# ruby_block "adding '#{bin_dir}' to chef-client ENV['PATH']" do
-#   block do
-#     ENV['PATH'] = bin_dir + ':' + ENV['PATH']
-#     Chef::Log.debug("Added #{bin_dir} to PATH: #{ENV['PATH']}")
-#   end
-#   # Ensure imdempotence by not adding twice
-#   only_if do
-#     ENV['PATH'].scan(bin_dir).empty?
-#   end
-# end
-
-# Add to path for interactive bash sessions
-file "/etc/profile.d/#{ruby_with_version}.sh" do
-  content "export PATH=#{bin_dir}:$PATH"
-  owner 'root'
-  group 'root'
-  mode '0755'
-  action :nothing
-end
-
-# ruby_block 'sourcing' do
-#   block do
-#     cmd = "source '/etc/profile.d/#{ruby_with_version}.sh'"
-#     Mixlib::ShellOut.new(cmd).run_command
-#     # `source "/etc/profile.d/#{ruby_with_version}.sh"`
-#   end
-# end
