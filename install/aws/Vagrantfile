@@ -60,17 +60,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     aws.secret_access_key = AWS_SECRET_KEY
 
     # AWS instance configuration
-    aws.region = 'eu-west-1'
-    # Official Ubuntu 14.04 LTS amd64 EBS image from Canonical: https://cloud-images.ubuntu.com/locator/ec2/
-    aws.ami = 'ami-b7c379c4'
+    aws.region = 'eu-central-1'
+    # Official Ubuntu 14.04 LTS amd64 hvm:ebs image from Canonical: https://cloud-images.ubuntu.com/locator/ec2/
+    aws.ami = 'ami-d19e79be'
     aws.keypair_name = SSH_KEY_NAME
     override.ssh.private_key_path = SSH_KEY_PATH
     override.ssh.username = SSH_USERNAME
-    # Notice that using modern instances requires to configure a VPC
-    # and custom security group for that subnet:
-    # http://docs.aws.amazon.com/AmazonVPC/latest/GettingStartedGuide/getting-started-create-vpc.html
-    # aws.subnet_id = 'subnet-my_subnet_id'
-    aws.instance_type = 'm1.small'
+    aws.instance_type = 't2.small'
     aws.security_groups = ['cwb-web']
   end
 
