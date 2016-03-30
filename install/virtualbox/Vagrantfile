@@ -3,9 +3,10 @@ require 'securerandom'
 # For debugging via `binding.pry` http://pryrepl.org/
 begin; require 'pry'; rescue LoadError; end
 
-# Username to ssh into VM instances.
-# Might be `root` for debian images or `vagrant` for others.
+# Username to ssh into VM instances (might be `root` or `vagrant` for other images)
 SSH_USERNAME = 'ubuntu'
+
+##########################################################
 # Must be an IP here (used in Virtualbox config)
 CHEF_SERVER_IP = ENV['CHEF_SERVER_IP'] || File.read('chef_server_ip.env').strip
 CWB_SERVER_IP  = '33.33.33.20'
@@ -112,6 +113,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # Convergence will currently fail on the first run because
       # the freshly installed Ruby is not yet available in the path
       chef.attempts = 2
+      # Refer to `cookbooks/cwb-server/attributes/default.rb` for an
+      # extensive list of configurable attributes
       chef.json =
       {
           'cwb-server' => {
