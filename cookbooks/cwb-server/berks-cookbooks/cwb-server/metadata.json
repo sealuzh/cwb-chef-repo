@@ -1,0 +1,40 @@
+{
+  "name": "cwb-server",
+  "description": "Installs and configures the Cloud WorkBench server",
+  "long_description": "# cwb-server cookbook\n\nInstalls and configures the Cloud WorkBench server.\n\n\n## Supported Platforms\n\n* Ubuntu 14.04 64bit (tested)\n\n## Attributes\n\nSee `attributes` directory.\n\n## Usage\n\n### cwb-server::default\n\nInclude `cwb-server` in your node's `run_list`:\n\n```json\n{\n  \"run_list\": [\n    \"recipe[cwb-server]\"\n  ]\n}\n```\n\n```ruby\nchef.run_list = ['recipe[cwb-server]']\n```\n\n```ruby\nchef.add_recipe 'cwb-server'\n```\n",
+  "maintainer": "Joel Scheuner",
+  "maintainer_email": "joel.scheuner.dev@gmail.com",
+  "license": "Apache 2.0",
+  "platforms": {
+  },
+  "dependencies": {
+    "sudo": "~> 2.9",
+    "apt": "~> 3.0",
+    "build-essential": "~> 3.2.0",
+    "git": "~> 4.4",
+    "timezone-ii": "~> 0.2.0",
+    "ntp": "~> 1.10.1",
+    "database": "~> 5.0.0",
+    "postgresql": "~> 4.0.4",
+    "vagrant": "~> 0.5.0"
+  },
+  "recommendations": {
+  },
+  "suggestions": {
+  },
+  "conflicting": {
+  },
+  "providing": {
+  },
+  "replacing": {
+  },
+  "attributes": {
+  },
+  "groupings": {
+  },
+  "recipes": {
+  },
+  "version": "0.3.0",
+  "source_url": "",
+  "issues_url": ""
+}

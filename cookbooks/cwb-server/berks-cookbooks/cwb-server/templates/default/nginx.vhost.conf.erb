@@ -1,0 +1,75 @@
+upstream <%= @app['name'] %> {
+  server localhost:<%= @app['port'] %> fail_timeout=0;
+}
+
+# Optimizing nginx config: https://www.digitalocean.com/community/tutorials/how-to-optimize-nginx-configuration
+server {
+  server_name <%= @nginx['hostname'] %>;
+  listen 80;
+
+  root <%= @app['dir'] %>/current/public;
+
+
+  access_log <%= @nginx['log_dir'] %>/<%= @app['name'] %>-access.log combined;
+  error_log  <%= @nginx['log_dir'] %>/<%= @app['name'] %>-error.log;
+
+  rewrite_log on;
+
+  # use the application's 500.html page
+  error_page 500 502 503 504 /500.html;
+
+  # allow clients to upload large files (`4G` if necessary)
+  client_max_body_size 256m;
+
+  keepalive_timeout 15;
+
+  location / {
+    try_files /system/maintenance.html
+              $uri $uri/index.html $uri.html
+              @app;
+  }
+
+  # Favicon
+  location ~* \.ico$ {
+    expires 1w;
+    add_header Cache-Control "public";
+    break;
+  }
+
+#  location = /favicon.ico {
+#    alias    /home/apps/cloud_benchmarking/current/public/favicon.ico;
+#  }
+
+  location ~ ^/(assets)/ {
+    # Per RFC2616 - 1 year maximum expiry
+    # http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
+    expires max;
+    add_header Cache-Control public;
+    gzip_static on; # to serve pre-gzipped version
+
+    # Some browsers still send conditional-GET requests if there's a
+    # Last-Modified header or an ETag header even if they haven't
+    # reached the expiry date sent in the Expires header.
+    add_header Last-Modified "";
+    add_header ETag "";
+    break;
+  }
+
+  location @app {
+    proxy_pass        http://<%= @app['name'] %>;
+    proxy_redirect    off;
+
+    proxy_set_header  Host                $http_host;
+    proxy_set_header  X-Real-IP           $remote_addr;
+    proxy_set_header  X-Forwarded-For     $proxy_add_x_forwarded_for;
+    proxy_set_header  X-Forwarded-Proto   $scheme;
+
+    client_max_body_size        100m;
+    client_body_buffer_size     128k;
+
+    proxy_buffer_size           4k;
+    proxy_buffers               4 32k;
+    proxy_busy_buffers_size     64k;
+    proxy_temp_file_write_size  64k;
+  }
+}
