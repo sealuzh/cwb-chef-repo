@@ -1,0 +1,39 @@
+---
+driver:
+  name: vagrant
+
+provisioner:
+  name: chef_zero
+
+# Uncomment the following verifier to leverage Inspec instead of Busser (the
+# default verifier)
+# verifier:
+#   name: inspec
+
+platforms:
+# Node attributes: `cat /tmp/kitchen/nodes/default-ubuntu-1404.json`
+  - name: ubuntu-14.04
+
+suites:
+  - name: default
+    run_list:
+      - recipe[cwb-server::default]
+    attributes:
+      # For a list of time zones see: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+      tz: Europe/Zurich
+      postgresql:
+        password:
+          postgres: rootcloud
+      cwb-server:
+        db:
+          password: cloud
+        providers:
+          aws:
+            access_key: my_aws_access_key
+          google:
+            api_key_name: google-compute
+            # my_google_compute_key ==base64==> "bXlfZ29vZ2xlX2NvbXB1dGVfa2V5\n"
+            api_key_BASE64_FILE: bXlfZ29vZ2xlX2NvbXB1dGVfa2V5\n
+          azure:
+#            mgmt_certificate_name: certificate_file_name => defaults to provider name: `azure`
+            mgmt_certificate_FILE: my_azure_certificate_file_content
