@@ -217,3 +217,70 @@ This might be required after restarting an instance.
     ```bash
     vagrant provision cwb-server
     ```
+
+## Manage Services
+
+Precondition: SSH'ed into the *cwb-server* instance
+
+### Installation directories
+
+```bash
+cd  /var/www/cloud-workbench
+ls -l /etc/init/cloud-workbench*
+cat /etc/nginx/sites-available/cloud-workbench
+```
+
+### Upstart
+
+#### Targets
+
+```bash
+cloud-workbench-web
+cloud-workbench-web-1
+cloud-workbench
+cloud-workbench-job
+cloud-workbench-job-1
+cloud-workbench-job-2
+```
+
+#### Status
+
+```bash
+sudo service cloud-workbench-job status
+sudo initctl status cloud-workbench
+sudo initctl status cloud-workbench-web
+sudo initctl status cloud-workbench-job
+```
+
+#### Stop, Start, Restart
+
+```bash
+sudo service cloud-workbench-job stop
+sudo initctl stop cloud-workbench-job
+
+sudo service cloud-workbench-job start
+sudo initctl start cloud-workbench-job
+
+sudo service cloud-workbench-job restart
+sudo initctl restart cloud-workbench-job
+```
+
+For further detail see: http://upstart.ubuntu.com/cookbook/
+
+### View Logs
+
+Precondition: SSH'ed into the target instance
+
+#### Cloud WorkBench
+
+```bash
+sudo tail -f /var/log/upstart/cloud-workbench-web-*.log
+sudo tail -f /var/log/upstart/cloud-workbench-job-*.log
+```
+
+#### Nginx
+
+```bash
+tail -f /var/log/nginx/cloud-workbench-access.log
+tail -f /var/log/nginx/cloud-workbench-error.log
+```
