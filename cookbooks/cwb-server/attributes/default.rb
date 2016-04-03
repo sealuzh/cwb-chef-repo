@@ -12,7 +12,7 @@ default['cwb-server']['app']['dir'] = '/var/www/cloud-workbench'
 default['cwb-server']['app']['log_dir'] = "/var/log/#{node['cwb-server']['app']['name']}"
 default['cwb-server']['app']['repo'] = 'https://github.com/sealuzh/cloud-workbench.git'
 # A branch, tag, or commit to be synchronized with git
-# default['cwb-server']['app']['branch'] = 'master'
+default['cwb-server']['app']['branch'] = 'master'
 default['cwb-server']['app']['rollback_on_error'] = false
 default['cwb-server']['app']['num_workers'] = 2
 # Should be a multiple of 1000 according to foreman: http://ddollar.github.io/foreman/#EXPORTING
