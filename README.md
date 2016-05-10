@@ -21,6 +21,7 @@ This Chef repo provides cookbooks to automatically install and configure
     * Ensure that incoming and outgoing traffic is allowed for ssh (22), http (80), and https (433).
       In Amazon EC2, you create a [security group](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-network-security.html)
       called `cwb-web`.
+      If you do not explicitly specify a security group in your benchmark, make sure the `default` security group allows incoming ssh (22).
 * [ChefDK](https://downloads.chef.io/chef-dk/) for benchmark cookbook development.
 
 1. Vagrant can be installed with the installer for your system from [https://www.vagrantup.com/downloads.html](https://www.vagrantup.com/downloads.html)
