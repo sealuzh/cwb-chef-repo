@@ -1,6 +1,21 @@
 # Providers
 
-Convention: Following the Chef naming conventions, attributes are lower case and get upcased at the CWB server to follow environment variable conventions (Example: access\_key => ACCESS\_KEY).
+* Convention: Following the Chef naming conventions, attributes are lower case and get upcased at the CWB server to follow environment variable conventions (Example: access\_key => ACCESS\_KEY).
+* The `CWB Configuration` can be added in the `chef.json` section of the Vagrantfile as part of the installation step 3. (see [README.md](README.md). Example:
+
+  ```ruby
+  chef.json = {
+      'cwb-server' => {
+         ...
+        'providers' => {
+		    'aws' => { ... },
+		    'azure' => { ... }
+        },
+        ...
+      }
+      ...
+  }
+  ```
 
 ## Amazon Web Services (AWS)
 

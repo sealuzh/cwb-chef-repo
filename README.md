@@ -14,7 +14,6 @@ This Chef repo provides cookbooks to automatically install and configure
     * [vagrant-aws (0.7.0)](https://github.com/mitchellh/vagrant-aws) for deployment in the Amazon EC2 Cloud
       ([alternative providers](https://github.com/mitchellh/vagrant/wiki/Available-Vagrant-Plugins#providers) are available)
 * [Amazon EC2](https://aws.amazon.com/ec2/) account. Alternative providers are available (see Vagrant plugins).
-  We have also deployed a CWB instance to OpenStack.
     * Both VMs (chef-server + cwb-server) must have a public IP address
     * Make sure you have created a private SSH key called `cloud-benchmarking` to
       log into cloud VMs and uploaded the corresponding public key to the cloud provider.
@@ -47,14 +46,18 @@ This Chef repo provides cookbooks to automatically install and configure
 
 3. Configure `Vagrantfile` and
    copy your private ssh key (for AWS) into `cloud-benchmarking.pem`.<br>
-   Find the *aws* config under `config.vm.provider :aws` (e.g., instance type)
-   Find the *cwb-server* config under `chef.json`
+   
+   - Find the *aws* config under `config.vm.provider :aws` (e.g., instance type).
 
-    ```
-    # For Amazon EC2
-    AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY'] || 'my_aws_access_key'
-    AWS_SECRET_KEY = ENV['AWS_SECRET_KEY'] || 'my_aws_secret_key'
-    ```
+     	 ```
+	    # For Amazon EC2
+	    AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY'] || 'my_aws_access_key'
+	    AWS_SECRET_KEY = ENV['AWS_SECRET_KEY'] || 'my_aws_secret_key'
+	    ```
+
+   - Find the *cwb-server* config under `chef.json`. See [providers](PROVIDERS.md) for details how to configure other cloud providers.
+
+
 
 4. Start automated installation and configuration.
 
@@ -148,6 +151,15 @@ vagrant provision cwb-server
 
 > *Capistrano:* The current configuration needs to be slightly updated
 >               for the new installation procedure.
+
+## Add Cloud Providers
+
+[PROVIDERS.md](PROVIDERS.md) described how to configure various cloud providers.
+
+### CWB Extension Points
+
+* CWB builds the Vagrantfile based on the template [Vagrantfile.erb](https://github.com/sealuzh/cloud-workbench/blob/master/lib/templates/erb/Vagrantfile.erb)
+* The sample Vagrantfile is created based on the template [Vagrantfile_example.erb](https://github.com/sealuzh/cloud-workbench/blob/master/lib/templates/erb/Vagrantfile_example.erb)
 
 ## Manage VMs
 
