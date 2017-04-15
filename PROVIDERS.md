@@ -52,3 +52,7 @@ Convention: Following the Chef naming conventions, attributes are lower case and
   },
 },
 ```
+
+#### Public Key
+
+Next to the private key path `/home/apps/.ssh/cloud-benchmarking.pem`, there MUST exist the matching public key with the name `cloud-benchmarking.pem.pub` according to [source](https://github.com/Azure/vagrant-azure/blob/v2.0/lib/vagrant-azure/action/run_instance.rb#L115).
