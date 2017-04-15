@@ -1,5 +1,7 @@
 # Providers
 
+Convention: Following the Chef naming conventions, attributes are lower case and get upcased at the CWB server to follow environment variable conventions (Example: access_key => ACCESS_KEY).
+
 ## Amazon Web Services (AWS)
 
 * EC2: https://aws.amazon.com/ec2/
@@ -23,17 +25,17 @@
 * Virtual Machines: https://azure.microsoft.com/en-us/services/virtual-machines/
 * Console: https://portal.azure.com/?whr=live.com#blade/HubsExtension/Resources/resourceType/Microsoft.Compute%2FVirtualMachines
 * Vagrant azure: https://github.com/Azure/vagrant-azure
-* Create Azure credentials
-  1. Create self-signed certificate (Windows only ?!): https://docs.microsoft.com/en-us/azure/cloud-services/cloud-services-certs-create
-  2. Upload management certificate: https://docs.microsoft.com/en-us/azure/azure-api-management-certs
+* Create Azure credentials: https://github.com/Azure/vagrant-azure#create-an-azure-active-directory-aad-application
 
 ### CWB Configuration
 
 ```ruby
 'providers' => {
   'azure' => {
-    'azure_mgmt_certificate_FILE' => 'AZURE_MGMT_CERTIFICATE_FILE_CONTENT',
     'azure_subscription_id' => 'AZURE_SUBSCRIPTION_ID',
+    'azure_tenant_id' => 'AZURE_TENANT_ID',
+    'azure_client_id' => 'AZURE_CLIENT_ID',
+    'azure_client_secret' => 'AZURE_CLIENT_SECRET',
   },
 },
 ```
