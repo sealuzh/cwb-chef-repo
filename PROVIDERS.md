@@ -1,6 +1,6 @@
 # Providers
 
-Convention: Following the Chef naming conventions, attributes are lower case and get upcased at the CWB server to follow environment variable conventions (Example: access_key => ACCESS_KEY).
+Convention: Following the Chef naming conventions, attributes are lower case and get upcased at the CWB server to follow environment variable conventions (Example: access\_key => ACCESS\_KEY).
 
 ## Amazon Web Services (AWS)
 
@@ -39,16 +39,17 @@ Convention: Following the Chef naming conventions, attributes are lower case and
 * Linux VM pricing: https://azure.microsoft.com/en-us/pricing/details/virtual-machines/linux/
 * Image list: https://docs.microsoft.com/en-us/azure/virtual-machines/linux/cli-ps-findimage
 * Regions: https://azure.microsoft.com/en-us/regions/
+  * CLIv2: `az account list-locations`
 
 ### CWB Configuration
 
 ```ruby
 'providers' => {
   'azure' => {
-    'azure_subscription_id' => 'AZURE_SUBSCRIPTION_ID',
-    'azure_tenant_id' => 'AZURE_TENANT_ID',
-    'azure_client_id' => 'AZURE_CLIENT_ID',
-    'azure_client_secret' => 'AZURE_CLIENT_SECRET',
+    'subscription_id' => 'AZURE_SUBSCRIPTION_ID',
+    'tenant_id' => 'AZURE_TENANT_ID',
+    'client_id' => 'AZURE_CLIENT_ID',
+    'client_secret' => 'AZURE_CLIENT_SECRET',
   },
 },
 ```
