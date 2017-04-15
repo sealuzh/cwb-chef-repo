@@ -9,6 +9,13 @@ Convention: Following the Chef naming conventions, attributes are lower case and
 * Create AWS credentials: http://docs.aws.amazon.com/general/latest/gr/managing-aws-access-keys.html
 * Vagrant aws: https://github.com/mitchellh/vagrant-aws
 
+### AWS Configuration
+* Instance types: https://aws.amazon.com/ec2/instance-types/
+* Instance pricing: https://aws.amazon.com/ec2/pricing/on-demand/
+* Canonical Ubuntu images: https://cloud-images.ubuntu.com/locator/ec2/
+  * Release history: https://cloud-images.ubuntu.com/query/trusty/server/released.txt
+* Regions: http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html
+
 ### CWB Configuration
 
 ```ruby
@@ -20,12 +27,18 @@ Convention: Following the Chef naming conventions, attributes are lower case and
 },
 ```
 
-## Microsoft Azure
+## Microsoft Azure (Azure)
 
 * Virtual Machines: https://azure.microsoft.com/en-us/services/virtual-machines/
 * Console: https://portal.azure.com/?whr=live.com#blade/HubsExtension/Resources/resourceType/Microsoft.Compute%2FVirtualMachines
 * Vagrant azure: https://github.com/Azure/vagrant-azure
 * Create Azure credentials: https://github.com/Azure/vagrant-azure#create-an-azure-active-directory-aad-application
+
+### Azure Configuration
+* VM sizes: https://docs.microsoft.com/en-us/azure/virtual-machines/linux/sizes-general
+* Linux VM pricing: https://azure.microsoft.com/en-us/pricing/details/virtual-machines/linux/
+* Image list: https://docs.microsoft.com/en-us/azure/virtual-machines/linux/cli-ps-findimage
+* Regions: https://azure.microsoft.com/en-us/regions/
 
 ### CWB Configuration
 
