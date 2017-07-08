@@ -33,10 +33,11 @@ default['cwb-server']['vagrant']['providers'] = [
 
 ### Ruby
 default['cwb-server']['ruby']['dir'] = '/usr/local'
-default['cwb-server']['ruby']['version'] = '2.2.4'
+default['cwb-server']['ruby']['version'] = '2.3.0'
 # `source_url` takes precedence over `version`
 # Platforms: https://packager.io/documentation/distributions/
 # Ruby versions: https://packager.io/documentation/ruby/
+# Try out: https://s3.amazonaws.com/pkgr-buildpack-ruby/current/ubuntu-14.04/ruby-2.3.0.tgz
 default['cwb-server']['ruby']['base_url'] = 'https://s3.amazonaws.com/pkgr-buildpack-ruby/current'
 default['cwb-server']['ruby']['source_url'] = nil
 default['cwb-server']['ruby']['checksum'] = nil

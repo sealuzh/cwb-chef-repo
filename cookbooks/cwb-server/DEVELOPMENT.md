@@ -1,5 +1,12 @@
 # Development
 
+## Update this cookbook
+
+1. Bump the version in `metadata.rb`
+2. Adjust the `CHANGELOG.md`
+3. Run `berks install`
+4. Vendor cookbooks with `vendor_berks_cookbooks.sh`
+
 ## Debugging Vagrantfile
 
 Requires a [readline](https://en.wikipedia.org/wiki/GNU_Readline) implementation:

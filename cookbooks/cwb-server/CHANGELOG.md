@@ -1,3 +1,10 @@
+# 0.4.0 (2017-04-02)
+
+* Update to Ruby `2.3.0` to fix buggy outdated Ruby version
+* Update Vagrant cookbook
+* Remove temporary fix for Vagrant <= 1.8.1
+* Loosen common cookbook (e.g., `apt`) constraints to avoid conflicts
+
 # 0.3.0 (2016-03-27)
 
 Complete rewrite based on the original `cloud-benchmarking-server` cookbook:

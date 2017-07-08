@@ -2,7 +2,7 @@ ruby = node['cwb-server']['ruby']
 ruby_with_version = "ruby-#{ruby['version']}"
 
 cache_file = File.join(Chef::Config[:file_cache_path], "#{ruby_with_version}.tgz")
-# Example: https://s3.amazonaws.com/pkgr-buildpack-ruby/current/ubuntu-14.04/ruby-2.2.4-p230.tgz
+# Example: https://s3.amazonaws.com/pkgr-buildpack-ruby/current/ubuntu-14.04/ruby-2.3.0.tgz
 default_source = "#{ruby['base_url']}/#{node['platform']}-#{node['platform_version']}/#{ruby_with_version}.tgz"
 remote_file cache_file do
   owner 'root'
