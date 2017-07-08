@@ -9,9 +9,9 @@ This Chef repo provides cookbooks to automatically install and configure
 > Feel free to contact us: leitner[AT]ifi.uzh.ch or joel.scheuner[AT]uzh.ch
 
 * [Git](http://git-scm.com/)
-* [Vagrant (1.8.1)](https://www.vagrantup.com/downloads.html)
-    * [vagrant-omnibus (1.4.1)](https://github.com/chef/vagrant-omnibus) for auto-installation via Chef
-    * [vagrant-aws (0.7.0)](https://github.com/mitchellh/vagrant-aws) for deployment in the Amazon EC2 Cloud
+* [Vagrant (1.9.7)](https://www.vagrantup.com/downloads.html)
+    * [vagrant-omnibus (1.5.0)](https://github.com/chef/vagrant-omnibus) for auto-installation via Chef
+    * [vagrant-aws (0.7.2)](https://github.com/mitchellh/vagrant-aws) for deployment in the Amazon EC2 Cloud
       ([alternative providers](https://github.com/mitchellh/vagrant/wiki/Available-Vagrant-Plugins#providers) are available)
 * [Amazon EC2](https://aws.amazon.com/ec2/) account. Alternative providers are available (see Vagrant plugins).
     * Both VMs (chef-server + cwb-server) must have a public IP address
@@ -31,6 +31,7 @@ This Chef repo provides cookbooks to automatically install and configure
     ```
 
 ## Installation
+
 1. Checkout repository.
 
     ```bash
