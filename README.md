@@ -244,6 +244,21 @@ ls -l /etc/init/cloud-workbench*
 cat /etc/nginx/sites-available/cloud-workbench
 ```
 
+### Rails Console
+
+```bash
+cd /var/www/cloud-workbench/current && RAILS_ENV=production bin/rails c
+```
+
+### PostgreSQL
+
+Save login credentials via a [password file](https://www.postgresql.org/docs/9.6/static/libpq-pgpass.html):
+
+```
+echo "localhost:5432:cloud_workbench_production:postgres:rootcloud" > ~/.pgpass
+chmod 0600 ~/.pgpass
+```
+
 ### Upstart
 
 #### Targets
