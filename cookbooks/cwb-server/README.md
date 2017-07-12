@@ -2,6 +2,7 @@
 
 Installs and configures the Cloud WorkBench server.
 
+See (DEVELOPMENT.md)[DEVELOPMENT.md] for developers.
 
 ## Supported Platforms
 
