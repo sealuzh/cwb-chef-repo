@@ -7,6 +7,25 @@
 3. Run `berks install`
 4. Vendor cookbooks with `vendor_berks_cookbooks.sh`
 
+## Testing
+
+This cookbook uses (Chef Delivery Local)[https://docs.chef.io/delivery_cli.html#delivery-local] to automate testing stages.
+
+Run all tests:
+
+```bash
+delivery local all
+```
+
+Individual phases:
+
+```bash
+delivery local lint # Cookstyle (Rubocup-based Ruby style linter)
+delivery local syntax # Foodcritic (cookbook checker)
+delivery local unit # short-running unit tests (rspec + chefspec)
+delivery local functional # long-running integration tests
+```
+
 ## Debugging Vagrantfile
 
 Requires a [readline](https://en.wikipedia.org/wiki/GNU_Readline) implementation:
