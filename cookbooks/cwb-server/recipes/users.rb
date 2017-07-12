@@ -3,14 +3,14 @@ app = node['cwb-server']['app']
 user app['user'] do
   action :create
   comment 'Runs the app'
-  supports manage_home: true
+  manage_home true
   home "/home/#{app['user']}"
 end
 
 user app['deploy_user'] do
   action :create
   comment 'Deploys the app'
-  supports manage_home: true
+  manage_home true
   home "/home/#{app['deploy_user']}"
 end
 

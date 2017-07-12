@@ -4,6 +4,7 @@ driver:
 
 provisioner:
   name: chef_zero
+  require_chef_omnibus: 13.2.20
 
 # Uncomment the following verifier to leverage Inspec instead of Busser (the
 # default verifier)
@@ -12,7 +13,7 @@ provisioner:
 
 platforms:
 # Node attributes: `cat /tmp/kitchen/nodes/default-ubuntu-1404.json`
-  - name: ubuntu-14.04
+  - name: ubuntu-16.04
 
 suites:
   - name: default
@@ -25,6 +26,9 @@ suites:
         password:
           postgres: rootcloud
       cwb-server:
+        app:
+          # branch: master
+          branch: support/update-ruby-version
         db:
           password: cloud
         providers:

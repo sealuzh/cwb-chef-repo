@@ -1,3 +1,13 @@
+# 0.5.0 (2017-07-08)
+
+* Bump all cookbook dependencies
+* Add Chef 13 compatibility
+* Add support for Ubuntu 16.04
+    * Switch from upstart to systemd process management
+* Use RVM Ruby binaries
+* Update to Ruby `2.4.1`
+* Remove Capistrano dependencies (were already out-commented)
+
 # 0.4.0 (2017-04-02)
 
 * Update to Ruby `2.3.0` to fix buggy outdated Ruby version

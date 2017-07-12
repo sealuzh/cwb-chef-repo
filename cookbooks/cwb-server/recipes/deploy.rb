@@ -37,10 +37,11 @@ update_pw_cmd = bundle("exec rake user:create[seal@uzh.ch,#{app['user_password']
 foreman_opts = "--procfile Procfile_production \
                 --env .env \
                 --app #{app['name']} \
-                --concurrency web=1,job=#{app['num_workers']} \
+                --formation web=1,job=#{app['num_workers']} \
                 --port #{app['port']} \
                 --user #{app['user']}"
-configure_upstart_cmd = bundle("exec foreman export upstart /etc/init #{foreman_opts}", sudo: true)
+configure_systemd_cmd = " sudo bin/foreman export systemd /etc/systemd/system #{foreman_opts}"
+reload_systemd_cmd = 'sudo systemctl daemon-reload'
 deploy app['name'] do
   deploy_to app['dir']
   scm_provider Chef::Provider::Git
@@ -116,7 +117,7 @@ deploy app['name'] do
   migration_command migration_cmd
   # TODO: refactor into `env_string_hash(envs)`
   # HOME must be set to deploy user for bundler
-  environment(env.map { |k, v| [k.to_s, v.to_s] }.to_h.merge('HOME' => "/home/#{app['deploy_user']}"))
+  environment(env.map { |k, v| [k.to_s, v.to_s] }.to_h.merge({'HOME' => "/home/#{app['deploy_user']}", 'PATH' => ENV['PATH']}))
 
   ### Symlinks
   purge_before_symlink.clear
@@ -175,13 +176,13 @@ deploy app['name'] do
     Chef::Log.info('Restarting cloud-workbench')
     # `release_path` is not available within the resources
     current_release = release_path
-    execute 'configure-upstart' do
+    execute 'configure-systemd' do
       user new_resource.user
-      command configure_upstart_cmd
+      command "#{configure_systemd_cmd} && #{reload_systemd_cmd}"
       cwd current_release
       action :run
     end
   end
   # TODO: Think about graceful restart for currently running worker processes!
-  restart_command "sudo service #{app['name']} restart"
+  restart_command "sudo systemctl restart #{app['name']}.target"
 end
