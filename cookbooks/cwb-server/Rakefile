@@ -26,6 +26,7 @@ namespace :integration do
   # doesn't work with systemd/upstart services (see https://github.com/chef-cookbooks/cron/issues/79)
   # * More details about this issue: https://github.com/TYPO3-cookbooks/t3-base/issues/1
   # * Potential workaround to change service provider for `service` resource: https://github.com/TYPO3-cookbooks/t3-base/pull/2/files
+  # * Install systemd in container to overcome `service` issue: https://brigade.engineering/reduce-chef-infrastructure-integration-test-times-by-75-with-test-kitchen-and-docker-bf638ab95a0a
   # Migrating to `kitchen-dokken` (https://github.com/someara/kitchen-dokken) solved this issue
   # Also see PR migrating to `kitchen-dokken`: https://github.com/TYPO3-infrastructure/jenkins-pipeline-global-library-chefci/pull/14
   desc 'Run integration tests with kitchen-dokken'
