@@ -1,0 +1,29 @@
+# Chef Travis CI config based on https://github.com/chef-cookbooks/enterprise-chef-common/blob/master/.travis.yml
+# Use Travis's container-based infrastructure
+sudo: false
+dist: trusty
+
+addons:
+  apt:
+    sources:
+      - chef-current-trusty
+    packages:
+      - chefdk
+
+install: echo "skip bundle install"
+
+branches:
+  only:
+    - master
+
+# Ensure we make ChefDK's Ruby the default
+before_script:
+  - eval "$(chef shell-init bash)"
+
+script:
+  - chef --version
+  - cookstyle --version
+  - foodcritic --version
+  - foodcritic . # Cookbook checker
+  - chef exec rspec spec/ # short-running unit tests (Rspec + ChefSpec)
+  - chef exec kitchen verify # long-running integration tests (TestKitchen)
