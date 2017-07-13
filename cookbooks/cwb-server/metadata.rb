@@ -25,4 +25,4 @@ depends 'database', '~> 6.1.1'
 depends 'postgresql', '~> 6.1.1'
 
 ### Runtime dependencies
-depends 'vagrant', '~> 0.7.0'
+depends 'vagrant', '~> 0.7.1'
