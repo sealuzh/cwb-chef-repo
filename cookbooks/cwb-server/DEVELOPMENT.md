@@ -21,7 +21,13 @@ chef exec rspec spec/ # short-running unit tests (Rspec + ChefSpec)
 chef exec kitchen verify # long-running integration tests (TestKitchen)
 
 # Integration tests via Docker (as used for Travis CI)
-rake integration:dokken[default-ubuntu-1604]
+KITCHEN_LOCAL_YAML=.kitchen.dokken.yml chef exec kitchen verify
+```
+
+### Cleanup Integration Tests
+
+```
+chef exec kitchen destroy
 ```
 
 ## Debugging Vagrantfile
