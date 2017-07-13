@@ -35,4 +35,4 @@ script:
   - foodcritic . # Cookbook checker
   - chef exec rspec spec/ # short-running unit tests (Rspec + ChefSpec)
   # Run test-kitchen with docker driver, for example:
-  - KITCHEN_LOCAL_YAML=.kitchen.docker.yml chef exec bundle exec kitchen verify ${INSTANCE}
+  - KITCHEN_LOCAL_YAML=.kitchen.docker.yml chef exec kitchen verify ${INSTANCE}
