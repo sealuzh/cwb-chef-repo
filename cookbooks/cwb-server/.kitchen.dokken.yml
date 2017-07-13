@@ -14,5 +14,4 @@ provisioner:
 verifier:
   # Required for `serverspec` https://github.com/someara/kitchen-dokken/issues/78#issuecomment-298314150
   root_path: '/opt/verifier'
-  sudo: true
-  remote_execution: true
+  sudo: false

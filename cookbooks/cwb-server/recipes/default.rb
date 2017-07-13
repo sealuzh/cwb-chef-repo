@@ -1,5 +1,4 @@
 ### Base utilities
-package 'net-tools'
 include_recipe 'cwb-server::attributes'
 include_recipe 'cwb-server::users'
 include_recipe 'apt::default'
