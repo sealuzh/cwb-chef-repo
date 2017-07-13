@@ -2,4 +2,6 @@
 driver:
   name: docker
   privileged: true
+  # [MacOS] Add this to `~/.kitchen/config` in the driver section (https://github.com/test-kitchen/kitchen-docker/issues/207#issuecomment-257106296)
+  # use_sudo: false
 # Gets the other defaults from .kitchen.yml
