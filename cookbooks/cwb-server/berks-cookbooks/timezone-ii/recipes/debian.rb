@@ -11,18 +11,28 @@
 # Set timezone for Debian family:  Put the timezone string in plain text in
 # /etc/timezone and then re-run the tzdata configuration to pick it up.
 
-template "/etc/timezone" do
+TIMEZONE_FILE = '/etc/timezone'
+
+template TIMEZONE_FILE do
   source "timezone.conf.erb"
   owner 'root'
   group 'root'
   mode 0644
-  notifies :run, 'bash[dpkg-reconfigure tzdata]'
+  notifies :run, 'execute[dpkg-reconfigure-tzdata]'
 end
 
-bash 'dpkg-reconfigure tzdata' do
-  user 'root'
-  code "/usr/sbin/dpkg-reconfigure -f noninteractive tzdata"
+execute 'dpkg-reconfigure-tzdata' do
+  command '/usr/sbin/dpkg-reconfigure -f noninteractive tzdata'
   action :nothing
 end
 
-# vim:ts=2:sw=2:
+# Certain values get normalized by dpkg-reconfigure, causing this recipe to try
+# to rewrite the file over and over.  This raises a red flag in such a case.
+log 'if-unexpected-timezone-change' do
+  message "dpkg-reconfigure is amending the value #{node['tz'].inspect} "\
+          "in #{TIMEZONE_FILE}"
+  level :warn
+  not_if { ::File.read(TIMEZONE_FILE).chomp == node['tz'] }
+  action :nothing
+  subscribes :write, 'execute[dpkg-reconfigure-tzdata]', :immediately
+end

@@ -2,6 +2,50 @@
 
 This file is used to list changes made in each version of the database cookbook.
 
+## 6.1.1 (2016-11-01)
+- Fix incorrectly named matchers
+
+## 6.1.0 (2016-11-01)
+- Add require_x509 option for mysql grants
+- Define custom matcher helpers for notification testing, fixes #200
+- Add support for PostgreSQL extended grants
+- Use multipackage to speed up the installs
+- Remove arch from the metadata
+- Improve specs
+- Remove yum/apt in the Berksfile
+- Add opensuse and opensuseleap to the metadata
+
+## 6.0.0 (2016-09-22)
+- Update maintainers wording and format [skip-ci]
+- Support reading of options from my.cnf for MySQL
+- Fix hashed_password for CREATE USER
+- Generalize MysqlPassword to HashedPassword and add it to PostreSQL
+- Fix again undefined method `empty?' for Mysql2::Result
+- Exclude the Rubocop rule that breaks the cookbook
+- Require Chef 12.1 or later
+
+## v5.1.2 (2016-04-21)
+
+- Fix for Unknown column 'mysql_native_password' error
+- Fix 'already initialized constant' warnings while testing
+
+## v5.1.1 (2016-04-07)
+
+- Fixed password resource not functioning on Postgresql
+- Removed unused templates leftover from the DB -> EBS backup recipes
+- Add better logging when the providers are used and the gems are not present
+
+## v5.1.0 (2016-04-06)
+
+- Added a new resource for Sqlite DBs. See the readme for details
+- Updated :create and :grant action in the mysql_database_user provider to update the user password if it changes
+- Added the ability to pass options to the sql_server connection
+- Added a mysql_hashed_password method to the mysql_database_user's password property to allow passing hashed passwords to the resource. See the readme for an example
+
+## v5.0.1 (2016-03-29)
+
+- Resolve error in the user provider under MySQL due to a Rubocop fix
+
 ## v5.0.0 (2016-03-23)
 
 - Removed Chef 10 compatibility checks

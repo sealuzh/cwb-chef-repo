@@ -1,0 +1,29 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+source 'https://rubygems.org'
+
+# Maybe: Check whether this is necessary because the ChefDK should
+# package all these dependencies out of the box
+
+gem 'rake'
+gem 'berkshelf', '~> 6.2' # Comes with ChefDK 0.18.30
+
+group :integration do
+  gem 'test-kitchen', '~> 1.16'
+end
+
+group :vagrant do
+  gem 'vagrant-wrapper', '~> 2.0', '>= 2.0.3'
+  gem 'kitchen-vagrant', '~> 1.1'
+end
+
+# Currently not working due to systemd/upstart issues with the `service` resource.
+# See further comments in Rakefile
+# group :docker do
+#   gem 'kitchen-docker', '~> 2.6'
+# end
+
+group :dokken do
+  gem 'kitchen-dokken', '~> 2.5', '>= 2.5.1'
+end

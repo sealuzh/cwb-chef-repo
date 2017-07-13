@@ -1,10 +1,10 @@
 #
-# Cookbook Name:: ntp
+# Cookbook:: ntp
 # Recipe:: default
 # Author:: Joshua Timberman (<joshua@chef.io>)
-# Author:: Tim Smith (<tsmith@limelight.com>)
+# Author:: Tim Smith (<tsmith@chef.io>)
 #
-# Copyright 2009-2015, Chef Software, Inc.
+# Copyright:: 2009-2017, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,12 +20,36 @@
 
 ::Chef::Resource.send(:include, Opscode::Ntp::Helper)
 
-if platform_family?('windows')
+if node['ntp']['servers'].empty?
+  node.default['ntp']['servers'] = [
+    '0.pool.ntp.org',
+    '1.pool.ntp.org',
+    '2.pool.ntp.org',
+    '3.pool.ntp.org',
+  ]
+  Chef::Log.debug 'No NTP servers specified, using default ntp.org server pools'
+end
+
+case node['platform_family']
+when 'windows'
   include_recipe 'ntp::windows_client'
+when 'mac_os_x'
+  include_recipe 'ntp::mac_os_x_client'
+  # On OS X we only support simple client config and nothing more
+  return 0
 else
 
   node['ntp']['packages'].each do |ntppkg|
-    package ntppkg
+    package ntppkg do
+      source node['ntp']['pkg_source'] if platform_family?('solaris2') && node['platform_version'] < '5.11'
+      action :install
+    end
+  end
+
+  package 'Remove ntpdate' do
+    package_name 'ntpdate'
+    action :remove
+    only_if { node['platform_family'] == 'debian' && node['platform_version'].to_i >= 16 }
   end
 
   [node['ntp']['varlibdir'], node['ntp']['statsdir']].each do |ntpdir|
@@ -47,19 +71,9 @@ else
   include_recipe 'ntp::apparmor' if node['ntp']['apparmor_enabled']
 end
 
-unless node['ntp']['servers'].size > 0
-  node.default['ntp']['servers'] = [
-    '0.pool.ntp.org',
-    '1.pool.ntp.org',
-    '2.pool.ntp.org',
-    '3.pool.ntp.org'
-  ]
-  Chef::Log.debug 'No NTP servers specified, using default ntp.org server pools'
-end
-
 if node['ntp']['listen'].nil? && !node['ntp']['listen_network'].nil?
   if node['ntp']['listen_network'] == 'primary'
-    node.set['ntp']['listen'] = node['ipaddress']
+    node.normal['ntp']['listen'] = node['ipaddress']
   else
     require 'ipaddr'
     net = IPAddr.new(node['ntp']['listen_network'])
@@ -67,7 +81,7 @@ if node['ntp']['listen'].nil? && !node['ntp']['listen_network'].nil?
     node['network']['interfaces'].each do |_iface, addrs|
       addrs['addresses'].each do |ip, params|
         addr = IPAddr.new(ip) if params['family'].eql?('inet') || params['family'].eql?('inet6')
-        node.set['ntp']['listen'] = addr if net.include?(addr)
+        node.normal['ntp']['listen'] = addr if net.include?(addr)
       end
     end
   end
@@ -97,7 +111,14 @@ if node['ntp']['sync_clock'] && !platform_family?('windows')
   end
 
   execute 'Force sync system clock with ntp server' do
-    command 'ntpd -q'
+    command case node['platform_family']
+            when 'freebsd'
+              'ntpd -q'
+            when 'solaris2', 'aix'
+              "ntpdate #{node['ntp']['servers'].sample}"
+            else
+              "ntpd -q -u #{node['ntp']['var_owner']}"
+            end
     action :run
     notifies :start, "service[#{node['ntp']['service']}]"
   end
@@ -106,7 +127,7 @@ end
 execute 'Force sync hardware clock with system clock' do
   command 'hwclock --systohc'
   action :run
-  only_if { node['ntp']['sync_hw_clock'] && !(platform_family?('windows') || platform_family?('freebsd')) }
+  only_if { node['ntp']['sync_hw_clock'] && !platform_family?('windows', 'solaris2', 'freebsd') }
 end
 
 service node['ntp']['service'] do

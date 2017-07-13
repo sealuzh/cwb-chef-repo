@@ -1,0 +1,44 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+#
+# Available Rake tasks:
+#
+# $ rake -T
+# rake integration:dokken[instance] # Run integration tests with kitchen-dokken
+# rake integration:vagrant          # Run integration tests with kitchen-vagrant
+#
+# More info at https://github.com/ruby/rake/blob/master/doc/rakefile.rdoc
+#
+
+require 'bundler/setup'
+
+desc 'Run Test Kitchen integration tests'
+namespace :integration do
+  desc 'Run integration tests with kitchen-vagrant'
+  task :vagrant do
+    require 'kitchen'
+    Kitchen.logger = Kitchen.default_file_logger
+    Kitchen::Config.new.instances.each { |instance| instance.test(:always) }
+  end
+
+  # NOTICE: `kitchen-docker` (https://github.com/test-kitchen/kitchen-docker)
+  # doesn't work with systemd/upstart services (see https://github.com/chef-cookbooks/cron/issues/79)
+  # * More details about this issue: https://github.com/TYPO3-cookbooks/t3-base/issues/1
+  # * Potential workaround to change service provider for `service` resource: https://github.com/TYPO3-cookbooks/t3-base/pull/2/files
+  # * Install systemd in container to overcome `service` issue: https://brigade.engineering/reduce-chef-infrastructure-integration-test-times-by-75-with-test-kitchen-and-docker-bf638ab95a0a
+  # Migrating to `kitchen-dokken` (https://github.com/someara/kitchen-dokken) solved this issue
+  # Also see PR migrating to `kitchen-dokken`: https://github.com/TYPO3-infrastructure/jenkins-pipeline-global-library-chefci/pull/14
+  desc 'Run integration tests with kitchen-dokken'
+  task :dokken, [:instance] do |_t, args|
+    args.with_defaults(instance: 'default-ubuntu-1604')
+    require 'kitchen'
+    Kitchen.logger = Kitchen.default_file_logger
+    loader = Kitchen::Loader::YAML.new(local_config: '.kitchen.dokken.yml')
+    instances = Kitchen::Config.new(loader: loader).instances
+    # Travis CI Docker service does not support destroy:
+    instances.get(args.instance).verify
+  end
+end
+
+task default: %w(integration:vagrant)

@@ -1,0 +1,17 @@
+---
+driver:
+  name: dokken
+  privileged: true
+  pid_one_command: /sbin/init
+  chef_version: 13.2.20
+
+transport:
+  name: dokken
+
+provisioner:
+  name: dokken
+
+verifier:
+  # Required for `serverspec` https://github.com/someara/kitchen-dokken/issues/78#issuecomment-298314150
+  root_path: '/opt/verifier'
+  sudo: false

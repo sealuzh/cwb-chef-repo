@@ -1,11 +1,14 @@
 # cwb-server cookbook
 
+[![Build Status](https://travis-ci.org/sealuzh/cwb-chef-repo.svg?branch=master)](https://travis-ci.org/sealuzh/cwb-chef-repo)
+
 Installs and configures the Cloud WorkBench server.
 
+See (DEVELOPMENT.md)[DEVELOPMENT.md] for developers.
 
 ## Supported Platforms
 
-* Ubuntu 14.04 64bit (tested)
+* Ubuntu 16.04 64bit (tested)
 
 ## Attributes
 

@@ -18,24 +18,5 @@ include_recipe 'cwb-server::ruby_binary'
 include_recipe 'cwb-server::nginx'
 include_recipe 'vagrant::default'
 
-### Deployment
-# Install file permission management utility acl
-# used by Capistrano plugin during deployment
-# include_recipe 'acl::default'
-
 include_recipe 'cwb-server::secrets'
 include_recipe 'cwb-server::deploy'
-
-### TEMPORARY fix for Vagrant <=1.8.1
-# Until version >1.8.1 will be released: https://github.com/mitchellh/vagrant/blob/master/CHANGELOG.md
-# Fix already merged: https://github.com/mitchellh/vagrant/issues/6158#issuecomment-171352030
-file '/usr/bin/vagrant' do
-  owner 'root'
-  group 'root'
-  mode '0755'
-  content '#!/usr/bin/env bash
-           #
-           # This script just forwards all arguments to the real vagrant binary.
-           unset RUBYLIB # Temporary fix until Vagrant >1.8.1 is released
-           /opt/vagrant/bin/vagrant "$@"'
-end

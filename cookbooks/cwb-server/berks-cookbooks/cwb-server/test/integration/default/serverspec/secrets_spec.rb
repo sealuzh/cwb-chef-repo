@@ -29,13 +29,13 @@ describe 'cwb-server::secrets' do
   providers_dir = '/home/apps/providers'
   google_file = "#{providers_dir}/google/google-compute.pem"
   azure_file = "#{providers_dir}/azure/azure.pem"
-  describe file('/etc/init/cloud-workbench-job-1.conf') do
-    its(:content) { should match(/env AWS_ACCESS_KEY='my_aws_access_key'/) }
-    its(:content) { should match(/env GOOGLE_API_KEY_NAME='google-compute'/) }
-    its(:content) { should match(%r{env GOOGLE_API_KEY_PATH='#{google_file}'}) }
-    its(:content) { should match(/env AZURE_MGMT_CERTIFICATE_PATH='#{azure_file}'/) }
-    its(:content) { should match(%r{env CHEF_SERVER_URL='https://33.33.33.10:443/organizations/chef'}) }
-    its(:content) { should match(/env CWB_SERVER_HOST='\d+\.\d+\.\d+.\d+'/) }
+  describe file('/etc/systemd/system/cloud-workbench-job@.service') do
+    its(:content) { should match(/AWS_ACCESS_KEY=my_aws_access_key/) }
+    its(:content) { should match(/GOOGLE_API_KEY_NAME=google-compute/) }
+    its(:content) { should match(%r{GOOGLE_API_KEY_PATH=#{google_file}}) }
+    its(:content) { should match(/AZURE_MGMT_CERTIFICATE_PATH=#{azure_file}/) }
+    its(:content) { should match(%r{CHEF_SERVER_URL=https://33.33.33.10:443/organizations/chef}) }
+    its(:content) { should match(/CWB_SERVER_HOST=\d+\.\d+\.\d+.\d+/) }
   end
 
   describe file(google_file) do

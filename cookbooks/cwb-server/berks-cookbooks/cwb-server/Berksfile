@@ -1,3 +1,7 @@
 source 'https://supermarket.chef.io'
 
+# Use forks with Chef 13 compatibility fixes
+cookbook 'timezone-ii', '~> 0.2.0', github: 'paulieborg/timezone-ii', ref: 'b9ea930d8176d382f68f0de06c1a78df83ecf055'
+cookbook 'vagrant', '~> 0.7.0', github: 'RoboticCheese/vagrant-cookbook', ref: '6fff795d33a9b6e8baf36a55a45625cedd7db29b'
+
 metadata

@@ -2,7 +2,7 @@
 # Author:: Seth Chisamore (<schisamo@chef.io>)
 # Author:: Lamont Granquist (<lamont@chef.io>)
 # Author:: Marco Betti (<m.betti@gmail.com>)
-# Copyright:: 2011-2015 Chef Software, Inc.
+# Copyright:: 2011-2016 Chef Software, Inc.
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +28,12 @@ class Chef
 
         def load_current_resource
           Gem.clear_paths
-          require 'pg'
+          begin
+            require 'pg'
+          rescue LoadError
+            Chef::Log.fatal('Could not load the required pg gem. Make sure to include the database::postgresql or postgresql::ruby recipes in your runlist')
+            raise
+          end
           @current_resource = Chef::Resource::DatabaseUser.new(@new_resource.name)
           @current_resource.username(@new_resource.name)
           @current_resource
@@ -87,6 +92,51 @@ class Chef
 
         def action_grant_schema
           grant_statement = "GRANT #{@new_resource.privileges.join(', ')} ON SCHEMA \"#{@new_resource.schema_name}\" TO \"#{@new_resource.username}\""
+          Chef::Log.info("#{@new_resource}: granting access with statement [#{grant_statement}]")
+          db(@new_resource.database_name).query(grant_statement)
+          @new_resource.updated_by_last_action(true)
+        ensure
+          close
+        end
+
+        def action_grant_table
+          grant_statement = "GRANT #{@new_resource.privileges.join(', ')} ON "
+          grant_statement << if @new_resource.tables.include?(:all)
+                               "ALL TABLES IN SCHEMA \"#{@new_resource.schema_name}\""
+                             else
+                               "TABLE #{@new_resource.tables.join(', ')}"
+                             end
+          grant_statement << " TO \"#{@new_resource.username}\""
+          Chef::Log.info("#{@new_resource}: granting access with statement [#{grant_statement}]")
+          db(@new_resource.database_name).query(grant_statement)
+          @new_resource.updated_by_last_action(true)
+        ensure
+          close
+        end
+
+        def action_grant_sequence
+          grant_statement = "GRANT #{@new_resource.privileges.join(', ')} ON "
+          grant_statement << if @new_resource.sequences.include?(:all)
+                               "ALL SEQUENCES IN SCHEMA \"#{@new_resource.schema_name}\""
+                             else
+                               "SEQUENCE #{@new_resource.sequences.join(', ')}"
+                             end
+          grant_statement << " TO \"#{@new_resource.username}\""
+          Chef::Log.info("#{@new_resource}: granting access with statement [#{grant_statement}]")
+          db(@new_resource.database_name).query(grant_statement)
+          @new_resource.updated_by_last_action(true)
+        ensure
+          close
+        end
+
+        def action_grant_function
+          grant_statement = "GRANT #{@new_resource.privileges.join(', ')} ON "
+          grant_statement << if @new_resource.functions.include?(:all)
+                               "ALL FUNCTIONS IN SCHEMA \"#{@new_resource.schema_name}\""
+                             else
+                               "FUNCTION #{@new_resource.functions.join(', ')}"
+                             end
+          grant_statement << " TO \"#{@new_resource.username}\""
           Chef::Log.info("#{@new_resource}: granting access with statement [#{grant_statement}]")
           db(@new_resource.database_name).query(grant_statement)
           @new_resource.updated_by_last_action(true)

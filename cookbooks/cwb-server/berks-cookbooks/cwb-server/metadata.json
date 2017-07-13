@@ -1,22 +1,23 @@
 {
   "name": "cwb-server",
   "description": "Installs and configures the Cloud WorkBench server",
-  "long_description": "# cwb-server cookbook\n\nInstalls and configures the Cloud WorkBench server.\n\n\n## Supported Platforms\n\n* Ubuntu 14.04 64bit (tested)\n\n## Attributes\n\nSee `attributes` directory.\n\n## Usage\n\n### cwb-server::default\n\nInclude `cwb-server` in your node's `run_list`:\n\n```json\n{\n  \"run_list\": [\n    \"recipe[cwb-server]\"\n  ]\n}\n```\n\n```ruby\nchef.run_list = ['recipe[cwb-server]']\n```\n\n```ruby\nchef.add_recipe 'cwb-server'\n```\n",
+  "long_description": "# cwb-server cookbook\n\n[![Build Status](https://travis-ci.org/sealuzh/cwb-chef-repo.svg?branch=master)](https://travis-ci.org/sealuzh/cwb-chef-repo)\n\nInstalls and configures the Cloud WorkBench server.\n\nSee (DEVELOPMENT.md)[DEVELOPMENT.md] for developers.\n\n## Supported Platforms\n\n* Ubuntu 16.04 64bit (tested)\n\n## Attributes\n\nSee `attributes` directory.\n\n## Usage\n\n### cwb-server::default\n\nInclude `cwb-server` in your node's `run_list`:\n\n```json\n{\n  \"run_list\": [\n    \"recipe[cwb-server]\"\n  ]\n}\n```\n\n```ruby\nchef.run_list = ['recipe[cwb-server]']\n```\n\n```ruby\nchef.add_recipe 'cwb-server'\n```\n",
   "maintainer": "Joel Scheuner",
   "maintainer_email": "joel.scheuner.dev@gmail.com",
-  "license": "Apache 2.0",
+  "license": "Apache-2.0",
   "platforms": {
+    "ubuntu": ">= 0.0.0"
   },
   "dependencies": {
-    "sudo": "~> 2.9",
-    "apt": "~> 3.0",
-    "build-essential": "~> 3.2.0",
-    "git": "~> 4.4",
+    "sudo": "~> 3.5.2",
+    "apt": ">= 6.1.2",
+    "build-essential": ">= 8.0.3",
+    "git": ">= 6.1.0",
     "timezone-ii": "~> 0.2.0",
-    "ntp": "~> 1.10.1",
-    "database": "~> 5.0.0",
-    "postgresql": "~> 4.0.4",
-    "vagrant": "~> 0.5.0"
+    "ntp": "~> 3.5.0",
+    "database": "~> 6.1.1",
+    "postgresql": "~> 6.1.1",
+    "vagrant": "~> 0.7.0"
   },
   "recommendations": {
   },
@@ -34,7 +35,19 @@
   },
   "recipes": {
   },
-  "version": "0.3.0",
-  "source_url": "",
-  "issues_url": ""
+  "version": "0.5.0",
+  "source_url": "https://github.com/sealuzh/cwb-chef-repo",
+  "issues_url": "https://github.com/sealuzh/cwb-chef-repo/issues",
+  "privacy": false,
+  "chef_versions": [
+    [
+      ">= 12.4"
+    ]
+  ],
+  "ohai_versions": [
+
+  ],
+  "gems": [
+
+  ]
 }

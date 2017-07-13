@@ -28,17 +28,20 @@ default['cwb-server']['nginx']['log_dir'] = '/var/log/nginx'
 # a) Optimistic (might break on newer releases): ['vagrant-google', ...]
 # b) Pessimistic (requires manual updating): [{ 'name' => 'vagrant-google',  'version' =>  '0.2.2' }, ...]
 default['cwb-server']['vagrant']['providers'] = [
-  { 'name' => 'vagrant-aws', 'version' => '0.6.0' }
+  { 'name' => 'vagrant-aws', 'version' => '0.7.2' },
+  { 'name' => 'vagrant-azure', 'version' => '2.0.0.pre8' },
+  { 'name' => 'vagrant-google', 'version' => '0.2.5' },
 ]
 
 ### Ruby
 default['cwb-server']['ruby']['dir'] = '/usr/local'
-default['cwb-server']['ruby']['version'] = '2.2.4'
+default['cwb-server']['ruby']['version'] = '2.4.1'
+default['cwb-server']['ruby']['base_url'] = 'https://rvm.io/binaries'
+default['cwb-server']['ruby']['target_arch'] = 'x86_64'
+# Full URL to Ruby binary. Example: https://rvm.io/binaries/ubuntu/16.04/x86_64/ruby-2.4.1.tar.bz2
 # `source_url` takes precedence over `version`
-# Platforms: https://packager.io/documentation/distributions/
-# Ruby versions: https://packager.io/documentation/ruby/
-default['cwb-server']['ruby']['base_url'] = 'https://s3.amazonaws.com/pkgr-buildpack-ruby/current'
 default['cwb-server']['ruby']['source_url'] = nil
+# Unchecked if not provided
 default['cwb-server']['ruby']['checksum'] = nil
 
 ### Nodejs
@@ -88,7 +91,8 @@ default['cwb-server']['chef']['server_url'] = "https://#{server_host}:443/organi
 # Chef VM provisioning
 # Latest version known to work properly: '12.2.1'
 # Some newer versions break certain cookbooks
-# (e.g. postgresql: https://github.com/hw-cookbooks/postgresql/issues/212)
+# (e.g. postgresql: https://github.com/hw-cookbooks/postgresql/issues/212)\
+# TODO: Fix this !!! => bump Chef version (e.g., to 13.2.20)
 default['cwb-server']['chef']['omnibus_chef_version'] = '12.2.1'
 default['cwb-server']['chef']['provisioning_path'] = '/etc/chef'
 
