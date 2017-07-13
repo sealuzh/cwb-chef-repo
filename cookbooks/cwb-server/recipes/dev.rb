@@ -4,3 +4,8 @@ dev['tools'].each do |tool|
     action :install
   end
 end
+
+# Required for running integration test.
+# Usually installed by default but not in certain Docker images!
+package 'net-tools'
+package 'wget'

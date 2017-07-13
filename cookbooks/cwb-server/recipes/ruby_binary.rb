@@ -8,7 +8,8 @@ package 'libyaml-dev'
 # Packages required to build native extensions (e.g., for `nio4r` in Rails)
 ## Listing dependencies: https://gorails.com/setup/ubuntu/16.04
 package 'ruby-dev'
-# package 'zlib1g-dev'
+# Required to build `nokogiri` on some platforms
+package 'zlib1g-dev'
 
 ruby = node['cwb-server']['ruby']
 ruby_with_version = "ruby-#{ruby['version']}"

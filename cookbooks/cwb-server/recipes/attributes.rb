@@ -18,7 +18,7 @@ def detect_public_ip
   cmd.run_command
   cmd.stdout.strip
 rescue
-  default_ip = node['ipaddress'] || '33.33.33.20'
+  default_ip = (node['ipaddress'].empty? ? '33.33.33.20' : node['ipaddress'])
   Chef::Log.warn("Could not detect public IP with `#{node['cwb-server']['host_detection']}`
                   Using default IP #{default_ip}.")
   default_ip
