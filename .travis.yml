@@ -1,7 +1,8 @@
 # Chef Travis CI config based on https://github.com/chef-cookbooks/enterprise-chef-common/blob/master/.travis.yml
 # Use Travis's container-based infrastructure
-sudo: false
+sudo: required
 dist: trusty
+services: docker
 
 addons:
   apt:
@@ -9,15 +10,21 @@ addons:
       - chef-current-trusty
     packages:
       - chefdk
-      - vagrant
-      - virtualbox
 
-install: echo "skip bundle install"
+env:
+  matrix:
+  - INSTANCE=default-ubuntu-1604
 
-# Ensure we make ChefDK's Ruby the default
-before_script:
-  - eval "$(chef shell-init bash)"
+before_install:
   - cd cookbooks/cwb-server
+
+install: chef exec bundle install --jobs=3 --retry=3 --without='vagrant'
+
+before_script:
+  # https://github.com/zuazo/kitchen-in-travis-native/issues/1#issuecomment-142455888
+  - sudo iptables -L DOCKER || sudo iptables -N DOCKER
+  # Ensure we make ChefDK's Ruby the default
+  - eval "$(chef shell-init bash)"
 
 script:
   - chef --version
@@ -25,4 +32,5 @@ script:
   - foodcritic --version
   - foodcritic . # Cookbook checker
   - chef exec rspec spec/ # short-running unit tests (Rspec + ChefSpec)
-  - chef exec kitchen verify # long-running integration tests (TestKitchen)
+  # Run test-kitchen with docker driver, for example:
+  - KITCHEN_LOCAL_YAML=.kitchen.docker.yml chef exec bundle exec kitchen verify ${INSTANCE}

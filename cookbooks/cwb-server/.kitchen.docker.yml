@@ -1,0 +1,5 @@
+---
+driver:
+  name: docker
+  privileged: true
+# Gets the other defaults from .kitchen.yml
