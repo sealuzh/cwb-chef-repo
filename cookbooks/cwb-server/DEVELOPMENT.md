@@ -3,6 +3,7 @@
 ## Requirements
 
 * ChefDK: https://downloads.chef.io/chefdk
+* Install Gemfile dependencies: `bundle install`
 
 ## Update this cookbook
 
@@ -18,6 +19,9 @@ cookstyle # Cookbook linting (Rubocup config for cookbooks)
 foodcritic . # Cookbook checker
 chef exec rspec spec/ # short-running unit tests (Rspec + ChefSpec)
 chef exec kitchen verify # long-running integration tests (TestKitchen)
+
+# Integration tests via Docker (as used for Travis CI)
+rake integration:dokken[default-ubuntu-1604]
 ```
 
 ## Debugging Vagrantfile
