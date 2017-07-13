@@ -9,6 +9,8 @@ addons:
       - chef-current-trusty
     packages:
       - chefdk
+      - vagrant
+      - virtualbox
 
 install: echo "skip bundle install"
 
