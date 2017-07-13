@@ -36,7 +36,7 @@ node.default['vagrant']['version'] = '1.8.1'
 node.default['vagrant']['user'] = node['cwb-server']['app']['user']
 node.default['vagrant']['plugins'] = [
   # Ensure that Chef is installed within a VM
-  { 'name' => 'vagrant-omnibus', 'version' =>  '1.4.1' },
+  { 'name' => 'vagrant-omnibus', 'version' =>  '1.5.0' },
   # Delete Chef client and node when destroying a VM
   { 'name' => 'vagrant-butcher', 'version' =>  '2.2.0' }
 ]  + node['cwb-server']['vagrant']['providers']
