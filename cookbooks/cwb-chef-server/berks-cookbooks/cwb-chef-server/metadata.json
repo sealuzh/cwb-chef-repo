@@ -4,11 +4,11 @@
   "long_description": "# cwb-chef-server\n\nWrapper cookbook for the `chef-server` cookbook from:\n\n* Chef Supermarket: https://supermarket.chef.io/cookbooks/chef-server\n* Github: https://github.com/opscode-cookbooks/chef-server\n* *chef-server.rb* Settings: https://docs.chef.io/config_rb_server_optional_settings.html\n\nCheckout these links for further information regarding supported platforms, usage, and attributes.\n\n## Additional features\n\n* Primarily to export all dependencies via [Berkshelf](http://berkshelf.com/)\n  such that future builds are reproducible\n\n## Chef Server License\n\n* Chef Client, Server, and ChefDK are [free](https://www.chef.io/pricing/)\n* The management console Web interface is free up to 25 nodes\n  (this changed from v11 to [v12](https://docs.chef.io/manage.html))\n\n## Authors\n\nJoel Scheuner (<joel.scheuner.dev@gmail.com>)\n",
   "maintainer": "Joel Scheuner",
   "maintainer_email": "joel.scheuner.dev@gmail.com",
-  "license": "Apache 2.0",
+  "license": "Apache-2.0",
   "platforms": {
   },
   "dependencies": {
-    "chef-server": "~> 4.1.0"
+    "chef-server": "~> 5.4.0"
   },
   "recommendations": {
   },
@@ -26,7 +26,17 @@
   },
   "recipes": {
   },
-  "version": "0.1.0",
+  "version": "0.2.0",
   "source_url": "",
-  "issues_url": ""
+  "issues_url": "",
+  "privacy": false,
+  "chef_versions": [
+
+  ],
+  "ohai_versions": [
+
+  ],
+  "gems": [
+
+  ]
 }
