@@ -17,7 +17,7 @@
     "ntp": "~> 3.5.0",
     "database": "~> 6.1.1",
     "postgresql": "~> 6.1.1",
-    "vagrant": "~> 0.7.0"
+    "vagrant": "~> 0.7.1"
   },
   "recommendations": {
   },

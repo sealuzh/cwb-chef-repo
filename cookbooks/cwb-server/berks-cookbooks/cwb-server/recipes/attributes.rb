@@ -32,7 +32,7 @@ if given.nil? || given.empty?
 end
 
 ### Vagrant: https://supermarket.chef.io/cookbooks/vagrant#readme
-node.default['vagrant']['version'] = '1.8.1'
+node.default['vagrant']['version'] = '1.9.7'
 node.default['vagrant']['user'] = node['cwb-server']['app']['user']
 node.default['vagrant']['plugins'] = [
   # Ensure that Chef is installed within a VM

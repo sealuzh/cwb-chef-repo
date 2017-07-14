@@ -6,10 +6,6 @@ DEPENDENCIES
     git: https://github.com/paulieborg/timezone-ii.git
     revision: b9ea930d8176d382f68f0de06c1a78df83ecf055
     ref: b9ea930
-  vagrant
-    git: https://github.com/RoboticCheese/vagrant-cookbook.git
-    revision: 6fff795d33a9b6e8baf36a55a45625cedd7db29b
-    ref: 6fff795
 
 GRAPH
   apt (6.1.2)
@@ -26,7 +22,7 @@ GRAPH
     postgresql (~> 6.1.1)
     sudo (~> 3.5.2)
     timezone-ii (~> 0.2.0)
-    vagrant (~> 0.7.0)
+    vagrant (~> 0.7.1)
   database (6.1.1)
     postgresql (>= 1.0.0)
   dmg (4.0.0)
@@ -47,9 +43,9 @@ GRAPH
     windows (>= 1.2.2)
   sudo (3.5.2)
   timezone-ii (0.2.0)
-  vagrant (0.7.0)
+  vagrant (0.7.1)
     dmg (>= 2.2.2)
-    windows (>= 1.38.0)
+    windows (>= 1.38)
   windows (3.1.1)
     ohai (>= 4.0.0)
   yum-epel (2.1.2)
