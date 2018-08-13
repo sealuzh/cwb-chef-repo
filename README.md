@@ -6,13 +6,20 @@ This Chef repo provides cookbooks to automatically install and configure
 ## Requirements
 
 > Interested in your own Cloud WorkBench installation?<br>
-> Feel free to contact us: leitner[AT]ifi.uzh.ch or joel.scheuner[AT]uzh.ch
+> Feel free to contact us: philipp.leitner[AT]chalmers.se or scheuner[AT]chalmers.se
 
 * [Git](http://git-scm.com/)
 * [Vagrant (1.8.1)](https://www.vagrantup.com/downloads.html)
     * [vagrant-omnibus (1.4.1)](https://github.com/chef/vagrant-omnibus) for auto-installation via Chef
     * [vagrant-aws (0.7.0)](https://github.com/mitchellh/vagrant-aws) for deployment in the Amazon EC2 Cloud
       ([alternative providers](https://github.com/mitchellh/vagrant/wiki/Available-Vagrant-Plugins#providers) are available)
+    * Install Vagrant with the [official installer](https://www.vagrantup.com/downloads.html) or with [Homebrew Cask](https://github.com/Homebrew/homebrew-cask) via `brew cask install vagrant`
+    * Install Vagrant plugins via
+
+        ```bash
+        vagrant plugin install vagrant-omnibus vagrant-aws;
+        ```
+
 * [Amazon EC2](https://aws.amazon.com/ec2/) account. Alternative providers are available (see Vagrant plugins).
   We have also deployed a CWB instance to OpenStack.
     * Both VMs (chef-server + cwb-server) must have a public IP address
@@ -23,15 +30,10 @@ This Chef repo provides cookbooks to automatically install and configure
       called `cwb-web`.
       If you do not explicitly specify a security group in your benchmark, make sure the `default` security group allows incoming ssh (22).
 * [ChefDK](https://downloads.chef.io/chef-dk/) for benchmark cookbook development.
-
-1. Vagrant can be installed with the installer for your system from [https://www.vagrantup.com/downloads.html](https://www.vagrantup.com/downloads.html)
-2. The Vagrant plugins can be installed with this one-liner:
-
-    ```bash
-    vagrant plugin install vagrant-omnibus vagrant-aws;
-    ```
+    * Install via the [official installer](https://downloads.chef.io/chefdk)
 
 ## Installation
+
 1. Checkout repository.
 
     ```bash
