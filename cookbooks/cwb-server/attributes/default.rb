@@ -47,6 +47,9 @@ default['cwb-server']['nodejs']['setup_script'] = 'https://deb.nodesource.com/se
 default['cwb-server']['nodejs']['setup_checksum'] = nil
 
 ### Database
+default['cwb-server']['db']['postgres_password'] = 'rootcloud'
+default['cwb-server']['db']['postgresql_version'] = '9.6'
+default['cwb-server']['db']['port'] = 5432
 default['cwb-server']['db']['name'] = 'cloud_workbench_production'
 default['cwb-server']['db']['user'] = 'cloud'
 # Randomly generated if not provided
@@ -86,10 +89,7 @@ organisation = validation_key_name.chomp('-validator')
 default['cwb-server']['chef']['server_url'] = "https://#{server_host}:443/organizations/#{organisation}"
 
 # Chef VM provisioning
-# Latest version known to work properly: '12.2.1'
-# Some newer versions break certain cookbooks
-# (e.g. postgresql: https://github.com/hw-cookbooks/postgresql/issues/212)
-default['cwb-server']['chef']['omnibus_chef_version'] = '12.2.1'
+default['cwb-server']['chef']['omnibus_chef_version'] = '12.14.60'
 default['cwb-server']['chef']['provisioning_path'] = '/etc/chef'
 
 ## Providers

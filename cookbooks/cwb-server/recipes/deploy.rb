@@ -1,6 +1,9 @@
 app = node['cwb-server']['app']
 env = node['cwb-server']['env']
 
+# Required for compiling the pg gem
+package 'libpq-dev'
+
 directory app['dir'] do
   owner app['user']
   group app['user']

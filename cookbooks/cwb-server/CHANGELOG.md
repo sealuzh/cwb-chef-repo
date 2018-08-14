@@ -1,3 +1,8 @@
+# 0.4.0 (2018-08-14)
+
+* Update deprecated cookbook dependencies that caused failing build (database, windows, timezone-ii => timezone_lwrp, deploy_resource)
+* Update Chef deprecations for Chef 14 compatibility
+
 # 0.3.0 (2016-03-27)
 
 Complete rewrite based on the original `cloud-benchmarking-server` cookbook:
