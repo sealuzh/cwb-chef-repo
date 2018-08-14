@@ -9,9 +9,9 @@ This Chef repo provides cookbooks to automatically install and configure
 > Feel free to contact us: philipp.leitner[AT]chalmers.se or scheuner[AT]chalmers.se
 
 * [Git](http://git-scm.com/)
-* [Vagrant (1.8.1)](https://www.vagrantup.com/downloads.html)
-    * [vagrant-omnibus (1.4.1)](https://github.com/chef/vagrant-omnibus) for auto-installation via Chef
-    * [vagrant-aws (0.7.0)](https://github.com/mitchellh/vagrant-aws) for deployment in the Amazon EC2 Cloud
+* [Vagrant (2.1.2)](https://www.vagrantup.com/downloads.html)
+    * [vagrant-omnibus (1.5.0)](https://github.com/chef/vagrant-omnibus) for auto-installation via Chef
+    * [vagrant-aws (0.7.2)](https://github.com/mitchellh/vagrant-aws) for deployment in the Amazon EC2 Cloud
       ([alternative providers](https://github.com/mitchellh/vagrant/wiki/Available-Vagrant-Plugins#providers) are available)
     * Install Vagrant with the [official installer](https://www.vagrantup.com/downloads.html) or with [Homebrew Cask](https://github.com/Homebrew/homebrew-cask) via `brew cask install vagrant`
     * Install Vagrant plugins via
@@ -52,10 +52,13 @@ This Chef repo provides cookbooks to automatically install and configure
    Find the *aws* config under `config.vm.provider :aws` (e.g., instance type)
    Find the *cwb-server* config under `chef.json`
 
-    ```
+    ```bash
     # For Amazon EC2
     AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY'] || 'my_aws_access_key'
     AWS_SECRET_KEY = ENV['AWS_SECRET_KEY'] || 'my_aws_secret_key'
+    # SSH Key
+    SSH_KEY_PATH = ENV['SSH_KEY_PATH'] || 'cloud-benchmarking.pem'
+    SSH_KEY_NAME = ENV['SSH_KEY_NAME'] || 'cloud-benchmarking'
     ```
 
 4. Start automated installation and configuration.
