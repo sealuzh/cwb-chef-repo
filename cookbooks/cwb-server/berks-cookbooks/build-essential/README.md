@@ -1,8 +1,8 @@
 # build-essential Cookbook
 
-[![Cookbook Version](http://img.shields.io/cookbook/v/build-essential.svg)][cookbook] [![Build Status](http://img.shields.io/travis/chef-cookbooks/build-essential.svg)][travis]
+[![Cookbook Version](http://img.shields.io/cookbook/v/build-essential.svg)][cookbook] [![Build Status](https://travis-ci.org/chef-cookbooks/build-essential.svg?branch=master)](https://travis-ci.org/chef-cookbooks/build-essential)
 
-Installs packages required for compiling C software from source. Use this cookbook if you wish to compile C programs, or install RubyGems with native extensions.
+Installs packages required for compiling C software from source. Use this cookbook if you wish to compile C programs, or install RubyGems with native extensions. Contains a resource, 'build_essential', as as well as a default recipe that simply calls that same resource.
 
 ## Requirements
 
@@ -10,30 +10,35 @@ Installs packages required for compiling C software from source. Use this cookbo
 
 - Debian/Ubuntu
 - RHEL/CentOS/Scientific/Amazon/Oracle
-- openSUSE
+- openSUSE / SUSE Enterprise Linux
 - SmartOS
 - Fedora
-- Mac OS X
+- Mac OS X 10.9+
 - FreeBSD
 
 ### Chef
 
-- Chef 11+
+- Chef 12.7+
 
 ### Cookbooks
 
 - seven_zip
+- mingw
 
 **Note for Debian platform family:** On Debian platform-family systems, it is recommended that `apt-get update` be run, to ensure that the package cache is updated. It's not in the scope of this cookbook to do that, as it can [create a duplicate resource](https://tickets.chef.io/browse/CHEF-3694). We recommend using the [apt](https://supermarket.chef.io/cookbooks/apt) cookbook to do this.
 
 ## Attributes
 
-Attribute                                 | Default                      | Description
------------------------------------------ | :--------------------------: | -----------------------------------
-`node['build-essential']['compile_time']` | `false`                      | Execute resources at compile time
-`node['build-essential']['msys']['path']` | `#{ENV['SYSTEMDRIVE']\\msys` | Destination for msys (Windows only)
+Attribute                                  |            Default            | Description
+------------------------------------------ | :---------------------------: | -----------------------------------------------------
+`node['build-essential']['compile_time']`  |            `false`            | Execute resources at compile time
+`node['build-essential']['msys2']['path']` | `#{ENV['SYSTEMDRIVE']\\msys2` | Destination for msys2 build tool chain (Windows only)
 
 ## Usage
+
+### Recipe Usage
+
+The recipe simply calls the build_essential resource, but it ideal for adding to roles or node run lists.
 
 Include the build-essential recipe in your run list:
 
@@ -87,11 +92,31 @@ For RubyGems that include native C extensions you wish to use with Chef, you sho
    chef_gem 'gem-with-native-extension'
   ```
 
-## License & Authors
+### Resource Usage
 
-**Author:** Cookbook Engineering Team ([cookbooks@chef.io](mailto:cookbooks@chef.io))
+The cookbook includes a resource 'build_essential' that can be included in your cookbook to install the necessary build-essential packages
 
-**Copyright:** 2009-2015, Chef Software, Inc.
+Simple package installation during the client run:
+
+```ruby
+build_essential 'some name you choose'
+```
+
+Package installation during the compile phase:
+
+```ruby
+build_essential 'some name you choose' do
+  compile_time false
+end
+```
+
+## Maintainers
+
+This cookbook is maintained by Chef's Community Cookbook Engineering team. Our goal is to improve cookbook quality and to aid the community in contributing to cookbooks. To learn more about our team, process, and design goals see our [team documentation](https://github.com/chef-cookbooks/community_cookbook_documentation/blob/master/COOKBOOK_TEAM.MD). To learn more about contributing to cookbooks like this see our [contributing documentation](https://github.com/chef-cookbooks/community_cookbook_documentation/blob/master/CONTRIBUTING.MD), or if you have general questions about this cookbook come chat with us in #cookbok-engineering on the [Chef Community Slack](http://community-slack.chef.io/)
+
+## License
+
+**Copyright:** 2009-2016, Chef Software, Inc.
 
 ```
 Licensed under the Apache License, Version 2.0 (the "License");

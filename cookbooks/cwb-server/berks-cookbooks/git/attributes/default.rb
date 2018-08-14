@@ -1,9 +1,9 @@
 #
 # Author:: Jamie Winsor (<jamie@vialstudios.com>)
-# Cookbook Name:: git
+# Cookbook:: git
 # Attributes:: default
 #
-# Copyright 2008-2016, Chef Software, Inc.
+# Copyright:: 2008-2016, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -19,22 +19,21 @@
 
 case node['platform_family']
 when 'windows'
-  default['git']['version'] = '2.7.4'
-  default['git']['architecture'] = '32'
+  default['git']['version'] = '2.8.1'
+  if node['kernel']['machine'] == 'x86_64'
+    default['git']['architecture'] = '64'
+    default['git']['checksum'] = '5e5283990cc91d1e9bd0858f8411e7d0afb70ce26e23680252fb4869288c7cfb'
+  else
+    default['git']['architecture'] = '32'
+    default['git']['checksum'] = '17418c2e507243b9c98db161e9e5e8041d958b93ce6078530569b8edaec6b8a4'
+  end
   default['git']['url'] = 'https://github.com/git-for-windows/git/releases/download/v%{version}.windows.1/Git-%{version}-%{architecture}-bit.exe'
-  default['git']['checksum'] = '49601d5102df249d6f866ecfa1eea68eb5672acc1dbb7e4051099e792f6da5fc'
   default['git']['display_name'] = "Git version #{node['git']['version']}"
-when 'mac_os_x'
-  default['git']['osx_dmg']['app_name']    = 'git-2.7.1-intel-universal-mavericks'
-  default['git']['osx_dmg']['volumes_dir'] = 'Git 2.7.1 Mavericks Intel Universal'
-  default['git']['osx_dmg']['package_id']  = 'GitOSX.Installer.git195Universal.git.pkg'
-  default['git']['osx_dmg']['url']         = 'http://sourceforge.net/projects/git-osx-installer/files/git-2.7.1-intel-universal-maverick.dmg/download'
-  default['git']['osx_dmg']['checksum']    = '260b32e8877eb72d07807b26163aeec42e2d98c350f32051ab1ff0cc33626440'
 else
   default['git']['prefix'] = '/usr/local'
-  default['git']['version'] = '2.7.4'
+  default['git']['version'] = '2.17.1'
   default['git']['url'] = 'https://nodeload.github.com/git/git/tar.gz/v%{version}'
-  default['git']['checksum'] = '8d53703d75890c03e26a915c7af3b7b98d8cfb94382f685a9bcbee1eeaec47b4'
+  default['git']['checksum'] = '690f12cc5691e5adaf2dd390eae6f5acce68ae0d9bd9403814f8a1433833f02a'
   default['git']['use_pcre'] = false
 end
 

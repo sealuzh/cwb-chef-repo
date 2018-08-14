@@ -1,9 +1,9 @@
 #
 # Author:: Shawn Neal (<sneal@sneal.net>)
-# Cookbook Name:: seven_zip
+# Cookbook:: seven_zip
 # Resource:: archive
 #
-# Copyright:: 2013, Daptiv Solutions LLC
+# Copyright:: 2013-2017, Daptiv Solutions LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,3 +26,4 @@ attribute :path, kind_of: String, name_attribute: true
 attribute :source, kind_of: String
 attribute :overwrite, kind_of: [TrueClass, FalseClass], default: false
 attribute :checksum, kind_of: String
+attribute :timeout, kind_of: Integer

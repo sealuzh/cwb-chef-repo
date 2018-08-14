@@ -8,4 +8,4 @@ production:
   username: <%= @db['user'] %>
   password: <%= @db['password'] %>
   host: localhost
-  port: <%= node['postgresql']['config']['port'] %>
+  port: <%= @db['port'] %>

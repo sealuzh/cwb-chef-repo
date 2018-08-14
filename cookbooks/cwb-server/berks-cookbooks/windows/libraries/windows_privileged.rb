@@ -1,11 +1,11 @@
 #
 # Author:: Doug MacEachern <dougm@vmware.com>
 # Author:: Paul Morton (<pmorton@biaprotect.com>)
-# Cookbook Name:: windows
+# Cookbook:: windows
 # Library:: windows_privileged
 #
-# Copyright:: 2010, VMware, Inc.
-# Copyright:: 2011, Business Intelligence Associates, Inc
+# Copyright:: 2010-2017, VMware, Inc.
+# Copyright:: 2011-2017, Business Intelligence Associates, Inc
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ class Chef
       unless OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, token)
         raise get_last_error
       end
-      token = token.unpack('L')[0]
+      token = token.unpack1('L')
 
       privileges.each do |name|
         unless adjust_privilege(token, name, SE_PRIVILEGE_ENABLED)
