@@ -7,8 +7,8 @@ SSH_USERNAME = 'ubuntu'
 AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY'] || 'my_aws_access_key'
 AWS_SECRET_KEY = ENV['AWS_SECRET_KEY'] || 'my_aws_secret_key'
 
-SSH_KEY_PATH = 'cloud-benchmarking.pem'
-SSH_KEY_NAME = 'cloud-benchmarking'
+SSH_KEY_PATH = ENV['SSH_KEY_PATH'] || 'cloud-benchmarking.pem'
+SSH_KEY_NAME = ENV['SSH_KEY_NAME'] || 'cloud-benchmarking'
 
 ##########################################################
 CHEF_SERVER_IP = ENV['CHEF_SERVER_IP'] || File.read('chef_server_ip.env').strip
@@ -52,6 +52,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # VM
   config.ssh.forward_agent = false
   config.vm.synced_folder '.', '/vagrant', disabled: true
+  # Fix SMB username promt: https://github.com/mitchellh/vagrant-aws/issues/365
+  config.vm.allowed_synced_folder_types = :rsync
 
   # Amazon EC2
   config.vm.provider :aws do |aws, override|
@@ -62,7 +64,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # AWS instance configuration
     aws.region = 'eu-central-1'
     # Official Ubuntu 14.04 LTS amd64 hvm:ebs image from Canonical: https://cloud-images.ubuntu.com/locator/ec2/
-    aws.ami = 'ami-d19e79be'
+    aws.ami = 'ami-097f7de2'
     aws.keypair_name = SSH_KEY_NAME
     override.ssh.private_key_path = SSH_KEY_PATH
     override.ssh.username = SSH_USERNAME
@@ -92,7 +94,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
               # See: https://downloads.chef.io/chef-server/
               # Version 11 does not support 14.04: https://github.com/opscode-cookbooks/chef-server/issues/48
               # Commonly used 11.1.6 on older CWB instances (requires Ubuntu 12.04)
-              'version' => '12.4.1', # or 'latest'
+              'version' => '12.14.60', # or 'latest'
               # Provide if cookbook service is not working correctly (i.e. cookbooks cannot be uploaded).
               # Attempts to automatically detect public IP via Ohai/What's my ip query
               # 'api_fqdn' => CHEF_SERVER_IP
@@ -111,7 +113,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     # Amazon EC2
     config.vm.provider :aws do |aws, override|
-      aws.tags = {
+        aws.tags = {
           'Name' => 'cwb-server-production'
       }
     end
@@ -145,7 +147,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                       'validation_key' => File.read('chef-validator.pem'),
                       'validation_key_name' => 'chef-validator',
                       # VM provisioning
-                      'omnibus_chef_version' => '12.8.1'
+                      'omnibus_chef_version' => '12.14.60'
                   },
                   'providers' => {
                       'aws' => {
@@ -163,20 +165,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                       # Keep in mind that workers are memory-intensive because the currently load the entire Rails environment.
                       'num_workers' => 2
                   },
+                  'db' => {
+                    'postgres_password' => 'rootcloud'
+                  },
                   'nginx' => {
                       # 'hostname' => 'PUBLIC_HOST_OR_IP'
-                  }
-              },
-              'postgresql' => {
-                  'password' => {
-                      # Mandatory in Chef-Solo mode: https://github.com/hw-cookbooks/postgresql#chef-solo-note
-                      'postgres' => 'rootcloud'
-                  },
-                  # Optimize for non-dedicated database instance: https://github.com/hw-cookbooks/postgresql#config_pgtune
-                  'config_pgtune' => {
-                      'db_type' => 'desktop',
-                      # 'max_connections' => 5,
-                      # 'total_memory' => '256000kB'
                   }
               },
               # For a list of time zones see: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
