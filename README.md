@@ -233,46 +233,41 @@ Precondition: SSH'ed into the *cwb-server* instance
 
 ```bash
 cd  /var/www/cloud-workbench
-ls -l /etc/init/cloud-workbench*
+ls -l /etc/systemd/system/cloud-workbench*
 cat /etc/nginx/sites-available/cloud-workbench
 ```
 
-### Upstart
+### Systemd
+
+[Foreman](http://ddollar.github.io/foreman/#SYSTEMD-EXPORT) creates Systemd service templates upon deployment under `/etc/systemd/system/`. Background on [How To Use Systemctl to Manage Systemd Services and Units](https://www.digitalocean.com/community/tutorials/how-to-use-systemctl-to-manage-systemd-services-and-units)
 
 #### Targets
 
 ```bash
+cloud-workbench
 cloud-workbench-web
 cloud-workbench-web-1
-cloud-workbench
 cloud-workbench-job
 cloud-workbench-job-1
 cloud-workbench-job-2
+...
 ```
 
 #### Status
 
 ```bash
-sudo service cloud-workbench-job status
-sudo initctl status cloud-workbench
-sudo initctl status cloud-workbench-web
-sudo initctl status cloud-workbench-job
+systemctl status cloud-workbench.target
 ```
 
 #### Stop, Start, Restart
 
 ```bash
-sudo service cloud-workbench-job stop
-sudo initctl stop cloud-workbench-job
-
-sudo service cloud-workbench-job start
-sudo initctl start cloud-workbench-job
-
-sudo service cloud-workbench-job restart
-sudo initctl restart cloud-workbench-job
+systemctl start cloud-workbench.target
+systemctl stop cloud-workbench-web.target
+systemctl restart cloud-workbench-worker-2.service
 ```
 
-For further detail see: http://upstart.ubuntu.com/cookbook/
+For further detail see: https://www.digitalocean.com/community/tutorials/how-to-use-systemctl-to-manage-systemd-services-and-units
 
 ### View Logs
 
@@ -281,8 +276,17 @@ Precondition: SSH'ed into the target instance
 #### Cloud WorkBench
 
 ```bash
-sudo tail -f /var/log/upstart/cloud-workbench-web-*.log
-sudo tail -f /var/log/upstart/cloud-workbench-job-*.log
+# Real-time
+journalctl -u cloud-workbench* -f
+# Recent
+journalctl -u cloud-workbench* -n 20
+
+journalctl -u cloud-workbench*
+journalctl -u cloud-workbench-web*
+journalctl -u cloud-workbench-job*
+journalctl -u cloud-workbench-job@3100.service
+
+tail -f /var/log/syslog
 ```
 
 #### Nginx
