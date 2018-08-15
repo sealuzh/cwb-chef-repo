@@ -22,7 +22,7 @@ describe 'cwb-server::deploy_spec' do
     its(:stdout) { should match(%r{<title>Cloud WorkBench</title>}) }
   end
 
-  describe file('/etc/init/cloud-workbench-web-1.conf') do
-    its(:content) { should match(/env RAILS_ENV='production'/) }
+  describe file('/etc/systemd/system/cloud-workbench-web@.service') do
+    its(:content) { should match(/Environment="RAILS_ENV=production"/) }
   end
 end
