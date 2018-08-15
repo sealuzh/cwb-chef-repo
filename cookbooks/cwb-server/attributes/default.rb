@@ -33,12 +33,16 @@ default['cwb-server']['vagrant']['providers'] = [
 
 ### Ruby
 default['cwb-server']['ruby']['dir'] = '/usr/local'
-default['cwb-server']['ruby']['version'] = '2.2.4'
-# `source_url` takes precedence over `version`
-# Platforms: https://packager.io/documentation/distributions/
-# Ruby versions: https://packager.io/documentation/ruby/
-default['cwb-server']['ruby']['base_url'] = 'https://s3.amazonaws.com/pkgr-buildpack-ruby/current'
-default['cwb-server']['ruby']['source_url'] = nil
+# Supported versions: https://rvm.io/binaries/ubuntu
+# 16.04: https://rvm.io/binaries/ubuntu/16.04/x86_64/
+default['cwb-server']['ruby']['version'] = '2.5.1'
+default['cwb-server']['ruby']['bin_dir'] = "#{node['cwb-server']['ruby']['dir']}/ruby-#{node['cwb-server']['ruby']['version']}/bin"
+# Alternatives: http://rubies.travis-ci.org/
+default['cwb-server']['ruby']['base_url'] = 'https://rvm.io/binaries'
+default_source_url = File.join(node['cwb-server']['ruby']['base_url'], node['platform'], node['platform_version'], node['kernel']['machine'], "ruby-#{node['cwb-server']['ruby']['version']}.tar.bz2")
+# Overriding the `source_url` takes precedence over `version`
+# Example: https://rvm.io/binaries/ubuntu/16.04/x86_64/ruby-2.2.5.tar.bz2
+default['cwb-server']['ruby']['source_url'] = default_source_url
 default['cwb-server']['ruby']['checksum'] = nil
 
 ### Nodejs

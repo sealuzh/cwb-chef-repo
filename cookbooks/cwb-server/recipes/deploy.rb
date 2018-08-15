@@ -3,6 +3,8 @@ env = node['cwb-server']['env']
 
 # Required for compiling the pg gem
 package 'libpq-dev'
+# Required for compiling the nokogiri gem
+package 'libgmp3-dev'
 
 directory app['dir'] do
   owner app['user']
@@ -18,8 +20,10 @@ end
 # Example: `/opt/chef/embedded/bin/ruby -S bundle platform`
 def bundle(cmd, opts = {})
   sudo = opts[:sudo]
-  ruby_bin = "#{node['cwb-server']['ruby']['dir']}/bin/ruby" # or '/usr/bin/ruby'
-  "#{sudo ? 'sudo' : ''} #{ruby_bin} -S bundle #{cmd}"
+  # Example: /usr/local/ruby-2.2.5/bin
+  ruby_bin = "#{node['cwb-server']['ruby']['bin_dir']}/ruby"
+  bundle_bin = "#{node['cwb-server']['ruby']['bin_dir']}/bundle"
+  "#{sudo ? 'sudo' : ''} #{ruby_bin} -S #{bundle_bin} #{cmd}"
 end
 
 # These variables MUST be evaluated outside of the deploy resource
