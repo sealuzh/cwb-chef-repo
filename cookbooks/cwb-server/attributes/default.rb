@@ -102,6 +102,7 @@ organisation = validation_key_name.chomp('-validator')
 default['cwb-server']['chef']['server_url'] = "https://#{server_host}:443/organizations/#{organisation}"
 
 # Chef VM provisioning
+# Chef client versions: https://github.com/chef/chef/blob/master/RELEASE_NOTES.md
 default['cwb-server']['chef']['omnibus_chef_version'] = '12.14.60'
 default['cwb-server']['chef']['provisioning_path'] = '/etc/chef'
 

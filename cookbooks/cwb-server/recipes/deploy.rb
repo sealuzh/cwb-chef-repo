@@ -196,5 +196,5 @@ deploy app['name'] do
     end
   end
   # TODO: Think about graceful restart for currently running worker processes!
-  restart_command "sudo systemctl restart #{app['name']}.target"
+  restart_command "sudo systemctl daemon-reload && sudo systemctl restart #{app['name']}.target"
 end
