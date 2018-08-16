@@ -67,8 +67,7 @@ This Chef repo provides cookbooks to automatically install and configure
     > Make sure you stop/terminate the VMs after usage in order to avoid unnecessary expenses.
 
     ```bash
-    vagrant up --provider=aws          # Amazon EC2 Cloud
-    vagrant up                         # Virtualbox (default provider)
+    vagrant up
     ```
 
 5. Once the Chef Server completed provisioning (may take 5-10 minutes) with<br>
@@ -130,10 +129,10 @@ This Chef repo provides cookbooks to automatically install and configure
     vagrant provision cwb-server
     ```
 
-10. Browser to `http://my_public_ip_of_cwb_server` and login with the default password `demo`
+10. Browser to `http://my_public_ip_of_cwb_server` (http://33.33.33.20 for virtualbox) and login with the default password `demo`
 
     ```bash
-    # Query cwb-server IP
+    # Query public cwb-server IP
     vagrant ssh cwb-server --command 'wget -qO- http://ipecho.net/plain; echo'
     ```
 
@@ -159,7 +158,7 @@ vagrant provision cwb-server
 Acquire 2 VMs and install `cwb-server` and `chef-server`.
 
 ```bash
-vagrant up --provider=aws
+vagrant up
 ```
 
 SSH into a VM (default: cwb-server)
