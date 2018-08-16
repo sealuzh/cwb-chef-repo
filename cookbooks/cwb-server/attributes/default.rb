@@ -31,6 +31,16 @@ default['cwb-server']['vagrant']['providers'] = [
   { 'name' => 'vagrant-aws', 'version' => '0.7.2' }
 ]
 
+### Vagrant: https://supermarket.chef.io/cookbooks/vagrant#readme
+default['vagrant']['version'] = '2.1.2'
+default['vagrant']['user'] = node['cwb-server']['app']['user']
+default['vagrant']['plugins'] = [
+  # Ensure that Chef is installed within a VM
+  { 'name' => 'vagrant-omnibus', 'version' =>  '1.5.0' },
+  # Delete Chef client and node when destroying a VM
+  { 'name' => 'vagrant-butcher', 'version' =>  '2.2.0' }
+]  + node['cwb-server']['vagrant']['providers']
+
 ### Ruby
 default['cwb-server']['ruby']['dir'] = '/usr/local'
 # Supported versions: https://rvm.io/binaries/ubuntu
