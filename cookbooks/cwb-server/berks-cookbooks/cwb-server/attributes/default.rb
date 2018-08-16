@@ -102,7 +102,10 @@ organisation = validation_key_name.chomp('-validator')
 default['cwb-server']['chef']['server_url'] = "https://#{server_host}:443/organizations/#{organisation}"
 
 # Chef VM provisioning
-default['cwb-server']['chef']['omnibus_chef_version'] = '12.14.60'
+# Chef client versions: https://docs.chef.io/release_notes.html
+# Notice that CWB is currently not yet compatible with Chef 13 and 14
+# https://github.com/sealuzh/cwb-benchmarks/issues/20
+default['cwb-server']['chef']['omnibus_chef_version'] = '12.22.3'
 default['cwb-server']['chef']['provisioning_path'] = '/etc/chef'
 
 ## Providers
