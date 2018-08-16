@@ -5,6 +5,7 @@ env = node['cwb-server']['env']
 package 'libpq-dev'
 # Required for compiling the nokogiri gem
 package 'libgmp3-dev'
+package 'zlib1g-dev'
 
 directory app['dir'] do
   owner app['user']

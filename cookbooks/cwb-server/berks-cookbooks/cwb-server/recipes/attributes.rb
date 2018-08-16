@@ -1,18 +1,3 @@
-require 'securerandom'
-
-### Base utilities
-node.normal['build-essential']['compile_time'] = true
-node.normal['apt']['compile_time_update'] = true
-
-### App
-# Unless given, randomly generate a password for the database
-node.default_unless['cwb-server']['db']['password'] = SecureRandom.hex(24)
-# Unless given, randomly generate secret key base (used for checking the integrity of signed cookies)
-node.default_unless['cwb-server']['env']['SECRET_KEY_BASE'] = SecureRandom.hex(64)
-
-## Nginx
-node.default_unless['cwb-server']['nginx']['hostname'] = '0.0.0.0'
-
 def detect_public_ip
   cmd = Mixlib::ShellOut.new(node['cwb-server']['host_detection'])
   cmd.run_command
