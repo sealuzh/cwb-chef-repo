@@ -1,8 +1,23 @@
+#
+# License:: Apache License, Version 2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 include OpenSSLCookbook::Helpers
 
 property :path,             String, name_property: true
-property :owner,            String, default: node['platform'] == 'windows' ? 'Administrator' : 'root'
-property :group,            String, default: node['root_group']
+property :owner,            String
+property :group,            String
 property :mode,             [Integer, String], default: '0644'
 property :country,          String
 property :state,            String
@@ -17,14 +32,12 @@ property :key_type,         equal_to: %w(rsa ec), default: 'ec'
 property :key_length,       equal_to: [1024, 2048, 4096, 8192], default: 2048
 property :key_curve,        equal_to: %w(secp384r1 secp521r1 prime256v1), default: 'prime256v1'
 
-default_action :create
-
 action :create do
   unless ::File.exist? new_resource.path
     converge_by("Create CSR #{@new_resource}") do
       file new_resource.name do
-        owner new_resource.owner
-        group new_resource.group
+        owner new_resource.owner unless new_resource.owner.nil?
+        group new_resource.group unless new_resource.group.nil?
         mode new_resource.mode
         content csr.to_pem
         action :create
@@ -32,8 +45,8 @@ action :create do
 
       file new_resource.key_file do
         mode new_resource.mode
-        owner new_resource.owner
-        group new_resource.group
+        owner new_resource.owner unless new_resource.owner.nil?
+        group new_resource.group unless new_resource.group.nil?
         content key.to_pem
         sensitive true
         action :create_if_missing

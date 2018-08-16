@@ -3,6 +3,8 @@ env = node['cwb-server']['env']
 
 # Required for compiling the pg gem
 package 'libpq-dev'
+# Required for compiling the nokogiri gem
+package 'libgmp3-dev'
 
 directory app['dir'] do
   owner app['user']
@@ -18,8 +20,10 @@ end
 # Example: `/opt/chef/embedded/bin/ruby -S bundle platform`
 def bundle(cmd, opts = {})
   sudo = opts[:sudo]
-  ruby_bin = "#{node['cwb-server']['ruby']['dir']}/bin/ruby" # or '/usr/bin/ruby'
-  "#{sudo ? 'sudo' : ''} #{ruby_bin} -S bundle #{cmd}"
+  # Example: /usr/local/ruby-2.2.5/bin
+  ruby_bin = "#{node['cwb-server']['ruby']['bin_dir']}/ruby"
+  bundle_bin = "#{node['cwb-server']['ruby']['bin_dir']}/bundle"
+  "#{sudo ? 'sudo' : ''} #{ruby_bin} -S #{bundle_bin} #{cmd}"
 end
 
 # These variables MUST be evaluated outside of the deploy resource
@@ -36,14 +40,18 @@ migration_cmd = bundle('exec rake db:migrate --trace')
 precompile_assets = bundle('exec rake assets:precompile')
 update_pw_cmd = bundle("exec rake user:create[seal@uzh.ch,#{app['user_password']}]")
 # --log #{app['log_dir']} has no effect,
-# Upstarts logs to /var/log/upstart/APPNAME per convention
+# Systemd logs to ???
+# Example:
+# sudo bin/foreman export systemd /etc/systemd/system \
+#   --procfile Procfile_production --env .env --app cloud-workbench \
+#   --formation web=1,job=1 --port 3000 --user app
 foreman_opts = "--procfile Procfile_production \
                 --env .env \
                 --app #{app['name']} \
-                --concurrency web=1,job=#{app['num_workers']} \
+                --formation web=1,job=#{app['num_workers']} \
                 --port #{app['port']} \
                 --user #{app['user']}"
-configure_upstart_cmd = bundle("exec foreman export upstart /etc/init #{foreman_opts}", sudo: true)
+configure_systemd_cmd = bundle("exec foreman export systemd /etc/systemd/system #{foreman_opts}", sudo: true)
 deploy app['name'] do
   deploy_to app['dir']
   scm_provider Chef::Provider::Git
@@ -54,12 +62,12 @@ deploy app['name'] do
   action :deploy
 
   ### User and group
-  user app['deploy_user']
-  group app['deploy_user']
+  user app['user']
+  group app['user']
 
   ### Migrations
   before_migrate do
-    # TODO: Consider logging to stdout and using a log management tool (e.g., logrotate)
+    # TODO: Consider using a log management tool (e.g., logrotate)
     # SEE: https://github.com/heroku/rails_12factor
     # MUST remove existing log directory before creating the symlink
     directory File.join(release_path, 'log') do
@@ -119,7 +127,7 @@ deploy app['name'] do
   migration_command migration_cmd
   # TODO: refactor into `env_string_hash(envs)`
   # HOME must be set to deploy user for bundler
-  environment(env.map { |k, v| [k.to_s, v.to_s] }.to_h.merge('HOME' => "/home/#{app['deploy_user']}"))
+  environment(env.map { |k, v| [k.to_s, v.to_s] }.to_h.merge('HOME' => "/home/#{app['user']}"))
 
   ### Symlinks
   purge_before_symlink.clear
@@ -172,19 +180,20 @@ deploy app['name'] do
       block do
         FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'storage'))
         FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'log'))
+        FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'vendor'))
       end
     end
 
     Chef::Log.info('Restarting cloud-workbench')
     # `release_path` is not available within the resources
     current_release = release_path
-    execute 'configure-upstart' do
+    execute 'configure-systemd' do
       user new_resource.user
-      command configure_upstart_cmd
+      command configure_systemd_cmd
       cwd current_release
       action :run
     end
   end
   # TODO: Think about graceful restart for currently running worker processes!
-  restart_command "sudo service #{app['name']} restart"
+  restart_command "sudo systemctl restart #{app['name']}.target"
 end

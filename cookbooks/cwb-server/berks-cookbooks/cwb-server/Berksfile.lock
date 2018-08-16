@@ -25,7 +25,7 @@ GRAPH
   mingw (2.1.0)
     seven_zip (>= 0.0.0)
   ntp (3.6.0)
-  openssl (8.5.0)
+  openssl (8.5.2)
   postgresql (7.1.0)
     build-essential (>= 2.0.0)
     openssl (>= 4.0)

@@ -2,7 +2,7 @@ db = node['cwb-server']['db']
 
 # Docs: https://github.com/sous-chefs/postgresql
 postgresql_server_install 'Install PostgreSQL' do
-  version db['version']
+  version db['postgresql_version']
   action :install
 end
 

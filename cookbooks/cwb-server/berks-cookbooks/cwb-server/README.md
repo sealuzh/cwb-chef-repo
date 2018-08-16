@@ -5,7 +5,7 @@ Installs and configures the Cloud WorkBench server.
 
 ## Supported Platforms
 
-* Ubuntu 14.04 64bit (tested)
+* Ubuntu 16.04 64bit (tested 2018-08-14)
 
 ## Attributes
 
