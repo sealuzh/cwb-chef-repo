@@ -143,6 +143,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                       # VM provisioning
                       # Chef versions: https://docs.chef.io/release_notes.html
                       # Notice that CWB is currently not yet compatible with Chef 13 and 14
+                      # https://github.com/sealuzh/cwb-benchmarks/issues/20
                       'omnibus_chef_version' => '12.22.3'
                   },
                   'providers' => {
