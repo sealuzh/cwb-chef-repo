@@ -12,5 +12,5 @@ test:
 lint:
 	foodcritic .
 
-vendor:
+vendor: install
 	./vendor_berks_cookbooks.sh
