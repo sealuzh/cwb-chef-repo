@@ -25,7 +25,7 @@ suites:
       tz: Europe/Zurich
       cwb-server:
         app:
-          branch: fix/deprecations
+          branch: fix/deprecations # TODO: switch to master
         db:
           password: cloud
           postgres_password: rootcloud

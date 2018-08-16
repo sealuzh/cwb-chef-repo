@@ -19,8 +19,7 @@ default['cwb-server']['app']['num_workers'] = 2
 default['cwb-server']['app']['port'] = 3000
 
 ### Nginx
-# Defaults to `0.0.0.0` if unset
-default['cwb-server']['nginx']['hostname'] = nil
+default['cwb-server']['nginx']['hostname'] = '0.0.0.0'
 default['cwb-server']['nginx']['log_dir'] = '/var/log/nginx'
 
 ### Providers
@@ -66,8 +65,7 @@ default['cwb-server']['db']['postgresql_version'] = '9.6'
 default['cwb-server']['db']['port'] = 5432
 default['cwb-server']['db']['name'] = 'cloud_workbench_production'
 default['cwb-server']['db']['user'] = 'cloud'
-# Randomly generated if not provided
-default['cwb-server']['db']['password'] = nil
+default['cwb-server']['db']['password'] = 'cloud'
 
 ### Environment variables
 default['cwb-server']['env']['HOME'] = "/home/#{node['cwb-server']['app']['user']}"
@@ -131,3 +129,7 @@ default['cwb-server']['providers'] = {}
 # default['cwb-server']['providers']['google']['client_email'] = ''
 # default['cwb-server']['providers']['google']['api_key_name'] = ''
 # default['cwb-server']['providers']['google']['api_key_BASE64_FILE'] = ''
+
+### Base utilities
+normal['build-essential']['compile_time'] = true
+normal['apt']['compile_time_update'] = true
