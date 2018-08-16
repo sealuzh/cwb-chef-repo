@@ -6,6 +6,8 @@ Wrapper cookbook for the `chef-server` cookbook from:
 * Github: https://github.com/opscode-cookbooks/chef-server
 * *chef-server.rb* Settings: https://docs.chef.io/config_rb_server_optional_settings.html
 
+* Chef server versions: https://downloads.chef.io/
+
 Checkout these links for further information regarding supported platforms, usage, and attributes.
 
 ## Additional features
