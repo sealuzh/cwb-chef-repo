@@ -141,7 +141,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                       'validation_key' => File.read('chef-validator.pem'),
                       'validation_key_name' => 'chef-validator',
                       # VM provisioning
-                      'omnibus_chef_version' => '12.14.60'
+                      # Chef versions: https://docs.chef.io/release_notes.html
+                      # Notice that CWB is currently not yet compatible with Chef 13 and 14
+                      'omnibus_chef_version' => '12.22.3'
                   },
                   'providers' => {
                       'aws' => {
