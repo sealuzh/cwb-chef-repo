@@ -7,7 +7,7 @@ end
 
 describe 'cwb-server::vagrant' do
   describe command(cmd_as_user('vagrant --version')) do
-    its(:stdout) { should match(/Vagrant 1\.\d+\.\d+/) }
+    its(:stdout) { should match(/Vagrant 2\.\d+\.\d+/) }
   end
 
   describe command(cmd_as_user('vagrant plugin list')) do

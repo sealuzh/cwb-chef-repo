@@ -28,7 +28,7 @@ default['cwb-server']['nginx']['log_dir'] = '/var/log/nginx'
 # a) Optimistic (might break on newer releases): ['vagrant-google', ...]
 # b) Pessimistic (requires manual updating): [{ 'name' => 'vagrant-google',  'version' =>  '0.2.2' }, ...]
 default['cwb-server']['vagrant']['providers'] = [
-  { 'name' => 'vagrant-aws', 'version' => '0.6.0' }
+  { 'name' => 'vagrant-aws', 'version' => '0.7.2' }
 ]
 
 ### Ruby
