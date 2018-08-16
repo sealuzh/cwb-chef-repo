@@ -256,15 +256,15 @@ cloud-workbench-job-2
 #### Status
 
 ```bash
-systemctl status cloud-workbench.target
+sudo systemctl status cloud-workbench.target
 ```
 
 #### Stop, Start, Restart
 
 ```bash
-systemctl start cloud-workbench.target
-systemctl stop cloud-workbench-web.target
-systemctl restart cloud-workbench-worker-2.service
+sudo systemctl start cloud-workbench.target
+sudo systemctl stop cloud-workbench-web.target
+sudo systemctl restart cloud-workbench-worker-2.service
 ```
 
 For further detail see: https://www.digitalocean.com/community/tutorials/how-to-use-systemctl-to-manage-systemd-services-and-units
