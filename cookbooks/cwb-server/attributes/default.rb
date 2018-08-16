@@ -71,6 +71,7 @@ default['cwb-server']['env']['WEB_CONCURRENCY'] = 3
 
 default['cwb-server']['host_detection'] = 'wget -qO- http://ipecho.net/plain; echo'
 default['cwb-server']['env']['CWB_SERVER_HOST'] = nil
+default['cwb-server']['env']['PATH'] = "#{node['cwb-server']['ruby']['bin_dir']}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 
 ### Secrets
 default['cwb-server']['apply_secret_config'] = true

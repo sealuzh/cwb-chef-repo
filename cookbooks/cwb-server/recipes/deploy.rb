@@ -62,8 +62,8 @@ deploy app['name'] do
   action :deploy
 
   ### User and group
-  user app['deploy_user']
-  group app['deploy_user']
+  user app['user']
+  group app['user']
 
   ### Migrations
   before_migrate do
@@ -127,7 +127,7 @@ deploy app['name'] do
   migration_command migration_cmd
   # TODO: refactor into `env_string_hash(envs)`
   # HOME must be set to deploy user for bundler
-  environment(env.map { |k, v| [k.to_s, v.to_s] }.to_h.merge('HOME' => "/home/#{app['deploy_user']}"))
+  environment(env.map { |k, v| [k.to_s, v.to_s] }.to_h.merge('HOME' => "/home/#{app['user']}"))
 
   ### Symlinks
   purge_before_symlink.clear
@@ -180,6 +180,7 @@ deploy app['name'] do
       block do
         FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'storage'))
         FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'log'))
+        FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'vendor'))
       end
     end
 
