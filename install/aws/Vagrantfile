@@ -38,7 +38,7 @@ VAGRANTFILE_API_VERSION = '2'
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Detect vagrant-omnibus plugin
   if Vagrant.has_plugin?('vagrant-omnibus')
-    config.omnibus.chef_version = '12.8.1' # or :latest
+    config.omnibus.chef_version = '14.3.37' # or :latest
   else
     STDERR.puts 'FATAL: Vagrant-omnibus plugin not detected. Please install the plugin with
                  `vagrant plugin install vagrant-omnibus`.'
@@ -63,8 +63,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     # AWS instance configuration
     aws.region = 'eu-central-1'
-    # Official Ubuntu 14.04 LTS amd64 hvm:ebs image from Canonical: https://cloud-images.ubuntu.com/locator/ec2/
-    aws.ami = 'ami-097f7de2'
+    # Official Ubuntu 16.04 LTS hvm:ebs-ssd image from Canonical: https://cloud-images.ubuntu.com/locator/ec2/
+    aws.ami = 'ami-027583e616ca104df'
     aws.keypair_name = SSH_KEY_NAME
     override.ssh.private_key_path = SSH_KEY_PATH
     override.ssh.username = SSH_USERNAME
@@ -90,11 +90,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       chef.add_recipe 'cwb-chef-server'
       chef.json = {
           'chef-server' => {
-              # Current version as of 2016-03-28 is 12.4.1 (recommended with Ubuntu 14.04)
-              # See: https://downloads.chef.io/chef-server/
-              # Version 11 does not support 14.04: https://github.com/opscode-cookbooks/chef-server/issues/48
-              # Commonly used 11.1.6 on older CWB instances (requires Ubuntu 12.04)
-              'version' => '12.14.60', # or 'latest'
+              # 12.17.33 as of 2018-08-16
+              'version' => '12.17.33', # or nil for latest
               # Provide if cookbook service is not working correctly (i.e. cookbooks cannot be uploaded).
               # Attempts to automatically detect public IP via Ohai/What's my ip query
               # 'api_fqdn' => CHEF_SERVER_IP
@@ -124,9 +121,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       chef.cookbooks_path = "#{CWB_SERVER}/berks-cookbooks"
       chef.provisioning_path = '/etc/chef'
       chef.add_recipe 'cwb-server'
-      # Convergence will currently fail on the first run because
-      # the freshly installed Ruby is not yet available in the path
-      chef.attempts = 2
       # Refer to `cookbooks/cwb-server/attributes/default.rb` for an
       # extensive list of configurable attributes
       chef.json =
@@ -156,16 +150,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                       }
                   },
                   'env' => {
-                      # We do not want to invalidate the secret on every provisioning
                       'SECRET_KEY_BASE' => read_or_cache('secret_key_base.env', SecureRandom.hex(64))
                   },
                   'app' => {
+                      'branch' => 'fix/deprecations', # TODO: switch to master
                       'user_password' => 'demo',
                       # Determines how many benchmarks can be prepared, started, or released in parallel.
                       # Keep in mind that workers are memory-intensive because the currently load the entire Rails environment.
                       'num_workers' => 2
                   },
                   'db' => {
+                    'password' => 'cloud',
                     'postgres_password' => 'rootcloud'
                   },
                   'nginx' => {
