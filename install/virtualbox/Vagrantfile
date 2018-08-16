@@ -142,7 +142,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                   'SECRET_KEY_BASE' => read_or_cache('secret_key_base.env', SecureRandom.hex(64))
               },
               'app' => {
-                'branch' => 'fix/deprecations', # TODO: switch to master
+                'branch' => 'master',
                 'user_password' => 'demo',
                 # Determines how many benchmarks can be prepared, started, or released in parallel.
                 # Keep in mind that workers are memory-intensive because the currently load the entire Rails environment.
