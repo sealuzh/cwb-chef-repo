@@ -1,0 +1,11 @@
+DEPENDENCIES
+  cwb-chef-server
+    path: .
+    metadata: true
+
+GRAPH
+  chef-ingredient (2.3.2)
+  chef-server (5.5.2)
+    chef-ingredient (>= 2.1.10)
+  cwb-chef-server (0.2.0)
+    chef-server (~> 5.5.2)

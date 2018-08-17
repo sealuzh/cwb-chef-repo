@@ -1,26 +1,27 @@
-dmg Cookbook
-============
+The dmg_package resource is now included in Chef 14 and this cookbook has been deprecated. We highly recommend updating to Chef 14 so you can use this resource without the need for a cookbook dependency.
 
-[![Build Status](https://travis-ci.org/chef-cookbooks/dmg.svg?branch=master)](https://travis-ci.org/chef-cookbooks/dmg)
-[![Cookbook Version](https://img.shields.io/cookbook/v/dmg.svg)](https://supermarket.chef.io/cookbooks/dmg)
+# dmg Cookbook
 
-Lightweight resource and provider to install OS X applications (.app) from dmg files.
+[![Build Status](https://travis-ci.org/chef-cookbooks/dmg.svg?branch=master)](https://travis-ci.org/chef-cookbooks/dmg) [![Cookbook Version](https://img.shields.io/cookbook/v/dmg.svg)](https://supermarket.chef.io/cookbooks/dmg)
 
+Resource to install OS X applications (.app) from dmg files.
 
-Requirements
-------------
-#### Platforms
-- Mac OS X
+## Requirements
 
-#### Chef
-- Chef 11+
+### Platforms
 
-#### Cookbooks
+- macOS
+
+### Chef
+
+- Chef 12.5+
+
+### Cookbooks
+
 - none
 
+## Resources/Providers
 
-Resources/Providers
--------------------
 ### dmg_package
 
 This resource will install a DMG "Package". It will retrieve the DMG from a remote URL, mount it using OS X's `hdid`, copy the application (.app directory) to the specified destination (/Applications), and detach the image using `hdiutil`. The dmg file will be stored in the `Chef::Config[:file_cache_path]`. If you want to install an application that has already been downloaded (not using the `source` parameter), copy it to the appropriate location. You can find out what directory this is with the following command on the node to run chef:
@@ -32,11 +33,14 @@ knife exec -E 'p Chef::Config[:file_cache_path]' -c /etc/chef/client.rb
 Optionally, the LWRP can install an "mpkg" or "pkg" package using installer(8).
 
 #### Actions
+
 - :install - Installs the application.
 
 #### Parameter attributes:
+
 - `app` - This is the name of the application used by default for the /Volumes directory and the .app directory copied to /Applications.
 - `source` - remote URL for the dmg to download if specified. Default is nil.
+- `file` - local dmg full file path. Default is nil.
 - `owner` - owner that should own the package installation.
 - `destination` - directory to copy the .app into. Default is /Applications.
 - `checksum` - sha256 checksum of the dmg to download. Default is nil.
@@ -45,16 +49,18 @@ Optionally, the LWRP can install an "mpkg" or "pkg" package using installer(8).
 - `package_id` - Package id registered with pkgutil when a pkg or mpkg is installed
 - `dmg_name` - Specify the name of the dmg if it is not the same as `app`, or if the name has spaces.
 - `dmg_passphrase` - Specify a passphrase to use to unencrypt the dmg while mounting.
-- `accept_eula` - Specify whether to accept the EULA.  Certain dmgs require acceptance of EULA before mounting.  Can be true or false, defaults to false.
+- `accept_eula` - Specify whether to accept the EULA. Certain dmgs require acceptance of EULA before mounting. Can be true or false, defaults to false.
 - `headers` - Allows custom HTTP headers (like cookies) to be set on the remote_file resource.
+- `allow_untrusted` - Allows packages with untrusted certs to be installed.
 
 #### Examples
+
 Install `/Applications/Tunnelblick.app` from the primary download site.
 
 ```ruby
 dmg_package 'Tunnelblick' do
-  source   'http://tunnelblick.googlecode.com/files/Tunnelblick_3.1.2.dmg'
-  checksum 'a3fae60b6833175f32df20c90cd3a3603a'
+  source   'https://tunnelblick.net/release/Tunnelblick_3.7.0_build_4790.dmg'
+  checksum '5053038aa8caf7dea66dcab11d6d240672216e6546eff4c2622e216c61af85e5'
   action   :install
 end
 ```
@@ -122,13 +128,12 @@ dmg_package 'Silerlight' do
 end
 ```
 
+## License & Authors
 
-License & Authors
------------------
+**Author:** Cookbook Engineering Team ([cookbooks@chef.io](mailto:cookbooks@chef.io))
 
-**Author:** Cookbook Engineering Team (<cookbooks@chef.io>)
+**Copyright:** 2011-2017, Chef Software, Inc.
 
-**Copyright:** 2011-2015, Chef Software, Inc.
 ```
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

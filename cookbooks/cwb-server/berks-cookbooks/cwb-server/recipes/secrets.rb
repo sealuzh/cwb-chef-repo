@@ -1,4 +1,5 @@
 require 'base64'
+require 'securerandom'
 
 app_user = node['cwb-server']['app']['user']
 app_user_home = "/home/#{app_user}"
@@ -22,6 +23,18 @@ def store_key(path, key, user)
     owner user
     group user
     mode '0600'
+  end
+end
+
+# Use file `/home/apps/.secret_key_base` to cache generated `SECRET_KEY_BASE`
+secret_key_base_path = "#{app_user_home}/.secret_key_base"
+if node['cwb-server']['env']['SECRET_KEY_BASE'].nil?
+  if File.exists?(secret_key_base_path)
+    node.normal['cwb-server']['env']['SECRET_KEY_BASE'] = File.read(secret_key_base_path)
+  else
+    new_key = SecureRandom.hex(64)
+    store_key secret_key_base_path, new_key
+    node.normal['cwb-server']['env']['SECRET_KEY_BASE'] = new_key
   end
 end
 

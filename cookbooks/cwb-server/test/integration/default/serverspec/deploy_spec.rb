@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'cwb-server::deploy_spec' do
   describe file('/var/www/cloud-workbench/current/Gemfile') do
-    it { should be_owned_by 'deploy' }
+    it { should be_owned_by 'apps' }
     its(:content) { should match(%r{source 'https://rubygems.org'}) }
   end
 
@@ -22,7 +22,7 @@ describe 'cwb-server::deploy_spec' do
     its(:stdout) { should match(%r{<title>Cloud WorkBench</title>}) }
   end
 
-  describe file('/etc/init/cloud-workbench-web-1.conf') do
-    its(:content) { should match(/env RAILS_ENV='production'/) }
+  describe file('/etc/systemd/system/cloud-workbench-web@.service') do
+    its(:content) { should match(/Environment="RAILS_ENV=production"/) }
   end
 end

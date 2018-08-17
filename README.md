@@ -9,9 +9,9 @@ This Chef repo provides cookbooks to automatically install and configure
 > Feel free to contact us: philipp.leitner[AT]chalmers.se or scheuner[AT]chalmers.se
 
 * [Git](http://git-scm.com/)
-* [Vagrant (1.8.1)](https://www.vagrantup.com/downloads.html)
-    * [vagrant-omnibus (1.4.1)](https://github.com/chef/vagrant-omnibus) for auto-installation via Chef
-    * [vagrant-aws (0.7.0)](https://github.com/mitchellh/vagrant-aws) for deployment in the Amazon EC2 Cloud
+* [Vagrant (2.1.2)](https://www.vagrantup.com/downloads.html)
+    * [vagrant-omnibus (1.5.0)](https://github.com/chef/vagrant-omnibus) for auto-installation via Chef
+    * [vagrant-aws (0.7.2)](https://github.com/mitchellh/vagrant-aws) for deployment in the Amazon EC2 Cloud
       ([alternative providers](https://github.com/mitchellh/vagrant/wiki/Available-Vagrant-Plugins#providers) are available)
     * Install Vagrant with the [official installer](https://www.vagrantup.com/downloads.html) or with [Homebrew Cask](https://github.com/Homebrew/homebrew-cask) via `brew cask install vagrant`
     * Install Vagrant plugins via
@@ -52,10 +52,13 @@ This Chef repo provides cookbooks to automatically install and configure
    Find the *aws* config under `config.vm.provider :aws` (e.g., instance type)
    Find the *cwb-server* config under `chef.json`
 
-    ```
+    ```bash
     # For Amazon EC2
     AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY'] || 'my_aws_access_key'
     AWS_SECRET_KEY = ENV['AWS_SECRET_KEY'] || 'my_aws_secret_key'
+    # SSH Key
+    SSH_KEY_PATH = ENV['SSH_KEY_PATH'] || 'cloud-benchmarking.pem'
+    SSH_KEY_NAME = ENV['SSH_KEY_NAME'] || 'cloud-benchmarking'
     ```
 
 4. Start automated installation and configuration.
@@ -64,8 +67,7 @@ This Chef repo provides cookbooks to automatically install and configure
     > Make sure you stop/terminate the VMs after usage in order to avoid unnecessary expenses.
 
     ```bash
-    vagrant up --provider=aws          # Amazon EC2 Cloud
-    vagrant up                         # Virtualbox (default provider)
+    vagrant up
     ```
 
 5. Once the Chef Server completed provisioning (may take 5-10 minutes) with<br>
@@ -127,10 +129,10 @@ This Chef repo provides cookbooks to automatically install and configure
     vagrant provision cwb-server
     ```
 
-10. Browser to `http://my_public_ip_of_cwb_server` and login with the default password `demo`
+10. Browser to `http://my_public_ip_of_cwb_server` (http://33.33.33.20 for virtualbox) and login with the default password `demo`
 
     ```bash
-    # Query cwb-server IP
+    # Query public cwb-server IP
     vagrant ssh cwb-server --command 'wget -qO- http://ipecho.net/plain; echo'
     ```
 
@@ -156,7 +158,7 @@ vagrant provision cwb-server
 Acquire 2 VMs and install `cwb-server` and `chef-server`.
 
 ```bash
-vagrant up --provider=aws
+vagrant up
 ```
 
 SSH into a VM (default: cwb-server)
@@ -230,46 +232,41 @@ Precondition: SSH'ed into the *cwb-server* instance
 
 ```bash
 cd  /var/www/cloud-workbench
-ls -l /etc/init/cloud-workbench*
+ls -l /etc/systemd/system/cloud-workbench*
 cat /etc/nginx/sites-available/cloud-workbench
 ```
 
-### Upstart
+### Systemd
+
+[Foreman](http://ddollar.github.io/foreman/#SYSTEMD-EXPORT) creates Systemd service templates upon deployment under `/etc/systemd/system/`. Background on [How To Use Systemctl to Manage Systemd Services and Units](https://www.digitalocean.com/community/tutorials/how-to-use-systemctl-to-manage-systemd-services-and-units)
 
 #### Targets
 
 ```bash
+cloud-workbench
 cloud-workbench-web
 cloud-workbench-web-1
-cloud-workbench
 cloud-workbench-job
 cloud-workbench-job-1
 cloud-workbench-job-2
+...
 ```
 
 #### Status
 
 ```bash
-sudo service cloud-workbench-job status
-sudo initctl status cloud-workbench
-sudo initctl status cloud-workbench-web
-sudo initctl status cloud-workbench-job
+sudo systemctl status cloud-workbench.target
 ```
 
 #### Stop, Start, Restart
 
 ```bash
-sudo service cloud-workbench-job stop
-sudo initctl stop cloud-workbench-job
-
-sudo service cloud-workbench-job start
-sudo initctl start cloud-workbench-job
-
-sudo service cloud-workbench-job restart
-sudo initctl restart cloud-workbench-job
+sudo systemctl start cloud-workbench.target
+sudo systemctl stop cloud-workbench-web.target
+sudo systemctl restart cloud-workbench-worker-2.service
 ```
 
-For further detail see: http://upstart.ubuntu.com/cookbook/
+For further detail see: https://www.digitalocean.com/community/tutorials/how-to-use-systemctl-to-manage-systemd-services-and-units
 
 ### View Logs
 
@@ -278,8 +275,17 @@ Precondition: SSH'ed into the target instance
 #### Cloud WorkBench
 
 ```bash
-sudo tail -f /var/log/upstart/cloud-workbench-web-*.log
-sudo tail -f /var/log/upstart/cloud-workbench-job-*.log
+# Real-time
+journalctl -u cloud-workbench* -f
+# Recent
+journalctl -u cloud-workbench* -n 20
+
+journalctl -u cloud-workbench*
+journalctl -u cloud-workbench-web*
+journalctl -u cloud-workbench-job*
+journalctl -u cloud-workbench-job@3100.service
+
+tail -f /var/log/syslog
 ```
 
 #### Nginx

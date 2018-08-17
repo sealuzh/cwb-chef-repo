@@ -1,5 +1,8 @@
 #
-# Copyright ()c) 2015 Chef Software, Inc.
+# Cookbook:: chef-server
+# Recipe:: addons
+#
+# Copyright:: 2015-2016, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,8 +16,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-node['chef-server']['addons'].each do |addon|
+node['chef-server']['addons'].each do |addon, ver|
   chef_ingredient addon do
+    accept_license node['chef-server']['accept_license'] unless node['chef-server']['accept_license'].nil?
     notifies :reconfigure, "chef_ingredient[#{addon}]"
+    version ver unless ver.nil?
   end
 end

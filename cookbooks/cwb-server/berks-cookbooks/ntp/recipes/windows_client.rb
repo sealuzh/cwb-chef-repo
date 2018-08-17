@@ -1,10 +1,10 @@
 #
-# Cookbook Name:: ntp
+# Cookbook:: ntp
 # Recipe:: windows_client
 # Author:: Tim Smith (<tsmith@chef.io>)
 #
-# Copyright 2012, Webtrends, Inc
-# Copyright 2013, Limelight Networks, Inc
+# Copyright:: 2012-2017, Webtrends, Inc
+# Copyright:: 2013-2017, Limelight Networks, Inc
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,14 +31,6 @@ cookbook_file 'C:/NTP/ntp.ini' do
   source 'ntp.ini'
   inherits true
   action :create
-end
-
-windows_package node['ntp']['vs_runtime_productname'] do
-  source node['ntp']['vs_runtime_url']
-  options '/q'
-  installer_type :custom
-  action :install
-  only_if { node['kernel']['release'].to_f < 6 }
 end
 
 unless File.exist?('C:/NTP/bin/ntpd.exe')

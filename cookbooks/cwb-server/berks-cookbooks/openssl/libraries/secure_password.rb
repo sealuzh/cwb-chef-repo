@@ -1,9 +1,9 @@
 #
-# Cookbook Name:: openssl
+# Cookbook:: openssl
 # Library:: secure_password
 # Author:: Joshua Timberman <joshua@chef.io>
 #
-# Copyright 2009, Chef Software, Inc.
+# Copyright:: 2009-2017, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ module Opscode
     # Generate secure passwords with OpenSSL
     module Password
       def secure_password(length = 20)
+        Chef::Log.warn('The Opscode::OpenSSL::Password helper "secure_password" has been deprecated. Use the random_password method in OpenSSLCookbook::RandomPassword instead.')
+
         pw = ''
 
         while pw.length < length

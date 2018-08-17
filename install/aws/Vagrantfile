@@ -7,8 +7,8 @@ SSH_USERNAME = 'ubuntu'
 AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY'] || 'my_aws_access_key'
 AWS_SECRET_KEY = ENV['AWS_SECRET_KEY'] || 'my_aws_secret_key'
 
-SSH_KEY_PATH = 'cloud-benchmarking.pem'
-SSH_KEY_NAME = 'cloud-benchmarking'
+SSH_KEY_PATH = ENV['SSH_KEY_PATH'] || 'cloud-benchmarking.pem'
+SSH_KEY_NAME = ENV['SSH_KEY_NAME'] || 'cloud-benchmarking'
 
 ##########################################################
 CHEF_SERVER_IP = ENV['CHEF_SERVER_IP'] || File.read('chef_server_ip.env').strip
@@ -38,7 +38,7 @@ VAGRANTFILE_API_VERSION = '2'
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Detect vagrant-omnibus plugin
   if Vagrant.has_plugin?('vagrant-omnibus')
-    config.omnibus.chef_version = '12.8.1' # or :latest
+    config.omnibus.chef_version = '14.3.37' # or :latest
   else
     STDERR.puts 'FATAL: Vagrant-omnibus plugin not detected. Please install the plugin with
                  `vagrant plugin install vagrant-omnibus`.'
@@ -52,6 +52,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # VM
   config.ssh.forward_agent = false
   config.vm.synced_folder '.', '/vagrant', disabled: true
+  # Fix SMB username promt: https://github.com/mitchellh/vagrant-aws/issues/365
+  config.vm.allowed_synced_folder_types = :rsync
 
   # Amazon EC2
   config.vm.provider :aws do |aws, override|
@@ -61,8 +63,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     # AWS instance configuration
     aws.region = 'eu-central-1'
-    # Official Ubuntu 14.04 LTS amd64 hvm:ebs image from Canonical: https://cloud-images.ubuntu.com/locator/ec2/
-    aws.ami = 'ami-d19e79be'
+    # Official Ubuntu 16.04 LTS hvm:ebs-ssd image from Canonical: https://cloud-images.ubuntu.com/locator/ec2/
+    aws.ami = 'ami-027583e616ca104df'
     aws.keypair_name = SSH_KEY_NAME
     override.ssh.private_key_path = SSH_KEY_PATH
     override.ssh.username = SSH_USERNAME
@@ -88,11 +90,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       chef.add_recipe 'cwb-chef-server'
       chef.json = {
           'chef-server' => {
-              # Current version as of 2016-03-28 is 12.4.1 (recommended with Ubuntu 14.04)
-              # See: https://downloads.chef.io/chef-server/
-              # Version 11 does not support 14.04: https://github.com/opscode-cookbooks/chef-server/issues/48
-              # Commonly used 11.1.6 on older CWB instances (requires Ubuntu 12.04)
-              'version' => '12.4.1', # or 'latest'
+              # 12.17.33 as of 2018-08-16
+              'version' => '12.17.33', # or nil for latest
               # Provide if cookbook service is not working correctly (i.e. cookbooks cannot be uploaded).
               # Attempts to automatically detect public IP via Ohai/What's my ip query
               # 'api_fqdn' => CHEF_SERVER_IP
@@ -111,7 +110,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     # Amazon EC2
     config.vm.provider :aws do |aws, override|
-      aws.tags = {
+        aws.tags = {
           'Name' => 'cwb-server-production'
       }
     end
@@ -122,9 +121,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       chef.cookbooks_path = "#{CWB_SERVER}/berks-cookbooks"
       chef.provisioning_path = '/etc/chef'
       chef.add_recipe 'cwb-server'
-      # Convergence will currently fail on the first run because
-      # the freshly installed Ruby is not yet available in the path
-      chef.attempts = 2
       # Refer to `cookbooks/cwb-server/attributes/default.rb` for an
       # extensive list of configurable attributes
       chef.json =
@@ -145,7 +141,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                       'validation_key' => File.read('chef-validator.pem'),
                       'validation_key_name' => 'chef-validator',
                       # VM provisioning
-                      'omnibus_chef_version' => '12.8.1'
+                      # Chef versions: https://docs.chef.io/release_notes.html
+                      # Notice that CWB is currently not yet compatible with Chef 13 and 14
+                      # https://github.com/sealuzh/cwb-benchmarks/issues/20
+                      'omnibus_chef_version' => '12.22.3'
                   },
                   'providers' => {
                       'aws' => {
@@ -154,29 +153,21 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                       }
                   },
                   'env' => {
-                      # We do not want to invalidate the secret on every provisioning
                       'SECRET_KEY_BASE' => read_or_cache('secret_key_base.env', SecureRandom.hex(64))
                   },
                   'app' => {
+                      'branch' => 'master',
                       'user_password' => 'demo',
                       # Determines how many benchmarks can be prepared, started, or released in parallel.
                       # Keep in mind that workers are memory-intensive because the currently load the entire Rails environment.
                       'num_workers' => 2
                   },
+                  'db' => {
+                    'password' => 'cloud',
+                    'postgres_password' => 'rootcloud'
+                  },
                   'nginx' => {
                       # 'hostname' => 'PUBLIC_HOST_OR_IP'
-                  }
-              },
-              'postgresql' => {
-                  'password' => {
-                      # Mandatory in Chef-Solo mode: https://github.com/hw-cookbooks/postgresql#chef-solo-note
-                      'postgres' => 'rootcloud'
-                  },
-                  # Optimize for non-dedicated database instance: https://github.com/hw-cookbooks/postgresql#config_pgtune
-                  'config_pgtune' => {
-                      'db_type' => 'desktop',
-                      # 'max_connections' => 5,
-                      # 'total_memory' => '256000kB'
                   }
               },
               # For a list of time zones see: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones

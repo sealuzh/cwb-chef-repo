@@ -1,6 +1,8 @@
 # THIS FILE IS MANAGED BY CHEF.
 # MANUAL CHANGES WILL BE NUKED ON THE NEXT CHEF RUN
 
+export PORT=3000
+
 <% @env.each do |key, value| %>
 export <%= key %>=<%= value %>
 <% end %>

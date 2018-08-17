@@ -1,28 +1,41 @@
 ruby = node['cwb-server']['ruby']
 ruby_with_version = "ruby-#{ruby['version']}"
+ruby_tar_file = "#{ruby_with_version}.tar.bz2"
 
-cache_file = File.join(Chef::Config[:file_cache_path], "#{ruby_with_version}.tgz")
-# Example: https://s3.amazonaws.com/pkgr-buildpack-ruby/current/ubuntu-14.04/ruby-2.2.4-p230.tgz
-default_source = "#{ruby['base_url']}/#{node['platform']}-#{node['platform_version']}/#{ruby_with_version}.tgz"
+# Required for Ruby gem
+package 'libyaml-dev'
+
+# Add Ruby bin to system-wide loaded `/etc/profile.d`: https://askubuntu.com/questions/866161/setting-path-variable-in-etc-environment-vs-profile
+# NOTICE: Systemd will NOT automatically pickup this configuration, therefore we also explicitly set the path in the environment (see env attributes)
+file '/etc/profile.d/ruby.sh' do
+  content "export PATH=\"#{node['cwb-server']['env']['PATH']}\""
+  mode '0644'
+  owner 'root'
+  group 'root'
+end
+
+# NOTICE: This resource notifies the `unpack => install bundler` chain
+#         such that the installation only updates if the installation file changes
+cache_file = File.join(Chef::Config[:file_cache_path], ruby_tar_file)
 remote_file cache_file do
   owner 'root'
   group 'root'
   mode '0644'
-  source ruby['source_url'] || default_source
+  source ruby['source_url']
   checksum ruby['checksum'] if ruby['checksum']
   action :create
   notifies :run, "execute[unpack #{ruby_with_version}]", :immediately
 end
 
-bin_dir = File.join(ruby['dir'], 'bin')
+ruby_bin = File.join(ruby['bin_dir'], 'ruby')
 execute "unpack #{ruby_with_version}" do
-  command "tar xzf #{cache_file} -C #{ruby['dir']}"
-  creates File.join(bin_dir, 'ruby')
+  command "tar xvjf #{cache_file} -C #{ruby['dir']}"
+  creates ruby_bin
   action :nothing
-  notifies :install, 'gem_package[bundler]', :immediately
+  notifies :run, 'execute[install-bundler]', :immediately
 end
 
-gem_package 'bundler' do
-  gem_binary "#{bin_dir}/gem"
+execute 'install-bundler' do
+  command "#{ruby_bin} -S #{ruby['bin_dir']}/gem install bundler"
   action :nothing
 end

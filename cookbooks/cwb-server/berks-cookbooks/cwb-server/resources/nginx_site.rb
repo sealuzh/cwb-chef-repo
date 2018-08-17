@@ -17,19 +17,19 @@ action :enable do
   # Pre-declare NGINX resource such that it can be notified
   service 'nginx'
 
-  template site_available do
-    cookbook conf_cookbook
-    source conf_template
-    variables conf_variables
+  template new_resource.site_available do
+    cookbook new_resource.conf_cookbook
+    source new_resource.conf_template
+    variables new_resource.conf_variables
     owner 'root'
     group 'root'
     mode '0644'
     notifies :restart, 'service[nginx]'
   end
 
-  link site_enabled do
-    to site_available
-    not_if "test -f #{site_enabled}"
+  link new_resource.site_enabled do
+    to new_resource.site_available
+    not_if "test -f #{new_resource.site_enabled}"
     notifies :restart, 'service[nginx]'
   end
 end
@@ -38,9 +38,9 @@ action :disable do
   # Pre-declare NGINX resource such that it can be notified
   service 'nginx'
 
-  link site_enabled do
+  link new_resource.site_enabled do
     action :delete
-    only_if "test -f #{site_enabled}"
+    only_if "test -f #{new_resource.site_enabled}"
     notifies :restart, 'service[nginx]'
   end
 end

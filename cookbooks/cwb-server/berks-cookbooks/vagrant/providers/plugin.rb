@@ -14,7 +14,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-use_inline_resources if defined?(:use_inline_resources)
 
 # Support whyrun
 def whyrun_supported?
@@ -22,7 +21,7 @@ def whyrun_supported?
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::VagrantPlugin.new(new_resource)
+  @current_resource = Chef::Resource.resource_for_node(:vagrant_plugin, node).new(new_resource)
 
   installed_version = plugin.installed_version
 
@@ -63,10 +62,8 @@ def plugin
 end
 
 def uninstall
-  if current_resource.installed
-    converge_by("Uninstalling Vagrant plugin: #{new_resource.name} #{new_resource.version}") do
-      plugin.uninstall
-    end
+  converge_by("Uninstalling Vagrant plugin: #{new_resource.name}") do
+    plugin.uninstall
   end
 end
 

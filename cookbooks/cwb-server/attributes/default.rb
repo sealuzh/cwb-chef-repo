@@ -19,8 +19,7 @@ default['cwb-server']['app']['num_workers'] = 2
 default['cwb-server']['app']['port'] = 3000
 
 ### Nginx
-# Defaults to `0.0.0.0` if unset
-default['cwb-server']['nginx']['hostname'] = nil
+default['cwb-server']['nginx']['hostname'] = '0.0.0.0'
 default['cwb-server']['nginx']['log_dir'] = '/var/log/nginx'
 
 ### Providers
@@ -28,17 +27,31 @@ default['cwb-server']['nginx']['log_dir'] = '/var/log/nginx'
 # a) Optimistic (might break on newer releases): ['vagrant-google', ...]
 # b) Pessimistic (requires manual updating): [{ 'name' => 'vagrant-google',  'version' =>  '0.2.2' }, ...]
 default['cwb-server']['vagrant']['providers'] = [
-  { 'name' => 'vagrant-aws', 'version' => '0.6.0' }
+  { 'name' => 'vagrant-aws', 'version' => '0.7.2' }
 ]
+
+### Vagrant: https://supermarket.chef.io/cookbooks/vagrant#readme
+default['vagrant']['version'] = '2.1.2'
+default['vagrant']['user'] = node['cwb-server']['app']['user']
+default['vagrant']['plugins'] = [
+  # Ensure that Chef is installed within a VM
+  { 'name' => 'vagrant-omnibus', 'version' =>  '1.5.0' },
+  # Delete Chef client and node when destroying a VM
+  { 'name' => 'vagrant-butcher', 'version' =>  '2.2.0' }
+]  + node['cwb-server']['vagrant']['providers']
 
 ### Ruby
 default['cwb-server']['ruby']['dir'] = '/usr/local'
-default['cwb-server']['ruby']['version'] = '2.2.4'
-# `source_url` takes precedence over `version`
-# Platforms: https://packager.io/documentation/distributions/
-# Ruby versions: https://packager.io/documentation/ruby/
-default['cwb-server']['ruby']['base_url'] = 'https://s3.amazonaws.com/pkgr-buildpack-ruby/current'
-default['cwb-server']['ruby']['source_url'] = nil
+# Supported versions: https://rvm.io/binaries/ubuntu
+# 16.04: https://rvm.io/binaries/ubuntu/16.04/x86_64/
+default['cwb-server']['ruby']['version'] = '2.5.1'
+default['cwb-server']['ruby']['bin_dir'] = "#{node['cwb-server']['ruby']['dir']}/ruby-#{node['cwb-server']['ruby']['version']}/bin"
+# Alternatives: http://rubies.travis-ci.org/
+default['cwb-server']['ruby']['base_url'] = 'https://rvm.io/binaries'
+default_source_url = File.join(node['cwb-server']['ruby']['base_url'], node['platform'], node['platform_version'], node['kernel']['machine'], "ruby-#{node['cwb-server']['ruby']['version']}.tar.bz2")
+# Overriding the `source_url` takes precedence over `version`
+# Example: https://rvm.io/binaries/ubuntu/16.04/x86_64/ruby-2.2.5.tar.bz2
+default['cwb-server']['ruby']['source_url'] = default_source_url
 default['cwb-server']['ruby']['checksum'] = nil
 
 ### Nodejs
@@ -47,10 +60,12 @@ default['cwb-server']['nodejs']['setup_script'] = 'https://deb.nodesource.com/se
 default['cwb-server']['nodejs']['setup_checksum'] = nil
 
 ### Database
+default['cwb-server']['db']['postgres_password'] = 'rootcloud'
+default['cwb-server']['db']['postgresql_version'] = '9.6'
+default['cwb-server']['db']['port'] = 5432
 default['cwb-server']['db']['name'] = 'cloud_workbench_production'
 default['cwb-server']['db']['user'] = 'cloud'
-# Randomly generated if not provided
-default['cwb-server']['db']['password'] = nil
+default['cwb-server']['db']['password'] = 'cloud'
 
 ### Environment variables
 default['cwb-server']['env']['HOME'] = "/home/#{node['cwb-server']['app']['user']}"
@@ -64,6 +79,7 @@ default['cwb-server']['env']['WEB_CONCURRENCY'] = 3
 
 default['cwb-server']['host_detection'] = 'wget -qO- http://ipecho.net/plain; echo'
 default['cwb-server']['env']['CWB_SERVER_HOST'] = nil
+default['cwb-server']['env']['PATH'] = "#{node['cwb-server']['ruby']['bin_dir']}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 
 ### Secrets
 default['cwb-server']['apply_secret_config'] = true
@@ -86,10 +102,10 @@ organisation = validation_key_name.chomp('-validator')
 default['cwb-server']['chef']['server_url'] = "https://#{server_host}:443/organizations/#{organisation}"
 
 # Chef VM provisioning
-# Latest version known to work properly: '12.2.1'
-# Some newer versions break certain cookbooks
-# (e.g. postgresql: https://github.com/hw-cookbooks/postgresql/issues/212)
-default['cwb-server']['chef']['omnibus_chef_version'] = '12.2.1'
+# Chef client versions: https://docs.chef.io/release_notes.html
+# Notice that CWB is currently not yet compatible with Chef 13 and 14
+# https://github.com/sealuzh/cwb-benchmarks/issues/20
+default['cwb-server']['chef']['omnibus_chef_version'] = '12.22.3'
 default['cwb-server']['chef']['provisioning_path'] = '/etc/chef'
 
 ## Providers
@@ -116,3 +132,7 @@ default['cwb-server']['providers'] = {}
 # default['cwb-server']['providers']['google']['client_email'] = ''
 # default['cwb-server']['providers']['google']['api_key_name'] = ''
 # default['cwb-server']['providers']['google']['api_key_BASE64_FILE'] = ''
+
+### Base utilities
+normal['build-essential']['compile_time'] = true
+normal['apt']['compile_time_update'] = true

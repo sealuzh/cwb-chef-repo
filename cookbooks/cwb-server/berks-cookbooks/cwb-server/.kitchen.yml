@@ -4,6 +4,8 @@ driver:
 
 provisioner:
   name: chef_zero
+  require_chef_omnibus: 14.3.37
+  log_level: info
 
 # Uncomment the following verifier to leverage Inspec instead of Busser (the
 # default verifier)
@@ -11,8 +13,8 @@ provisioner:
 #   name: inspec
 
 platforms:
-# Node attributes: `cat /tmp/kitchen/nodes/default-ubuntu-1404.json`
-  - name: ubuntu-14.04
+# Node attributes: cat /tmp/kitchen/nodes/default-ubuntu-1604.json
+  - name: ubuntu-16.04
 
 suites:
   - name: default
@@ -21,12 +23,12 @@ suites:
     attributes:
       # For a list of time zones see: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
       tz: Europe/Zurich
-      postgresql:
-        password:
-          postgres: rootcloud
       cwb-server:
+        app:
+          branch: fix/deprecations # TODO: switch to master
         db:
           password: cloud
+          postgres_password: rootcloud
         providers:
           aws:
             access_key: my_aws_access_key

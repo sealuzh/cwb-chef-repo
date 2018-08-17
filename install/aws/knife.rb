@@ -5,8 +5,8 @@
 # 3. Symlink this file to ~/.chef/knife.rb with:
 #    `ln -s "$(pwd -P)/knife.rb" $HOME/.chef/knife.rb;`
 
-CWB_CHEF_REPO  = ENV['HOME'] + '/Projects/cwb-chef-repo'
-CWB_BENCHMARKS = ENV['HOME'] + '/Projects/cwb-benchmarks'
+CWB_CHEF_REPO  = ENV['HOME'] + '/Projects/CWB/cwb-chef-repo'
+CWB_BENCHMARKS = ENV['HOME'] + '/Projects/CWB/cwb-benchmarks'
 ENVIRONMENT = 'aws' # name of the install directory
 ORGANIZATION = 'chef'
 

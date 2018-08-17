@@ -1,5 +1,17 @@
 # Development
 
+## Integration Testing
+
+```
+kitchen verify
+```
+
+## Lint
+
+```
+foodcritic .
+```
+
 ## Debugging Vagrantfile
 
 Requires a [readline](https://en.wikipedia.org/wiki/GNU_Readline) implementation:
