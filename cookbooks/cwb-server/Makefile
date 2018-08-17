@@ -1,4 +1,4 @@
-.PHONY: install outdated test integration_test unit_test lint syntax all_tests vendor
+.PHONY: install outdated test converge integration_test unit_test lint syntax all_tests vendor
 
 install:
 	berks install
@@ -7,6 +7,9 @@ outdated:
 	berks outdated
 
 test: integration_test
+
+converge:
+	kitchen converge
 
 integration_test:
 	kitchen verify

@@ -50,6 +50,7 @@ if node['cwb-server']['apply_secret_config']
   key_path = "#{ssh_dir}/#{ssh['key_name']}.pem"
   create_dir ssh_dir, app_user
   store_key key_path, ssh['key'], app_user
+  store_key "#{key_path}.pub", ssh['pub_key'], app_user
   default_env 'SSH_KEY_NAME', ssh['key_name']
   default_env 'SSH_KEY_PATH', key_path
 

@@ -59,7 +59,7 @@ This Chef repo provides cookbooks to automatically install and configure
     SSH_KEY_NAME = ENV['SSH_KEY_NAME'] || 'cloud-benchmarking'
     ```
 
-   * The private key will be copied into the cwb-server (`/home/apps/cloud-benchmarking.pem`) for provisioning cloud VMs.
+   * The private key will be copied into the cwb-server (`/home/apps/.ssh/cloud-benchmarking.pem`) for provisioning cloud VMs.
    * Find the *aws* config under `config.vm.provider :aws` (e.g., instance type).
    * Find the *cwb-server* config under `chef.json`. See [providers](https://github.com/sealuzh/cwb-benchmarks/blob/master/docs/PROVIDERS.md) for details how to configure other cloud providers.
 

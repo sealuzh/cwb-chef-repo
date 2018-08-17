@@ -87,6 +87,7 @@ default['cwb-server']['apply_secret_config'] = true
 
 # SSH
 default['cwb-server']['ssh']['key'] = '-----BEGIN RSA PRIVATE KEY-----'
+default['cwb-server']['ssh']['pub_key'] = ''
 default['cwb-server']['ssh']['key_name'] = 'cloud-benchmarking'
 
 # Chef
