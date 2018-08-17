@@ -16,8 +16,29 @@ make install
 make outdated
 # Run integration tests
 make test
-# Run linter
-make lint
+# Run all tests
+make all_tests
+# Run syntax checker
+make syntax
+```
+
+## Testing
+
+This cookbook uses (Chef Delivery Local)[https://docs.chef.io/delivery_cli.html#delivery-local] to automate testing stages.
+
+Run all tests:
+
+```bash
+delivery local all
+```
+
+Individual phases:
+
+```bash
+delivery local lint # Cookstyle (Rubocup-based Ruby style linter)
+delivery local syntax # Foodcritic (cookbook checker)
+delivery local unit # short-running unit tests (rspec + chefspec)
+delivery local functional # long-running integration tests
 ```
 
 ## Debugging Vagrantfile

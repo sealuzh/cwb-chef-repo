@@ -13,10 +13,13 @@ integration_test:
 	kitchen test
 
 unit_test:
-	chef exec rspec
+	delivery local unit
 
 lint:
-	foodcritic .
+	delivery local lint
+
+syntax:
+	delivery local syntax
 
 vendor: install
 	./vendor_berks_cookbooks.sh
