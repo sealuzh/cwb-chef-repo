@@ -1,4 +1,4 @@
-.PHONY: install outdated test lint vendor
+.PHONY: install outdated test integration_test unit_test lint syntax all_tests vendor
 
 install:
 	berks install
@@ -6,20 +6,21 @@ install:
 outdated:
 	berks outdated
 
-test:
-	kitchen verify
+test: integration_test
 
 integration_test:
-	kitchen test
+	kitchen verify
 
 unit_test:
-	delivery local unit
+	chef exec rspec spec/
 
 lint:
-	delivery local lint
+	chef exec cookstyle
 
 syntax:
-	delivery local syntax
+	chef exec foodcritic . --exclude spec -f any # -t \"~FC064\" -t \"~FC065\"
+
+all_tests: lint syntax unit_test integration_test
 
 vendor: install
 	./vendor_berks_cookbooks.sh

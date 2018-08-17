@@ -24,6 +24,10 @@ make syntax
 
 ## Testing
 
+> This feature is currently broken in mono-repos\
+> See https://github.com/chef/delivery-cli/issues/47
+> Workaround: Use Makefile targets instead
+
 This cookbook uses (Chef Delivery Local)[https://docs.chef.io/delivery_cli.html#delivery-local] to automate testing stages.
 
 Run all tests:
