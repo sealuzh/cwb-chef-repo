@@ -14,6 +14,10 @@ converge:
 integration_test:
 	kitchen verify
 
+dokken_test: KITCHEN_LOCAL_YAML=.kitchen.dokken.yml
+dokken_test:
+	kitchen verify
+
 unit_test:
 	chef exec rspec spec/
 

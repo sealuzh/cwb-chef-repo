@@ -1,0 +1,31 @@
+---
+driver:
+  name: dokken
+  privileged: true
+  # Fixing systemd: https://github.com/someara/kitchen-dokken#process-orientation
+  pid_one_command: /usr/lib/systemd/systemd
+  volumes:
+  - /sys/fs/cgroup:/sys/fs/cgroup:ro # required by systemd
+  - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro
+  # - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro # required for `/usr/bin/timedatectl`
+  # - /sys/fs/kdbus/0-system/bus:/sys/fs/kdbus/0-system/bus:ro # required for `/usr/bin/timedatectl`
+  # - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro
+  # - /etc/ld.so.nohwcap:/etc/ld.so.nohwcap:ro
+  # - /etc/ld.so.preload:/etc/ld.so.preload:ro
+  # - /sys/fs/selinux:/sys/fs/selinux:ro
+  # - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro
+  intermediate_instructions:
+    - RUN /usr/bin/apt-get update
+    - RUN /usr/bin/apt-get install -y apt-transport-https net-tools dbus
+
+transport:
+  name: dokken
+
+provisioner:
+  name: dokken
+  log_level: debug
+
+verifier:
+  # Required for `serverspec` https://github.com/someara/kitchen-dokken/issues/78#issuecomment-298314150
+  root_path: '/opt/verifier'
+  sudo: false

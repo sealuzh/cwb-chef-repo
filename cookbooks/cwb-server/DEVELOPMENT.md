@@ -28,11 +28,21 @@ make syntax
 
 ## Testing
 
+### Integration tests via Docker (as used for Travis CI)
+
+```bash
+KITCHEN_LOCAL_YAML=.kitchen.dokken.yml chef exec kitchen verify
+```
+
+See [kitchen-dokken](https://github.com/someara/kitchen-dokken)
+
+### Chef Delivery Local
+
+This cookbook uses (Chef Delivery Local)[https://docs.chef.io/delivery_cli.html#delivery-local] to automate testing stages.
+
 > This feature is currently broken in mono-repos\
 > See https://github.com/chef/delivery-cli/issues/47
 > Workaround: Use Makefile targets instead
-
-This cookbook uses (Chef Delivery Local)[https://docs.chef.io/delivery_cli.html#delivery-local] to automate testing stages.
 
 Run all tests:
 
