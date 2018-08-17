@@ -7,9 +7,12 @@ driver:
   volumes:
   - /sys/fs/cgroup:/sys/fs/cgroup:ro # required by systemd
   intermediate_instructions:
-    - RUN /usr/bin/apt-get update
-    # For setting timezone via `/usr/bin/timedatectl`: dbus,tzdata
-    - RUN /usr/bin/apt-get install -y apt-transport-https net-tools dbus tzdata
+    # For setting timezone via `/usr/bin/timedatectl`: dbus tzdata
+    # For PostgreSQL en_US.UTF-8 locals: locales
+    # For sudo in deploy#export systemd templates: sudo
+    - RUN apt-get update && apt-get install -y apt-transport-https net-tools dbus tzdata locales sudo
+    # Setup en_US.UTF-8 local for PostgreSQL server installation => builds `/usr/share/locale-langpack/en_US.UTF-8/LC_MESSAGES/pgscripts-9.6.mo`
+    - RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && echo 'LANG="en_US.UTF-8"'>/etc/default/locale && dpkg-reconfigure --frontend=noninteractive locales && update-locale LANG=en_US.UTF-8
 
 transport:
   name: dokken
