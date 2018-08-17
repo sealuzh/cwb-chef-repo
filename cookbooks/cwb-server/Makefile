@@ -9,6 +9,12 @@ outdated:
 test:
 	kitchen verify
 
+integration_test:
+	kitchen test
+
+unit_test:
+	chef exec rspec
+
 lint:
 	foodcritic .
 
