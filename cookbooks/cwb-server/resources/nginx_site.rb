@@ -1,6 +1,5 @@
 provides :nginx_site
 
-property :name, String, name_property: true
 property :conf_cookbook, String, default: 'cwb-server'
 property :conf_template, String, default: 'nginx.vhost.conf.erb'
 property :conf_variables, Hash, default: {}
