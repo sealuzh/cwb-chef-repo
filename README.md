@@ -5,8 +5,8 @@ This Chef repo provides cookbooks to automatically install and configure
 
 ## Requirements
 
-> Interested in your own Cloud WorkBench installation?<br>
-> Feel free to contact us: philipp.leitner[AT]chalmers.se or scheuner[AT]chalmers.se
+> Interested in your own Cloud WorkBench (CWB) installation?<br>
+> These 10 steps will setup and configure CWB on AWS for you in less than 30 minutes (tested 2018-08-17).
 
 * [Git](http://git-scm.com/)
 * [Vagrant (2.1.2)](https://www.vagrantup.com/downloads.html)
@@ -20,7 +20,7 @@ This Chef repo provides cookbooks to automatically install and configure
         vagrant plugin install vagrant-omnibus vagrant-aws;
         ```
 
-* [Amazon EC2](https://aws.amazon.com/ec2/) account. Alternative providers are available (see Vagrant plugins).
+* [Amazon EC2](https://aws.amazon.com/ec2/) account. Alternative providers are available (see [cwb-benchmarks#Providers](https://github.com/sealuzh/cwb-benchmarks#providers)).
   We have also deployed a CWB instance to OpenStack.
     * Both VMs (chef-server + cwb-server) must have a public IP address
     * Make sure you have created a private SSH key called `cloud-benchmarking` to
@@ -49,8 +49,6 @@ This Chef repo provides cookbooks to automatically install and configure
 
 3. Configure `Vagrantfile` and
    copy your private ssh key (for AWS) into `cloud-benchmarking.pem`.<br>
-   Find the *aws* config under `config.vm.provider :aws` (e.g., instance type)
-   Find the *cwb-server* config under `chef.json`
 
     ```bash
     # For Amazon EC2
@@ -60,6 +58,10 @@ This Chef repo provides cookbooks to automatically install and configure
     SSH_KEY_PATH = ENV['SSH_KEY_PATH'] || 'cloud-benchmarking.pem'
     SSH_KEY_NAME = ENV['SSH_KEY_NAME'] || 'cloud-benchmarking'
     ```
+
+   * The private key will be copied into the cwb-server (`/home/apps/cloud-benchmarking.pem`) for provisioning cloud VMs.
+   * Find the *aws* config under `config.vm.provider :aws` (e.g., instance type).
+   * Find the *cwb-server* config under `chef.json`. See [providers](https://github.com/sealuzh/cwb-benchmarks/blob/master/docs/PROVIDERS.md) for details how to configure other cloud providers.
 
 4. Start automated installation and configuration.
 
@@ -234,6 +236,22 @@ Precondition: SSH'ed into the *cwb-server* instance
 cd  /var/www/cloud-workbench
 ls -l /etc/systemd/system/cloud-workbench*
 cat /etc/nginx/sites-available/cloud-workbench
+```
+
+### Rails Console
+
+```bash
+sudo su - apps
+cd /var/www/cloud-workbench/current && RAILS_ENV=production bin/rails c
+```
+
+### PostgreSQL
+
+Save login credentials via a [password file](https://www.postgresql.org/docs/9.6/static/libpq-pgpass.html):
+
+```bash
+echo "localhost:5432:cloud_workbench_production:postgres:rootcloud" > ~/.pgpass
+chmod 0600 ~/.pgpass
 ```
 
 ### Systemd
