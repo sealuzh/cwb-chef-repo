@@ -6,17 +6,10 @@ driver:
   pid_one_command: /lib/systemd/systemd
   volumes:
   - /sys/fs/cgroup:/sys/fs/cgroup:ro # required by systemd
-  # - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro
-  # - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro # required for `/usr/bin/timedatectl`
-  # - /sys/fs/kdbus/0-system/bus:/sys/fs/kdbus/0-system/bus:ro # required for `/usr/bin/timedatectl`
-  # - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro
-  # - /etc/ld.so.nohwcap:/etc/ld.so.nohwcap:ro
-  # - /etc/ld.so.preload:/etc/ld.so.preload:ro
-  # - /sys/fs/selinux:/sys/fs/selinux:ro
-  # - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro
   intermediate_instructions:
     - RUN /usr/bin/apt-get update
-    - RUN /usr/bin/apt-get install -y apt-transport-https net-tools
+    # For setting timezone via `/usr/bin/timedatectl`: dbus,tzdata
+    - RUN /usr/bin/apt-get install -y apt-transport-https net-tools dbus tzdata
 
 transport:
   name: dokken
