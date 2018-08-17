@@ -52,7 +52,9 @@ foreman_opts = "--procfile Procfile_production \
                 --formation web=1,job=#{app['num_workers']} \
                 --port #{app['port']} \
                 --user #{app['user']}"
-configure_systemd_cmd = bundle("exec foreman export systemd /etc/systemd/system #{foreman_opts}", sudo: true)
+export_systemd_template = bundle("exec foreman export systemd /etc/systemd/system #{foreman_opts}", sudo: true)
+reload_systemd_cmd = 'sudo systemctl daemon-reload'
+configure_systemd_cmd = "#{export_systemd_template} && #{reload_systemd_cmd}"
 deploy app['name'] do
   deploy_to app['dir']
   scm_provider Chef::Provider::Git
@@ -196,5 +198,5 @@ deploy app['name'] do
     end
   end
   # TODO: Think about graceful restart for currently running worker processes!
-  restart_command "sudo systemctl daemon-reload && sudo systemctl restart #{app['name']}.target"
+  restart_command "sudo systemctl restart #{app['name']}.target"
 end

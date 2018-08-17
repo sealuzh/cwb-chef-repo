@@ -19,11 +19,6 @@ include_recipe 'cwb-server::ruby_binary'
 include_recipe 'cwb-server::nginx'
 include_recipe 'vagrant::default'
 
-### Deployment
-# Install file permission management utility acl
-# used by Capistrano plugin during deployment
-# include_recipe 'acl::default'
-
 include_recipe 'cwb-server::secrets'
 include_recipe 'cwb-server::deploy'
 

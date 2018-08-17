@@ -1,3 +1,10 @@
+# 0.6.0 (2018-08-17)
+
+Skip 0.5.x to avoid conflict/confusion with stale branch changes.
+
+* Remove legacy Capistrano deployment (were already out commented)
+* Fix deployment daemon reload commands
+
 # 0.4.0 (2018-08-14)
 
 * Update deprecated cookbook dependencies that caused failing build (database, windows, timezone-ii => timezone_lwrp, deploy_resource)
