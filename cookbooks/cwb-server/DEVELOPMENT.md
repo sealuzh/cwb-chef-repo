@@ -1,15 +1,23 @@
 # Development
 
-## Integration Testing
+## Update this cookbook
 
-```
-kitchen verify
-```
+1. Bump the version in `metadata.rb`
+2. Adjust the `CHANGELOG.md`
+3. Run `berks install`
+4. Vendor cookbooks with `make vendor`
 
-## Lint
+## Commands
 
-```
-foodcritic .
+```bash
+# Install cookbook dependencies
+make install
+# Check outdated dependencies
+make outdated
+# Run integration tests
+make test
+# Run linter
+make lint
 ```
 
 ## Debugging Vagrantfile
