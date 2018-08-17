@@ -1,5 +1,9 @@
 # Development
 
+## Requirements
+
+* ChefDK: https://downloads.chef.io/chefdk
+
 ## Update this cookbook
 
 1. Bump the version in `metadata.rb`
