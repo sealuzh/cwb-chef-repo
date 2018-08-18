@@ -17,7 +17,7 @@ integration_test:
 dokken_test: export KITCHEN_YAML=.kitchen.yml
 dokken_test: export KITCHEN_LOCAL_YAML=.kitchen.dokken.yml
 dokken_test:
-	kitchen verify
+	kitchen converge && kitchen verify
 
 unit_test:
 	rspec spec/

@@ -116,9 +116,9 @@ if node['cwb-server']['apply_secret_config']
   end
   providers.each do |provider, attributes|
     attributes.each do |key, value|
-      envs = [provider, key, value, binding].instance_eval(&base64_filter)
-                                            .instance_eval(&file_filter)
-                                            .instance_eval(&env_filter)
+      [provider, key, value, binding].instance_eval(&base64_filter)
+                                     .instance_eval(&file_filter)
+                                     .instance_eval(&env_filter)
     end
   end
   # Convenience for app user that wants to source the environment

@@ -37,7 +37,7 @@ describe 'cwb-server::secrets' do
     its(:content) { should match(%r{Environment="CHEF_SERVER_URL=https://33.33.33.10:443/organizations/chef"}) }
     its(:content) { should match(/Environment="CWB_SERVER_HOST=\d+\.\d+\.\d+.\d+"/) }
     # Contains Ruby PATH
-    its(:content) { should match(/Environment="PATH=\/usr\/local\/ruby-\d\.\d+\.\d+\/bin:.*"/) }
+    its(:content) { should match(%r{Environment="PATH=/usr/local/ruby-\d\.\d+\.\d+\/bin:.*"}) }
   end
 
   describe file(google_file) do
