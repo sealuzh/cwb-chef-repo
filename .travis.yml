@@ -13,13 +13,13 @@ addons:
 
 env:
   matrix:
-  - INSTANCE=default-ubuntu-1604
+  - INSTANCE=ubuntu-1604
 
 before_install:
   - cd cookbooks/cwb-server
 
-install: echo "skip bundle install, using ChefDK instead"
-  # - chef exec bundle install --without='vagrant'
+install:
+  - echo "skip bundle install, using ChefDK instead"
 
 before_script:
   # https://github.com/zuazo/kitchen-in-travis-native/issues/1#issuecomment-142455888
@@ -32,10 +32,5 @@ before_script:
   - chef exec gem list
 
 script:
-  # TODO: fix foodcritic issues
-  # Cookbook syntax checker: http://www.foodcritic.io/
-  - foodcritic .
-  # Short-running unit tests with ChefSpec: https://chefspec.github.io/chefspec/
-  - chef exec rspec spec/
-  # Long-running integration tests with TestKitchen: https://kitchen.ci/
-  - KITCHEN_YAML=.kitchen.yml KITCHEN_LOCAL_YAML=.kitchen.dokken.yml chef exec kitchen verify ${INSTANCE}
+  # Run all test stages: lint, syntax, unit_test, integration_test
+  - make all_tests ${INSTANCE}

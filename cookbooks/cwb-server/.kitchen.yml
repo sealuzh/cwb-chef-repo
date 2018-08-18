@@ -15,6 +15,7 @@ provisioner:
 platforms:
 # Node attributes: cat /tmp/kitchen/nodes/default-ubuntu-1604.json
   - name: ubuntu-16.04
+  - name: ubuntu-18.04
 
 provisioner:
   name: chef_zero
