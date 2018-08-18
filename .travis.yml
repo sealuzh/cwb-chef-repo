@@ -33,4 +33,4 @@ before_script:
 
 script:
   # Run all test stages: lint, syntax, unit_test, integration_test
-  - make all_tests ${INSTANCE}
+  - make all_tests INSTANCE=${INSTANCE}
