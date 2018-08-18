@@ -1,5 +1,7 @@
 # cwb-chef-repo
 
+[![Build Status](https://travis-ci.org/sealuzh/cwb-chef-repo.svg?branch=master)](https://travis-ci.org/sealuzh/cwb-chef-repo)
+
 This Chef repo provides cookbooks to automatically install and configure
 [Cloud WorkBench](https://github.com/sealuzh/cloud-workbench).
 
