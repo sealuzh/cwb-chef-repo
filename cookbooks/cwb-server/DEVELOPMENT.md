@@ -17,19 +17,36 @@
 ```bash
 cookstyle # Cookbook linting (Rubocup config for cookbooks)
 foodcritic . # Cookbook checker
-chef exec rspec spec/ # short-running unit tests (Rspec + ChefSpec)
-chef exec kitchen verify # long-running integration tests (TestKitchen)
+rspec spec/ # short-running unit tests (Rspec + ChefSpec)
+kitchen verify # long-running integration tests (TestKitchen)
 
 # Integration tests via Docker (as used for Travis CI)
 KITCHEN_LOCAL_YAML=.kitchen.dokken.yml chef exec kitchen verify
+
+# Cleanup
+kitchen destroy
 ```
 
-### Cleanup Integration Tests
+### Chef Delivery Local
 
-```
-chef exec kitchen destroy
+This cookbook uses (Chef Delivery Local)[https://docs.chef.io/delivery_cli.html#delivery-local] to automate testing stages.
+
+Run all tests:
+
+```bash
+delivery local all
 ```
 
+Individual phases:
+
+```bash
+delivery local lint # Cookstyle (Rubocup-based Ruby style linter)
+delivery local syntax # Foodcritic (cookbook checker)
+delivery local unit # short-running unit tests (rspec + chefspec)
+delivery local functional # long-running integration tests
+```
+
+>>>>>>> support/chef-delivery
 ## Debugging Vagrantfile
 
 Requires a [readline](https://en.wikipedia.org/wiki/GNU_Readline) implementation:
