@@ -15,18 +15,6 @@ directory app['dir'] do
   action :create
 end
 
-# TODO: Can we replace `bundle exec` with `bin/*` similarly?
-# Run bundler with a specific Ruby binary to overcome failure on initial provisioning
-# https://github.com/bundler/bundler/issues/2053#issuecomment-7827190
-# Example: `/opt/chef/embedded/bin/ruby -S bundle platform`
-def bundle(cmd, opts = {})
-  sudo = opts[:sudo]
-  # Example: /usr/local/ruby-2.2.5/bin
-  ruby_bin = "#{node['cwb-server']['ruby']['bin_dir']}/ruby"
-  bundle_bin = "#{node['cwb-server']['ruby']['bin_dir']}/bundle"
-  "#{sudo ? 'sudo' : ''} #{ruby_bin} -S #{bundle_bin} #{cmd}"
-end
-
 # These variables MUST be evaluated outside of the deploy resource
 # TODO: Replace with helper method
 env_variables = env.map { |k, v| "#{k}=#{v}" }.join("\n")
@@ -35,11 +23,11 @@ common_groups = %w(development test staging production doc)
 common_groups.delete(env['RAILS_ENV'])
 # Bundler options: http://bundler.io/v1.11/deploying.html
 # --deployment installs gems into `vendor/bundle` (encapsulate from system ruby)
-bundle_install = bundle("install --deployment --without #{common_groups.join(' ')}")
+bundle_install = "bin/bundle install --deployment --without #{common_groups.join(' ')}"
 
-migration_cmd = bundle('exec rake db:migrate --trace')
-precompile_assets = bundle('exec rake assets:precompile')
-update_pw_cmd = bundle("exec rake user:create[seal@uzh.ch,#{app['user_password']}]")
+migration_cmd = 'bin/rake db:migrate --trace'
+precompile_assets = 'bin/rake assets:precompile'
+update_pw_cmd = "bin/rake user:create[seal@uzh.ch,#{app['user_password']}]"
 # Example:
 # sudo bin/foreman export systemd /etc/systemd/system \
 #   --procfile Procfile_production --env .env --app cloud-workbench \
@@ -50,7 +38,7 @@ foreman_opts = "--procfile Procfile_production \
                 --formation web=1,job=#{app['num_workers']} \
                 --port #{app['port']} \
                 --user #{app['user']}"
-export_systemd_template = bundle("exec foreman export systemd /etc/systemd/system #{foreman_opts}", sudo: true)
+export_systemd_template = "sudo bin/foreman export systemd /etc/systemd/system #{foreman_opts}"
 reload_systemd_cmd = 'sudo systemctl daemon-reload'
 configure_systemd_cmd = "#{export_systemd_template} && #{reload_systemd_cmd}"
 deploy app['name'] do
@@ -192,10 +180,10 @@ deploy app['name'] do
     # `release_path` is not available within the resources
     current_release = release_path
     execute 'configure-systemd' do
-      user new_resource.user
       command configure_systemd_cmd
       cwd current_release
-      action :run
+      user new_resource.user
+      environment new_resource.environment
     end
   end
   # TODO: Think about graceful restart for currently running worker processes!
