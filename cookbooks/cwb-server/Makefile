@@ -3,6 +3,7 @@
 INSTANCE=default-ubuntu-1604
 
 ### Default Target
+.PHONY: all
 all: all_tests
 
 ### Installation Berkshelf
