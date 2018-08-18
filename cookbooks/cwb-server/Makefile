@@ -20,13 +20,13 @@ dokken_test:
 	kitchen verify
 
 unit_test:
-	chef exec rspec spec/
+	rspec spec/
 
 lint:
-	chef exec cookstyle
+	cookstyle
 
 syntax:
-	chef exec foodcritic . --exclude spec -f any # -t \"~FC064\" -t \"~FC065\"
+	foodcritic . --exclude spec -f any # -t \"~FC064\" -t \"~FC065\"
 
 all_tests: lint syntax unit_test integration_test
 
