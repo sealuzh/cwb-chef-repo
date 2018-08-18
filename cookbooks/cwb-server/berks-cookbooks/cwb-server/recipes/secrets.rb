@@ -29,7 +29,7 @@ end
 # Use file `/home/apps/.secret_key_base` to cache generated `SECRET_KEY_BASE`
 secret_key_base_path = "#{app_user_home}/.secret_key_base"
 if node['cwb-server']['env']['SECRET_KEY_BASE'].nil?
-  if File.exists?(secret_key_base_path)
+  if File.exist?(secret_key_base_path)
     node.normal['cwb-server']['env']['SECRET_KEY_BASE'] = File.read(secret_key_base_path)
   else
     new_key = SecureRandom.hex(64)
@@ -82,8 +82,8 @@ if node['cwb-server']['apply_secret_config']
     mode 00755
   end
 
-  BASE64_SUFFIX = '_BASE64'
-  base64_filter = Proc.new do |p,k,v,b|
+  BASE64_SUFFIX = '_BASE64'.freeze
+  base64_filter = proc do |p, k, v, b|
     if k.include?(BASE64_SUFFIX)
       new_k = k.sub(BASE64_SUFFIX, '')
       new_v = Base64.decode64(v)
@@ -92,8 +92,8 @@ if node['cwb-server']['apply_secret_config']
       [p, k, v, b]
     end
   end
-  FILE_SUFFIX = '_FILE'
-  file_filter = Proc.new do |p,k,v,b|
+  FILE_SUFFIX = '_FILE'.freeze
+  file_filter = proc do |p, k, v, b|
     if k.include?(FILE_SUFFIX)
       clean_k = k.sub(FILE_SUFFIX, '')
       file_name = providers[p][clean_k + '_name'] || p
@@ -109,16 +109,16 @@ if node['cwb-server']['apply_secret_config']
       [p, k, v, b]
     end
   end
-  env_filter = Proc.new do |p,k,v,b|
+  env_filter = proc do |p, k, v, b|
     new_k = (p + '_' + k).upcase
     eval("default_env('#{new_k}', '#{v}')", b)
     [p, new_k, v, b]
   end
   providers.each do |provider, attributes|
     attributes.each do |key, value|
-      envs = [provider, key, value, binding].instance_eval(&base64_filter)
-                                            .instance_eval(&file_filter)
-                                            .instance_eval(&env_filter)
+      [provider, key, value, binding].instance_eval(&base64_filter)
+                                     .instance_eval(&file_filter)
+                                     .instance_eval(&env_filter)
     end
   end
   # Convenience for app user that wants to source the environment
