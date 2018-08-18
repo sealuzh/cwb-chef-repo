@@ -40,8 +40,6 @@ bundle_install = bundle("install --deployment --without #{common_groups.join(' '
 migration_cmd = bundle('exec rake db:migrate --trace')
 precompile_assets = bundle('exec rake assets:precompile')
 update_pw_cmd = bundle("exec rake user:create[seal@uzh.ch,#{app['user_password']}]")
-# --log #{app['log_dir']} has no effect,
-# Systemd logs to ???
 # Example:
 # sudo bin/foreman export systemd /etc/systemd/system \
 #   --procfile Procfile_production --env .env --app cloud-workbench \
@@ -52,7 +50,9 @@ foreman_opts = "--procfile Procfile_production \
                 --formation web=1,job=#{app['num_workers']} \
                 --port #{app['port']} \
                 --user #{app['user']}"
-configure_systemd_cmd = bundle("exec foreman export systemd /etc/systemd/system #{foreman_opts}", sudo: true)
+export_systemd_template = bundle("exec foreman export systemd /etc/systemd/system #{foreman_opts}", sudo: true)
+reload_systemd_cmd = 'sudo systemctl daemon-reload'
+configure_systemd_cmd = "#{export_systemd_template} && #{reload_systemd_cmd}"
 deploy app['name'] do
   deploy_to app['dir']
   scm_provider Chef::Provider::Git
@@ -63,7 +63,7 @@ deploy app['name'] do
   action :deploy
 
   ### User and group
-  user app['user']
+  user app['deploy_user']
   group app['user']
 
   ### Migrations
@@ -182,6 +182,9 @@ deploy app['name'] do
         FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'storage'))
         FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'log'))
         FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'vendor'))
+        FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'vendor_bundle'))
+        # The app user needs to access cache files (e.g., `/var/www/cloud-workbench/releases/20180818085533/tmp/cache/bootsnap-compile-cache/...`)
+        FileUtils.chown_R(app['user'], app['user'], File.join(release_path, 'tmp'))
       end
     end
 
@@ -196,5 +199,5 @@ deploy app['name'] do
     end
   end
   # TODO: Think about graceful restart for currently running worker processes!
-  restart_command "sudo systemctl daemon-reload && sudo systemctl restart #{app['name']}.target"
+  restart_command "sudo systemctl restart #{app['name']}.target"
 end

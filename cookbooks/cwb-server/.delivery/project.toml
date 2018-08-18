@@ -1,0 +1,8 @@
+[local_phases]
+unit = "chef exec rspec spec/"
+lint = "chef exec cookstyle"
+syntax = "chef exec foodcritic . --exclude spec -f any # -t \"~FC064\" -t \"~FC065\""
+provision = "chef exec kitchen create"
+deploy = "chef exec kitchen converge"
+smoke = "chef exec kitchen verify"
+cleanup = "chef exec kitchen destroy"

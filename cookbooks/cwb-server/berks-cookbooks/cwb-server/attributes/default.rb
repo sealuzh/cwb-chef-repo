@@ -52,6 +52,7 @@ default_source_url = File.join(node['cwb-server']['ruby']['base_url'], node['pla
 # Overriding the `source_url` takes precedence over `version`
 # Example: https://rvm.io/binaries/ubuntu/16.04/x86_64/ruby-2.2.5.tar.bz2
 default['cwb-server']['ruby']['source_url'] = default_source_url
+# Unchecked if not provided
 default['cwb-server']['ruby']['checksum'] = nil
 
 ### Nodejs
@@ -86,6 +87,7 @@ default['cwb-server']['apply_secret_config'] = true
 
 # SSH
 default['cwb-server']['ssh']['key'] = '-----BEGIN RSA PRIVATE KEY-----'
+default['cwb-server']['ssh']['pub_key'] = ''
 default['cwb-server']['ssh']['key_name'] = 'cloud-benchmarking'
 
 # Chef
