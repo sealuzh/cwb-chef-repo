@@ -129,13 +129,6 @@ deploy app['name'] do
       content env_variables
     end
 
-    directory File.join(shared_path, 'vendor_bundle') do
-      owner new_resource.user
-      group new_resource.group
-      mode '0755'
-      action :create
-    end
-
     Chef::Log.info('Precompiling assets')
     execute precompile_assets do
       cwd release_path
@@ -147,8 +140,6 @@ deploy app['name'] do
   # NOTE: Target directory is not created if non-existent
   symlinks(
     '.env' => '.env'
-    # 'vendor/bundle' => 'vendor_bundle'
-    # => 'vendor_bundle'
     # 'pids' => 'tmp/pids'
     # CWB old
     # 'tmp/pids tmp/cache tmp/sockets vendor/bundle public/system storage chef-repo'
@@ -170,7 +161,6 @@ deploy app['name'] do
         FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'storage'))
         FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'log'))
         FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'vendor'))
-        FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'vendor_bundle'))
         # The app user needs to access cache files (e.g., `/var/www/cloud-workbench/releases/20180818085533/tmp/cache/bootsnap-compile-cache/...`)
         FileUtils.chown_R(app['user'], app['user'], File.join(release_path, 'tmp'))
       end
@@ -186,6 +176,6 @@ deploy app['name'] do
       environment new_resource.environment
     end
   end
-  # TODO: Think about graceful restart for currently running worker processes!
+  # ENHANCEMENT: Think about graceful restart for currently running worker processes!
   restart_command "sudo systemctl restart #{app['name']}.target"
 end
