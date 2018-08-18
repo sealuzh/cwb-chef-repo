@@ -6,7 +6,7 @@
   "maintainer_email": "joel.scheuner.dev@gmail.com",
   "license": "Apache 2.0",
   "platforms": {
-
+    "ubuntu": ">= 0.0.0"
   },
   "dependencies": {
     "sudo": "~> 5.4.0",
@@ -28,12 +28,14 @@
   "recipes": {
 
   },
-  "version": "0.4.0",
-  "source_url": "",
-  "issues_url": "",
+  "version": "0.6.0",
+  "source_url": "https://github.com/sealuzh/cwb-chef-repo",
+  "issues_url": "https://github.com/sealuzh/cwb-chef-repo/issues",
   "privacy": false,
   "chef_versions": [
-
+    [
+      ">= 13"
+    ]
   ],
   "ohai_versions": [
 

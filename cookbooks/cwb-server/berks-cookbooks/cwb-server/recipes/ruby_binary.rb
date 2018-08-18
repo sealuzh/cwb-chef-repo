@@ -2,7 +2,12 @@ ruby = node['cwb-server']['ruby']
 ruby_with_version = "ruby-#{ruby['version']}"
 ruby_tar_file = "#{ruby_with_version}.tar.bz2"
 
-# Required for Ruby gem
+# Required for Ruby (see dependency list: https://gorails.com/setup/ubuntu/16.04)
+# Fixes the missing `libyaml` dependency causing the error:
+# ```
+# It seems your ruby installation is missing psych (for YAML output).
+# To eliminate this warning, please install libyaml and reinstall your ruby.
+# ```
 package 'libyaml-dev'
 
 # Add Ruby bin to system-wide loaded `/etc/profile.d`: https://askubuntu.com/questions/866161/setting-path-variable-in-etc-environment-vs-profile
@@ -17,7 +22,8 @@ end
 # NOTICE: This resource notifies the `unpack => install bundler` chain
 #         such that the installation only updates if the installation file changes
 cache_file = File.join(Chef::Config[:file_cache_path], ruby_tar_file)
-remote_file cache_file do
+remote_file 'download-ruby' do
+  path cache_file
   owner 'root'
   group 'root'
   mode '0644'
@@ -32,10 +38,28 @@ execute "unpack #{ruby_with_version}" do
   command "tar xvjf #{cache_file} -C #{ruby['dir']}"
   creates ruby_bin
   action :nothing
-  notifies :run, 'execute[install-bundler]', :immediately
 end
 
+# This also affects the current Chef run because it's
+# run via `run_action(:run)` at compile time.
+# modify_path = ruby_block 'Add new Ruby to PATH' do
+#   block do
+#     ENV['PATH'] = "#{ruby_bin}:#{ENV['PATH']}"
+#   end
+# end
+# modify_path.run_action(:run)
+
+bundle_exists = "test -f #{ruby['bin_dir']}/bundle"
 execute 'install-bundler' do
   command "#{ruby_bin} -S #{ruby['bin_dir']}/gem install bundler"
-  action :nothing
+  not_if bundle_exists
+  action :run
 end
+
+# Symlink Ruby executables => should not be necessary given correct path settings
+# %w(ruby gem bundle ruby_executable_hooks).each do |executable|
+#   link "/usr/local/bin/#{executable}" do
+#     to File.join(ruby['bin_dir'], executable)
+#     action :create
+#   end
+# end

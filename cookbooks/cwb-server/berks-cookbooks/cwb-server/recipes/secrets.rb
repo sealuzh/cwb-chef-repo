@@ -33,7 +33,7 @@ if node['cwb-server']['env']['SECRET_KEY_BASE'].nil?
     node.normal['cwb-server']['env']['SECRET_KEY_BASE'] = File.read(secret_key_base_path)
   else
     new_key = SecureRandom.hex(64)
-    store_key secret_key_base_path, new_key
+    store_key secret_key_base_path, new_key, app_user
     node.normal['cwb-server']['env']['SECRET_KEY_BASE'] = new_key
   end
 end
@@ -50,6 +50,7 @@ if node['cwb-server']['apply_secret_config']
   key_path = "#{ssh_dir}/#{ssh['key_name']}.pem"
   create_dir ssh_dir, app_user
   store_key key_path, ssh['key'], app_user
+  store_key "#{key_path}.pub", ssh['pub_key'], app_user
   default_env 'SSH_KEY_NAME', ssh['key_name']
   default_env 'SSH_KEY_PATH', key_path
 

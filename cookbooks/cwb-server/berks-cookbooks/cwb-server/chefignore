@@ -12,6 +12,8 @@
 # secret config
 *.secret
 
+.delivery/*
+
 # OS generated files #
 ######################
 .DS_Store
@@ -61,8 +63,17 @@ spec/*
 spec/fixtures/*
 test/*
 features/*
+examples/*
 Guardfile
 Procfile
+.kitchen*
+kitchen.yml*
+.rubocop.yml
+spec/*
+Rakefile
+.travis.yml
+.foodcritic
+.codeclimate.yml
 
 # SCM #
 #######
@@ -79,26 +90,27 @@ Procfile
 
 # Berkshelf #
 #############
+Berksfile
+Berksfile.lock
 cookbooks/*
 tmp
 
+# Bundler #
+###########
+vendor/*
+
+# Policyfile #
+##############
+Policyfile.rb
+Policyfile.lock.json
+
 # Cookbooks #
 #############
-CONTRIBUTING
+CONTRIBUTING*
 CHANGELOG*
-
-# Strainer #
-############
-Colanderfile
-Strainerfile
-.colander
-.strainer
+TESTING*
 
 # Vagrant #
 ###########
 .vagrant
 Vagrantfile
-
-# Travis #
-##########
-.travis.yml

@@ -1,10 +1,14 @@
 name             'cwb-server'
 maintainer       'Joel Scheuner'
 maintainer_email 'joel.scheuner.dev@gmail.com'
+source_url       'https://github.com/sealuzh/cwb-chef-repo'
+issues_url       'https://github.com/sealuzh/cwb-chef-repo/issues'
 license          'Apache 2.0'
 description      'Installs and configures the Cloud WorkBench server'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          '0.4.0'
+chef_version     '>= 13'
+supports         'ubuntu'
+version          '0.6.0'
 
 ### Base utilities
 depends 'sudo', '~> 5.4.0'
@@ -20,7 +24,3 @@ depends 'postgresql', '~> 7.1.0'
 
 ### Runtime dependencies
 depends 'vagrant', '~> 0.9.1'
-
-### Deployment
-# If using Capistrano
-# depends 'acl', '~> 1.0.2'
