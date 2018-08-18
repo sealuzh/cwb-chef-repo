@@ -3,10 +3,11 @@ require 'spec_helper'
 describe 'cwb-server::default' do
   context 'When all attributes are default, on Ubuntu 16.0' do
     ruby_version = '2.5.1'
+    postgresql_version = '9.6'
 
     before do
       stub_command('which sudo')
-      stub_command("ls /var/lib/postgresql/9.6/main/recovery.conf")
+      stub_command("ls /var/lib/postgresql/#{postgresql_version}/main/recovery.conf")
       stub_command("test -f /usr/local/ruby-#{ruby_version}/bin/bundle").and_return(false)
       stub_command("test -f /usr/local/ruby-#{ruby_version}/bin/ruby_executable_hooks").and_return(false)
     end
