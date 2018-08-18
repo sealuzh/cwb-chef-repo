@@ -29,7 +29,7 @@ remote_file 'download-ruby' do
   mode '0644'
   source ruby['source_url']
   checksum ruby['checksum'] if ruby['checksum']
-  action :create
+  action :create_if_missing
   notifies :run, "execute[unpack #{ruby_with_version}]", :immediately
 end
 
