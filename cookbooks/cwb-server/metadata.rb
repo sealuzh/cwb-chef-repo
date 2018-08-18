@@ -12,8 +12,6 @@ version          '0.6.0'
 
 ### Base utilities
 depends 'sudo', '~> 5.4.0'
-depends 'apt', '~> 7.0.0'
-depends 'build-essential', '~> 8.1.1'
 depends 'git', '~> 9.0.1'
 depends 'timezone_lwrp', '~> 0.2.1'
 depends 'ntp', '~> 3.6.0'

@@ -34,7 +34,7 @@ before_script:
 script:
   # TODO: fix foodcritic issues
   # Cookbook syntax checker: http://www.foodcritic.io/
-  # - foodcritic .
+  - foodcritic .
   # Short-running unit tests with ChefSpec: https://chefspec.github.io/chefspec/
   - chef exec rspec spec/
   # Long-running integration tests with TestKitchen: https://kitchen.ci/

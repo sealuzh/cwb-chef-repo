@@ -26,7 +26,7 @@ lint:
 	cookstyle
 
 syntax:
-	foodcritic . --exclude spec -f any # -t \"~FC064\" -t \"~FC065\"
+	foodcritic . --exclude spec -f any  -t ~FC101
 
 all_tests: lint syntax unit_test integration_test
 

@@ -1,8 +1,10 @@
 ### Base utilities
 include_recipe 'cwb-server::detect_host'
 include_recipe 'cwb-server::users'
-include_recipe 'apt::default'
-include_recipe 'build-essential::default'
+apt_update
+build_essential 'install build essentials' do
+    compile_time true
+end
 include_recipe 'git::default'
 include_recipe 'timezone_lwrp::default'
 include_recipe 'ntp::default'
