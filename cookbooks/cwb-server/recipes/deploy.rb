@@ -1,3 +1,13 @@
+Chef::Recipe.send(:include, CwbServer::Helpers)
+
+# Filters out all groups that do not match the specified Rails environment (e.g., production)
+# Example: `only_rails_env_list(env)` => 'development test staging doc'
+def only_rails_env_list(env)
+  common_groups = %w(development test staging production doc)
+  common_groups.delete(env['RAILS_ENV'])
+  common_groups.join(' ')
+end
+
 app = node['cwb-server']['app']
 env = node['cwb-server']['env']
 
@@ -15,16 +25,11 @@ directory app['dir'] do
   action :create
 end
 
-# These variables MUST be evaluated outside of the deploy resource
-# TODO: Replace with helper method
-env_variables = env.map { |k, v| "#{k}=#{v}" }.join("\n")
-# TODO: refactor into method `only_rails_env(env)`
-common_groups = %w(development test staging production doc)
-common_groups.delete(env['RAILS_ENV'])
-# Bundler options: http://bundler.io/v1.11/deploying.html
-# --deployment installs gems into `vendor/bundle` (encapsulate from system ruby)
-bundle_install = "bin/bundle install --deployment --without #{common_groups.join(' ')}"
-
+### These variables MUST be evaluated outside of the deploy resource
+env_variables = env_pairs(env)
+# Bundler options: https://bundler.io/v1.16/guides/deploying.html
+# --deployment installs gems into `vendor/bundle` (encapsulated from system ruby)
+bundle_install = "bin/bundle install --deployment --without #{only_rails_env_list(env)}"
 migration_cmd = 'bin/rake db:migrate --trace'
 precompile_assets = 'bin/rake assets:precompile'
 update_pw_cmd = "bin/rake user:create[seal@uzh.ch,#{app['user_password']}]"
@@ -84,7 +89,6 @@ deploy app['name'] do
 
     # Based on: https://github.com/poise/application_ruby/blob/v3.0.2/providers/rails.rb
     # Inspired by: https://github.com/capistrano/bundler
-    # TODO: Check whether log statements are shown at the right time
     Chef::Log.info 'Running bundle install'
     execute bundle_install do
       cwd release_path
