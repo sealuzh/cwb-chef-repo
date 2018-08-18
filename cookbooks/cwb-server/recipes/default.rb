@@ -1,5 +1,5 @@
 ### Base utilities
-include_recipe 'cwb-server::attributes'
+include_recipe 'cwb-server::detect_host'
 include_recipe 'cwb-server::users'
 include_recipe 'apt::default'
 include_recipe 'build-essential::default'
