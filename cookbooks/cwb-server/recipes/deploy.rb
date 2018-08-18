@@ -8,6 +8,11 @@ def only_rails_env_list(env)
   common_groups.join(' ')
 end
 
+# Convert all environment variables to string hashes
+def env_string_hash(env)
+  env.map { |k, v| [k.to_s, v.to_s] }
+end
+
 app = node['cwb-server']['app']
 env = node['cwb-server']['env']
 
@@ -26,6 +31,7 @@ directory app['dir'] do
 end
 
 ### These variables MUST be evaluated outside of the deploy resource
+deploy_environment = env_string_hash(env).to_h.merge('HOME' => "/home/#{app['user']}")
 env_variables = env_pairs(env)
 # Bundler options: https://bundler.io/v1.16/guides/deploying.html
 # --deployment installs gems into `vendor/bundle` (encapsulated from system ruby)
@@ -116,9 +122,7 @@ deploy app['name'] do
   )
   migrate true
   migration_command migration_cmd
-  # TODO: refactor into `env_string_hash(envs)`
-  # HOME must be set to deploy user for bundler
-  environment(env.map { |k, v| [k.to_s, v.to_s] }.to_h.merge('HOME' => "/home/#{app['user']}"))
+  environment deploy_environment
 
   ### Symlinks
   purge_before_symlink.clear
