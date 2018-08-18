@@ -3,7 +3,7 @@ maintainer       'Joel Scheuner'
 maintainer_email 'joel.scheuner.dev@gmail.com'
 source_url       'https://github.com/sealuzh/cwb-chef-repo'
 issues_url       'https://github.com/sealuzh/cwb-chef-repo/issues'
-license          'Apache 2.0'
+license          'Apache-2.0'
 description      'Installs and configures the Cloud WorkBench server'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 chef_version     '>= 13'
