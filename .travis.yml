@@ -1,7 +1,8 @@
 # Chef Travis CI config based on https://github.com/chef-cookbooks/enterprise-chef-common/blob/master/.travis.yml
 # Use Travis's container-based infrastructure
-sudo: false
+sudo: required
 dist: trusty
+services: docker
 
 addons:
   apt:
@@ -10,21 +11,31 @@ addons:
     packages:
       - chefdk
 
-install: echo "skip bundle install"
+env:
+  matrix:
+  - INSTANCE=default-ubuntu-1604
 
-branches:
-  only:
-    - master
+before_install:
+  - cd cookbooks/cwb-server
 
-# Ensure we make ChefDK's Ruby the default
+install: echo "skip bundle install, using ChefDK instead"
+  # - chef exec bundle install --without='vagrant'
+
 before_script:
+  # https://github.com/zuazo/kitchen-in-travis-native/issues/1#issuecomment-142455888
+  - sudo iptables -L DOCKER || sudo iptables -N DOCKER
+  # Ensure we make ChefDK's Ruby the default
   - eval "$(chef shell-init bash)"
   - chef --version
   - cookstyle --version
   - foodcritic --version
+  - chef exec gem list
 
 script:
   # TODO: fix foodcritic issues
-  # - foodcritic . # Cookbook syntax checker: http://www.foodcritic.io/
-  - chef exec rspec spec/ # short-running unit tests (Rspec + ChefSpec)
-  - KITCHEN_YAML=.kitchen.yml KITCHEN_LOCAL_YAML=.kitchen.dokken.yml chef exec kitchen verify # long-running integration tests (TestKitchen)
+  # Cookbook syntax checker: http://www.foodcritic.io/
+  # - foodcritic .
+  # Short-running unit tests with ChefSpec: https://chefspec.github.io/chefspec/
+  - chef exec rspec spec/
+  # Long-running integration tests with TestKitchen: https://kitchen.ci/
+  - KITCHEN_YAML=.kitchen.yml KITCHEN_LOCAL_YAML=.kitchen.dokken.yml chef exec kitchen verify ${INSTANCE}
