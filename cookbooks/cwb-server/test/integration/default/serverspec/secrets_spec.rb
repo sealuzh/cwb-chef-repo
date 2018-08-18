@@ -21,7 +21,7 @@ describe 'cwb-server::secrets' do
 
   describe file('/home/apps/.chef/knife.rb') do
     skip 'Not mandatory, but might be helpful as admin tool' do
-    its(:content) { should match(/node_name\s+'cwb-server'/) }
+      its(:content) { should match(/node_name\s+'cwb-server'/) }
     end
   end
 
@@ -32,7 +32,7 @@ describe 'cwb-server::secrets' do
   describe file('/etc/systemd/system/cloud-workbench-job@.service') do
     its(:content) { should match(/Environment="AWS_ACCESS_KEY=my_aws_access_key"/) }
     its(:content) { should match(/Environment="GOOGLE_API_KEY_NAME=google-compute"/) }
-    its(:content) { should match(%r{Environment="GOOGLE_API_KEY_PATH=#{google_file}"}) }
+    its(:content) { should match(/Environment="GOOGLE_API_KEY_PATH=#{google_file}"/) }
     its(:content) { should match(/Environment="AZURE_MGMT_CERTIFICATE_PATH=#{azure_file}"/) }
     its(:content) { should match(%r{Environment="CHEF_SERVER_URL=https://33.33.33.10:443/organizations/chef"}) }
     its(:content) { should match(/Environment="CWB_SERVER_HOST=\d+\.\d+\.\d+.\d+"/) }

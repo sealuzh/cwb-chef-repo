@@ -27,7 +27,7 @@ default['cwb-server']['nginx']['log_dir'] = '/var/log/nginx'
 # a) Optimistic (might break on newer releases): ['vagrant-google', ...]
 # b) Pessimistic (requires manual updating): [{ 'name' => 'vagrant-google',  'version' =>  '0.2.2' }, ...]
 default['cwb-server']['vagrant']['providers'] = [
-  { 'name' => 'vagrant-aws', 'version' => '0.7.2' }
+  { 'name' => 'vagrant-aws', 'version' => '0.7.2' },
 ]
 
 ### Vagrant: https://supermarket.chef.io/cookbooks/vagrant#readme
@@ -37,8 +37,8 @@ default['vagrant']['plugins'] = [
   # Ensure that Chef is installed within a VM
   { 'name' => 'vagrant-omnibus', 'version' =>  '1.5.0' },
   # Delete Chef client and node when destroying a VM
-  { 'name' => 'vagrant-butcher', 'version' =>  '2.2.0' }
-]  + node['cwb-server']['vagrant']['providers']
+  { 'name' => 'vagrant-butcher', 'version' =>  '2.2.0' },
+] + node['cwb-server']['vagrant']['providers']
 
 ### Ruby
 default['cwb-server']['ruby']['dir'] = '/usr/local'

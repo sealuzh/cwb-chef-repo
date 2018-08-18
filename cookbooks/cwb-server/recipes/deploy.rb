@@ -160,11 +160,11 @@ deploy app['name'] do
   symlinks(
     '.env' => '.env'
     # 'vendor/bundle' => 'vendor_bundle'
-     # => 'vendor_bundle'
+    # => 'vendor_bundle'
     # 'pids' => 'tmp/pids'
-      # CWB old
+    # CWB old
     # 'tmp/pids tmp/cache tmp/sockets vendor/bundle public/system storage chef-repo'
-      # CAPIstrano rails: https://github.com/capistrano/rails
+    # CAPIstrano rails: https://github.com/capistrano/rails
     # 'log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'vendor/bundle', 'public/system', 'public/uploads'
   )
 

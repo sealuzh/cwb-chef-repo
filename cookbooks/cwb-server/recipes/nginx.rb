@@ -25,9 +25,9 @@ end
 
 nginx_site node['cwb-server']['app']['name'] do
   conf_template 'nginx.vhost.conf.erb'
-  conf_variables({
+  conf_variables(
     app: node['cwb-server']['app'],
     nginx: node['cwb-server']['nginx']
-  })
+  )
   action :enable
 end

@@ -3,7 +3,7 @@ include_recipe 'cwb-server::detect_host'
 include_recipe 'cwb-server::users'
 apt_update
 build_essential 'install build essentials' do
-    compile_time true
+  compile_time true
 end
 include_recipe 'git::default'
 include_recipe 'timezone_lwrp::default'
