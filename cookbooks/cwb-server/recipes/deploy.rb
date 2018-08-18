@@ -56,8 +56,6 @@ deploy app['name'] do
 
   ### Migrations
   before_migrate do
-    # TODO: Consider using a log management tool (e.g., logrotate)
-    # SEE: https://github.com/heroku/rails_12factor
     # MUST remove existing log directory before creating the symlink
     directory File.join(release_path, 'log') do
       owner new_resource.user

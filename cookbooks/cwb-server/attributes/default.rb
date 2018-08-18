@@ -71,6 +71,7 @@ default['cwb-server']['db']['password'] = 'cloud'
 ### Environment variables
 default['cwb-server']['env']['HOME'] = "/home/#{node['cwb-server']['app']['user']}"
 default['cwb-server']['env']['RAILS_ENV'] = 'production'
+default['cwb-server']['env']['RAILS_LOG_TO_STDOUT'] = 'true'
 # Enable this when switching from therubyracer to Node
 # default['cwb-server']['env']['EXECJS_RUNTIME'] = 'Node'
 # Randomly generated if not provided
