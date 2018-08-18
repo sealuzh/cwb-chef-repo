@@ -14,7 +14,8 @@ converge:
 integration_test:
 	kitchen verify
 
-dokken_test: KITCHEN_LOCAL_YAML=.kitchen.dokken.yml
+dokken_test: export KITCHEN_YAML=.kitchen.yml
+dokken_test: export KITCHEN_LOCAL_YAML=.kitchen.dokken.yml
 dokken_test:
 	kitchen verify
 

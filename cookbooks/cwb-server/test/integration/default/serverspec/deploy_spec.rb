@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'cwb-server::deploy_spec' do
   describe file('/var/www/cloud-workbench/current/Gemfile') do
-    it { should be_owned_by 'apps' }
+    it { should be_owned_by 'deploy' }
     its(:content) { should match(%r{source 'https://rubygems.org'}) }
   end
 

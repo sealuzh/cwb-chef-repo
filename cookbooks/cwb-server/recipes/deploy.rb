@@ -40,8 +40,6 @@ bundle_install = bundle("install --deployment --without #{common_groups.join(' '
 migration_cmd = bundle('exec rake db:migrate --trace')
 precompile_assets = bundle('exec rake assets:precompile')
 update_pw_cmd = bundle("exec rake user:create[seal@uzh.ch,#{app['user_password']}]")
-# --log #{app['log_dir']} has no effect,
-# Systemd logs to ???
 # Example:
 # sudo bin/foreman export systemd /etc/systemd/system \
 #   --procfile Procfile_production --env .env --app cloud-workbench \
@@ -65,7 +63,7 @@ deploy app['name'] do
   action :deploy
 
   ### User and group
-  user app['user']
+  user app['deploy_user']
   group app['user']
 
   ### Migrations
@@ -184,6 +182,9 @@ deploy app['name'] do
         FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'storage'))
         FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'log'))
         FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'vendor'))
+        FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'vendor_bundle'))
+        # The app user needs to access cache files (e.g., `/var/www/cloud-workbench/releases/20180818085533/tmp/cache/bootsnap-compile-cache/...`)
+        FileUtils.chown_R(app['user'], app['user'], File.join(release_path, 'tmp'))
       end
     end
 

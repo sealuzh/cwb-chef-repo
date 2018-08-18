@@ -31,7 +31,9 @@ make syntax
 ### Integration tests via Docker (as used for Travis CI)
 
 ```bash
-KITCHEN_LOCAL_YAML=.kitchen.dokken.yml chef exec kitchen verify
+export KITCHEN_YAML=.kitchen.yml
+export KITCHEN_LOCAL_YAML=.kitchen.dokken.yml
+kitchen verify
 ```
 
 See [kitchen-dokken](https://github.com/someara/kitchen-dokken)
