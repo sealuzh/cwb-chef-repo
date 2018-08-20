@@ -59,7 +59,7 @@ default['cwb-server']['ruby']['checksum'] = nil
 
 ### Nodejs
 # Nodejs versions: https://github.com/nodesource/distributions#installation-instructions
-default['cwb-server']['nodejs']['setup_script'] = 'https://deb.nodesource.com/setup_5.x'
+default['cwb-server']['nodejs']['setup_script'] = 'https://deb.nodesource.com/setup_10.x'
 default['cwb-server']['nodejs']['setup_checksum'] = nil
 
 ### Database
@@ -74,8 +74,7 @@ default['cwb-server']['db']['password'] = 'cloud'
 default['cwb-server']['env']['HOME'] = "/home/#{node['cwb-server']['app']['user']}"
 default['cwb-server']['env']['RAILS_ENV'] = 'production'
 default['cwb-server']['env']['RAILS_LOG_TO_STDOUT'] = 'true'
-# Enable this when switching from therubyracer to Node
-# default['cwb-server']['env']['EXECJS_RUNTIME'] = 'Node'
+default['cwb-server']['env']['EXECJS_RUNTIME'] = 'Node'
 # Randomly generated if not provided
 default['cwb-server']['env']['SECRET_KEY_BASE'] = nil
 # Dynamic example: [node['cpu']['total'].to_i * 4, 8].min
