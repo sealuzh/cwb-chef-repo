@@ -20,6 +20,7 @@ include_recipe 'cwb-server::ruby_binary'
 ### Runtime dependencies
 include_recipe 'cwb-server::nginx'
 include_recipe 'vagrant::default'
+include_recipe 'cwb-server::vagrant'
 
 include_recipe 'cwb-server::secrets'
 include_recipe 'cwb-server::deploy'
