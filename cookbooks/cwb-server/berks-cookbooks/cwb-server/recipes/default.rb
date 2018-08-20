@@ -14,12 +14,12 @@ include_recipe 'cwb-server::dev'
 include_recipe 'cwb-server::database'
 # Alternatively use maintained Ubuntu packages: https://www.brightbox.com/docs/ruby/ubuntu/
 include_recipe 'cwb-server::ruby_binary'
-# Enable when switching from `therubyracer` to `Node` as ExecJS
-# include_recipe 'cwb-server::nodejs'
+include_recipe 'cwb-server::nodejs'
 
 ### Runtime dependencies
 include_recipe 'cwb-server::nginx'
 include_recipe 'vagrant::default'
+include_recipe 'cwb-server::vagrant'
 
 include_recipe 'cwb-server::secrets'
 include_recipe 'cwb-server::deploy'
