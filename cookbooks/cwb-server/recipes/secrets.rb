@@ -130,7 +130,7 @@ if node['cwb-server']['apply_secret_config']
     mode 0600
     variables(env: node['cwb-server']['env'])
   end
-else
+else # Delete secrets if `apply_secret_config` is set to false
   secret_dirs = %w(.chef .ssh providers)
   secret_dirs.each do |dir|
     directory dir do

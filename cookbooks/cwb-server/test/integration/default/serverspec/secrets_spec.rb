@@ -19,11 +19,14 @@ describe 'cwb-server::secrets' do
     it { should be_owned_by 'apps' }
   end
 
-  describe file('/home/apps/.chef/knife.rb') do
-    skip 'Not mandatory, but might be helpful as admin tool' do
-      its(:content) { should match(/node_name\s+'cwb-server'/) }
-    end
-  end
+  # Steps to implement this:
+  # 1) Add `/opt/chef/bin/` to path
+  # 2) Generate `knife.rb`
+  # describe file('/home/apps/.chef/knife.rb') do
+  #   skip 'Not mandatory, but might be helpful as admin tool' do
+  #     its(:content) { should match(/node_name\s+'cwb-server'/) }
+  #   end
+  # end
 
   # Providers
   providers_dir = '/home/apps/providers'
