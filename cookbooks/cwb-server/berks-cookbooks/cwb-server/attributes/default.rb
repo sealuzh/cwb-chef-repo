@@ -74,6 +74,7 @@ default['cwb-server']['db']['password'] = 'cloud'
 default['cwb-server']['env']['HOME'] = "/home/#{node['cwb-server']['app']['user']}"
 default['cwb-server']['env']['RAILS_ENV'] = 'production'
 default['cwb-server']['env']['RAILS_LOG_TO_STDOUT'] = 'true'
+default['cwb-server']['env']['LOG_LEVEL'] = 'info'
 default['cwb-server']['env']['EXECJS_RUNTIME'] = 'Node'
 # Randomly generated if not provided
 default['cwb-server']['env']['SECRET_KEY_BASE'] = nil
