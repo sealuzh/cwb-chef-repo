@@ -78,7 +78,7 @@ deploy app['name'] do
     # Using different owners is useless because this resource enforces ownership
     # of the entire deployment directory recursively:
     # See https://github.com/chef/chef/blob/master/lib/chef/provider/deploy.rb#L277
-    %w(log storage vendor/bundle public/assets).each do |dir|
+    %w(log storage vendor/bundle public/assets backups).each do |dir|
       directory File.join(shared_path, dir) do
         owner new_resource.user
         group new_resource.group
@@ -90,6 +90,10 @@ deploy app['name'] do
       link File.join(release_path, dir) do
         to File.join(shared_path, dir)
         # mode '0755' # Not implemented!
+      end
+
+      link File.join(release_path, 'db', 'backups') do
+        to File.join(shared_path, 'backups')
       end
     end
 
@@ -145,7 +149,7 @@ deploy app['name'] do
   # NOTE: `log` needs to be symlinked before any Rails commands writes to it (see before_migrate)
   # NOTE: Target directory is not created if non-existent
   symlinks(
-    '.env' => '.env'
+    '.env' => '.env',
     # 'pids' => 'tmp/pids'
     # CWB old
     # 'tmp/pids tmp/cache tmp/sockets vendor/bundle public/system storage chef-repo'
@@ -167,6 +171,7 @@ deploy app['name'] do
         FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'storage'))
         FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'log'))
         FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'vendor'))
+        FileUtils.chown_R(app['user'], app['user'], File.join(shared_path, 'backups'))
         # The app user needs to access cache files (e.g., `/var/www/cloud-workbench/releases/20180818085533/tmp/cache/bootsnap-compile-cache/...`)
         FileUtils.chown_R(app['user'], app['user'], File.join(release_path, 'tmp'))
       end
