@@ -152,7 +152,7 @@ cd $HOME/git/cwb-chef-repo/install/aws/
 vagrant provision cwb-server
 ```
 
-> *Capistrano:* The current configuration needs to be slightly updated
+> *Capistrano:* The current configuration needs to be updated
 >               for the new installation procedure.
 
 ## Manage VMs
@@ -283,6 +283,12 @@ journalctl -u cloud-workbench-job@3100.service
 tail -f /var/log/syslog
 ```
 
+#### Benchmark Schedule Triggers
+
+```bash
+cat /var/www/cloud-workbench/shared/log/benchmark_schedule.log
+```
+
 #### Nginx
 
 ```bash
@@ -296,6 +302,7 @@ tail -f /var/log/nginx/cloud-workbench-error.log
 cd  /var/www/cloud-workbench
 ls -l /etc/systemd/system/cloud-workbench*
 cat /etc/nginx/sites-available/cloud-workbench
+cd  /var/www/cloud-workbench/shared/storage/production
 ```
 
 ### Rails Console
