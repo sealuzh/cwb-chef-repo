@@ -230,6 +230,66 @@ This might be required after restarting an instance.
 
 Precondition: SSH'ed into the *cwb-server* instance
 
+### Systemd
+
+[Foreman](http://ddollar.github.io/foreman/#SYSTEMD-EXPORT) creates Systemd service templates upon deployment under `/etc/systemd/system/`. Background on [How To Use Systemctl to Manage Systemd Services and Units](https://www.digitalocean.com/community/tutorials/how-to-use-systemctl-to-manage-systemd-services-and-units)
+
+#### Targets
+
+```bash
+cloud-workbench.target
+cloud-workbench-web.target
+cloud-workbench-web@3000.service
+cloud-workbench-job.target
+cloud-workbench-job@3100.service
+cloud-workbench-job@3101.service
+...
+```
+
+#### Status
+
+```bash
+sudo systemctl status cloud-workbench.target
+```
+
+#### Stop, Start, Restart
+
+```bash
+sudo systemctl start cloud-workbench.target
+sudo systemctl restart cloud-workbench-web.target
+sudo systemctl stop cloud-workbench-job.target
+sudo systemctl start cloud-workbench-job@3100.service
+```
+
+For further detail see: https://www.digitalocean.com/community/tutorials/how-to-use-systemctl-to-manage-systemd-services-and-units
+
+### View Logs
+
+Precondition: SSH'ed into the target instance
+
+#### Cloud WorkBench
+
+```bash
+# Real-time
+journalctl -u cloud-workbench* -f
+# Recent
+journalctl -u cloud-workbench* -n 20
+
+journalctl -u cloud-workbench*
+journalctl -u cloud-workbench-web*
+journalctl -u cloud-workbench-job*
+journalctl -u cloud-workbench-job@3100.service
+
+tail -f /var/log/syslog
+```
+
+#### Nginx
+
+```bash
+tail -f /var/log/nginx/cloud-workbench-access.log
+tail -f /var/log/nginx/cloud-workbench-error.log
+```
+
 ### Installation directories
 
 ```bash
@@ -299,63 +359,4 @@ Save login credentials via a [password file](https://www.postgresql.org/docs/9.6
 ```bash
 echo "localhost:5432:cloud_workbench_production:postgres:rootcloud" > ~/.pgpass
 chmod 0600 ~/.pgpass
-```
-
-### Systemd
-
-[Foreman](http://ddollar.github.io/foreman/#SYSTEMD-EXPORT) creates Systemd service templates upon deployment under `/etc/systemd/system/`. Background on [How To Use Systemctl to Manage Systemd Services and Units](https://www.digitalocean.com/community/tutorials/how-to-use-systemctl-to-manage-systemd-services-and-units)
-
-#### Targets
-
-```bash
-cloud-workbench.target
-cloud-workbench-web.target
-cloud-workbench-web@3000.service
-cloud-workbench-job.target
-cloud-workbench-job@3100.service
-cloud-workbench-job@3101.service
-...
-```
-
-#### Status
-
-```bash
-sudo systemctl status cloud-workbench.target
-```
-
-#### Stop, Start, Restart
-
-```bash
-sudo systemctl start cloud-workbench.target
-sudo systemctl stop cloud-workbench-web.target
-sudo systemctl restart cloud-workbench-job@3100.service
-```
-
-For further detail see: https://www.digitalocean.com/community/tutorials/how-to-use-systemctl-to-manage-systemd-services-and-units
-
-### View Logs
-
-Precondition: SSH'ed into the target instance
-
-#### Cloud WorkBench
-
-```bash
-# Real-time
-journalctl -u cloud-workbench* -f
-# Recent
-journalctl -u cloud-workbench* -n 20
-
-journalctl -u cloud-workbench*
-journalctl -u cloud-workbench-web*
-journalctl -u cloud-workbench-job*
-journalctl -u cloud-workbench-job@3100.service
-
-tail -f /var/log/syslog
-```
-
-#### Nginx
-
-```bash
-tail -f /var/log/nginx/cloud-workbench-access.log
-tail -f /var/log/nginx/cloud-workbench-error.log
 ```
