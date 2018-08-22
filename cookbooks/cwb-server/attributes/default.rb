@@ -37,10 +37,9 @@ default['vagrant']['plugins'] = [
   # Ensure that Chef is installed within a VM
   { 'name' => 'vagrant-omnibus', 'version' => '1.5.0' },
   # Delete Chef client and node when destroying a VM
-  # Issue with 2.2.0: https://github.com/cassianoleal/vagrant-butcher/issues/37
-  # { 'name' => 'vagrant-butcher', 'version' => '2.2.0' },
+  # Issue with 2.3.0: https://github.com/cassianoleal/vagrant-butcher/issues/37
+  { 'name' => 'vagrant-butcher', 'version' => '2.3.0' },
 ] + node['cwb-server']['vagrant']['providers']
-# Install bottled version of vagrant-butcher 2.3.1 via custom gem in recipe
 
 ### Ruby
 default['cwb-server']['ruby']['dir'] = '/usr/local'
