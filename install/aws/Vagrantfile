@@ -97,7 +97,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
               # 'api_fqdn' => CHEF_SERVER_IP
               # List of commercial addons: https://github.com/chef-cookbooks/chef-server#attributes
               # The management console (mange) is free up to 25 nodes
-              # 'addons' => %w(manage)
+              # 'addons' => %w(manage),
+              # 'accept_license' => true
           }
       }
     end
@@ -154,7 +155,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                   },
                   'env' => {
                       'SECRET_KEY_BASE' => read_or_cache('secret_key_base.env', SecureRandom.hex(64)),
-                      'LOG_LEVEL' => 'info'
+                      'LOG_LEVEL' => 'info' # Rails log levels: debug, info, warn, error, fatal, unknown
                   },
                   'app' => {
                       'branch' => 'master',
