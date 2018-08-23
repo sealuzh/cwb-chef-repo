@@ -10,13 +10,13 @@ remote_file cache_file do
   source nodejs['setup_script']
   checksum nodejs['setup_checksum'] if nodejs['setup_checksum']
   action :create
-  notifies :run, 'execute[setup_nodejs]'
+  notifies :run, 'execute[setup_nodejs]', :immediately
 end
 
 execute 'setup_nodejs' do
   command "bash #{cache_file}"
   action :nothing
-  notifies :install, 'package[nodejs]'
+  notifies :install, 'package[nodejs]', :immediately
 end
 
 package 'nodejs' do

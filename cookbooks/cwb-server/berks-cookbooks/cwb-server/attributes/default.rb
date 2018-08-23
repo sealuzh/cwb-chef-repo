@@ -27,7 +27,7 @@ default['cwb-server']['nginx']['log_dir'] = '/var/log/nginx'
 # a) Optimistic (might break on newer releases): ['vagrant-google', ...]
 # b) Pessimistic (requires manual updating): [{ 'name' => 'vagrant-google',  'version' =>  '0.2.2' }, ...]
 default['cwb-server']['vagrant']['providers'] = [
-  { 'name' => 'vagrant-aws', 'version' => '0.7.2' }
+  { 'name' => 'vagrant-aws', 'version' => '0.7.2' },
 ]
 
 ### Vagrant: https://supermarket.chef.io/cookbooks/vagrant#readme
@@ -35,10 +35,11 @@ default['vagrant']['version'] = '2.1.2'
 default['vagrant']['user'] = node['cwb-server']['app']['user']
 default['vagrant']['plugins'] = [
   # Ensure that Chef is installed within a VM
-  { 'name' => 'vagrant-omnibus', 'version' =>  '1.5.0' },
+  { 'name' => 'vagrant-omnibus', 'version' => '1.5.0' },
   # Delete Chef client and node when destroying a VM
-  { 'name' => 'vagrant-butcher', 'version' =>  '2.2.0' }
-]  + node['cwb-server']['vagrant']['providers']
+  # Issue with 2.3.0: https://github.com/cassianoleal/vagrant-butcher/issues/37
+  { 'name' => 'vagrant-butcher', 'version' => '2.3.0' },
+] + node['cwb-server']['vagrant']['providers']
 
 ### Ruby
 default['cwb-server']['ruby']['dir'] = '/usr/local'
@@ -57,7 +58,7 @@ default['cwb-server']['ruby']['checksum'] = nil
 
 ### Nodejs
 # Nodejs versions: https://github.com/nodesource/distributions#installation-instructions
-default['cwb-server']['nodejs']['setup_script'] = 'https://deb.nodesource.com/setup_5.x'
+default['cwb-server']['nodejs']['setup_script'] = 'https://deb.nodesource.com/setup_10.x'
 default['cwb-server']['nodejs']['setup_checksum'] = nil
 
 ### Database
@@ -71,8 +72,9 @@ default['cwb-server']['db']['password'] = 'cloud'
 ### Environment variables
 default['cwb-server']['env']['HOME'] = "/home/#{node['cwb-server']['app']['user']}"
 default['cwb-server']['env']['RAILS_ENV'] = 'production'
-# Enable this when switching from therubyracer to Node
-# default['cwb-server']['env']['EXECJS_RUNTIME'] = 'Node'
+default['cwb-server']['env']['RAILS_LOG_TO_STDOUT'] = 'true'
+default['cwb-server']['env']['LOG_LEVEL'] = 'info'
+default['cwb-server']['env']['EXECJS_RUNTIME'] = 'Node'
 # Randomly generated if not provided
 default['cwb-server']['env']['SECRET_KEY_BASE'] = nil
 # Dynamic example: [node['cpu']['total'].to_i * 4, 8].min

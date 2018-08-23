@@ -1,6 +1,5 @@
-# cwb-chef-repo
-
-[![Build Status](https://travis-ci.org/sealuzh/cwb-chef-repo.svg?branch=master)](https://travis-ci.org/sealuzh/cwb-chef-repo)
+cwb-chef-repo [![Build Status](https://travis-ci.org/sealuzh/cwb-chef-repo.svg?branch=master)](https://travis-ci.org/sealuzh/cwb-chef-repo)
+=========
 
 This Chef repo provides cookbooks to automatically install and configure
 [Cloud WorkBench](https://github.com/sealuzh/cloud-workbench).
@@ -74,7 +73,7 @@ This Chef repo provides cookbooks to automatically install and configure
     vagrant up
     ```
 
-5. Once the Chef Server completed provisioning (may take 5-10 minutes) with<br>
+5. Once the Chef Server completed provisioning (around 4' on a t2.small instance) with<br>
    `INFO: Report handlers complete`,<br>
    update the public IP of *chef-server* (assigned by your provider)
     * Automatic query
@@ -124,9 +123,8 @@ This Chef repo provides cookbooks to automatically install and configure
     berks install && berks upload;
     ```
 
-9. Once the CWB Server completed provisioning (may take 10-30 minutes
-   depending on the chosen instance), reprovision to successfully complete the
-   configuration (may take 1-5 minutes).
+9. Once the CWB Server completed provisioning (around 9' on a t2.small instance), reprovision to successfully complete the
+   configuration (around 1').
 
     ```bash
     cd $HOME/git/cwb-chef-repo/install/aws/
@@ -154,7 +152,7 @@ cd $HOME/git/cwb-chef-repo/install/aws/
 vagrant provision cwb-server
 ```
 
-> *Capistrano:* The current configuration needs to be slightly updated
+> *Capistrano:* The current configuration needs to be updated
 >               for the new installation procedure.
 
 ## Manage VMs
@@ -232,30 +230,6 @@ This might be required after restarting an instance.
 
 Precondition: SSH'ed into the *cwb-server* instance
 
-### Installation directories
-
-```bash
-cd  /var/www/cloud-workbench
-ls -l /etc/systemd/system/cloud-workbench*
-cat /etc/nginx/sites-available/cloud-workbench
-```
-
-### Rails Console
-
-```bash
-sudo su - apps
-cd /var/www/cloud-workbench/current && RAILS_ENV=production bin/rails c
-```
-
-### PostgreSQL
-
-Save login credentials via a [password file](https://www.postgresql.org/docs/9.6/static/libpq-pgpass.html):
-
-```bash
-echo "localhost:5432:cloud_workbench_production:postgres:rootcloud" > ~/.pgpass
-chmod 0600 ~/.pgpass
-```
-
 ### Systemd
 
 [Foreman](http://ddollar.github.io/foreman/#SYSTEMD-EXPORT) creates Systemd service templates upon deployment under `/etc/systemd/system/`. Background on [How To Use Systemctl to Manage Systemd Services and Units](https://www.digitalocean.com/community/tutorials/how-to-use-systemctl-to-manage-systemd-services-and-units)
@@ -263,12 +237,12 @@ chmod 0600 ~/.pgpass
 #### Targets
 
 ```bash
-cloud-workbench
-cloud-workbench-web
-cloud-workbench-web-1
-cloud-workbench-job
-cloud-workbench-job-1
-cloud-workbench-job-2
+cloud-workbench.target
+cloud-workbench-web.target
+cloud-workbench-web@3000.service
+cloud-workbench-job.target
+cloud-workbench-job@3100.service
+cloud-workbench-job@3101.service
 ...
 ```
 
@@ -282,8 +256,9 @@ sudo systemctl status cloud-workbench.target
 
 ```bash
 sudo systemctl start cloud-workbench.target
-sudo systemctl stop cloud-workbench-web.target
-sudo systemctl restart cloud-workbench-worker-2.service
+sudo systemctl restart cloud-workbench-web.target
+sudo systemctl stop cloud-workbench-job.target
+sudo systemctl start cloud-workbench-job@3100.service
 ```
 
 For further detail see: https://www.digitalocean.com/community/tutorials/how-to-use-systemctl-to-manage-systemd-services-and-units
@@ -308,9 +283,87 @@ journalctl -u cloud-workbench-job@3100.service
 tail -f /var/log/syslog
 ```
 
+#### Benchmark Schedule Triggers
+
+```bash
+cat /var/www/cloud-workbench/shared/log/benchmark_schedule.log
+```
+
 #### Nginx
 
 ```bash
 tail -f /var/log/nginx/cloud-workbench-access.log
 tail -f /var/log/nginx/cloud-workbench-error.log
+```
+
+### Installation directories
+
+```bash
+cd  /var/www/cloud-workbench
+ls -l /etc/systemd/system/cloud-workbench*
+cat /etc/nginx/sites-available/cloud-workbench
+cd  /var/www/cloud-workbench/shared/storage/production
+```
+
+### Rails Console
+
+```bash
+sudo su - apps
+cd /var/www/cloud-workbench/current && RAILS_ENV=production bin/rails c
+```
+
+### Backup
+
+```bash
+# Login into cwb-server
+vagrant ssh cwb-server
+# Stop server
+sudo systemctl stop cloud-workbench.target
+# Backup on cwb-server
+sudo su - apps
+cd /var/www/cloud-workbench/current
+bin/rake data:backup
+bin/rake data:list
+# Start server
+exit
+sudo systemctl start cloud-workbench.target
+
+# Download from cwb-server
+exit
+vagrant ssh-config cwb-server > ssh-config
+scp -F ssh-config cwb-server:/var/www/cloud-workbench/shared/backups/*_cloud_workbench_production.* .
+```
+
+### Restore
+
+```bash
+# Upload to cwb-server
+vagrant ssh-config cwb-server > ssh-config
+scp -F ssh-config *_cloud_workbench_production.* cwb-server:/home/ubuntu
+
+# Login into cwb-server
+vagrant ssh cwb-server
+# Move files
+sudo mv /home/ubuntu/*_cloud_workbench_production.* /var/www/cloud-workbench/shared/backups/ && sudo chown apps:apps /var/www/cloud-workbench/shared/backups/*
+# Stop server
+sudo systemctl stop cloud-workbench.target
+# Restore from backup (purges current state!)
+sudo su - apps
+cd /var/www/cloud-workbench/current
+bin/rake data:list # List backups
+bin/rake data:restore[cloud_workbench_production] # File pattern argument or common date prefix (of .dump and .tar.gz)
+# Start server
+exit
+sudo systemctl start cloud-workbench.target
+# Check logs for errors
+journalctl -u cloud-workbench* -f
+```
+
+### PostgreSQL
+
+Save login credentials via a [password file](https://www.postgresql.org/docs/9.6/static/libpq-pgpass.html):
+
+```bash
+echo "localhost:5432:cloud_workbench_production:postgres:rootcloud" > ~/.pgpass
+chmod 0600 ~/.pgpass
 ```

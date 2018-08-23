@@ -1,34 +1,75 @@
-.PHONY: install outdated test converge integration_test unit_test lint syntax all_tests vendor
+### Configurable Variables
+# Example: `make all_tests INSTANCE=ubuntu-1804`
+INSTANCE=default-ubuntu-1604
 
+### Default Target
+.PHONY: all
+all: all_tests
+
+### Installation Berkshelf
+.PHONY: install
 install:
 	berks install
 
+.PHONY: outdated
 outdated:
 	berks outdated
 
-test: integration_test
+.PHONY: install
+vendor: install
+	./vendor_berks_cookbooks.sh
 
-converge:
-	kitchen converge
+### Testing stages
+.PHONY: all_tests
+all_tests: lint syntax unit_test integration_test
 
-integration_test:
-	kitchen verify
+.PHONY: lint
+lint:
+	cookstyle
 
-dokken_test: export KITCHEN_YAML=.kitchen.yml
-dokken_test: export KITCHEN_LOCAL_YAML=.kitchen.dokken.yml
-dokken_test:
-	kitchen verify
+.PHONY: syntax
+syntax:
+	foodcritic . --exclude spec -f any  -t ~FC101
 
+.PHONY: unit_test
 unit_test:
 	chef exec rspec spec/
 
-lint:
-	chef exec cookstyle
+# Shortcut for commonly used integration test
+.PHONY: test
+test: integration_test
 
-syntax:
-	chef exec foodcritic . --exclude spec -f any # -t \"~FC064\" -t \"~FC065\"
+.PHONY: integration_test
+integration_test: dokken_integration_test
 
-all_tests: lint syntax unit_test integration_test
+.PHONY: dokken_integration_test
+dokken_integration_test: export KITCHEN_YAML=.kitchen.yml
+dokken_integration_test: export KITCHEN_LOCAL_YAML=.kitchen.dokken.yml
+dokken_integration_test:
+	kitchen converge $(INSTANCE) && kitchen verify $(INSTANCE)
 
-vendor: install
-	./vendor_berks_cookbooks.sh
+.PHONY: login
+login: export KITCHEN_YAML=.kitchen.yml
+login: export KITCHEN_LOCAL_YAML=.kitchen.dokken.yml
+login:
+	kitchen login $(INSTANCE)
+
+.PHONY: vagrant_integration_test
+vagrant_integration_test: export KITCHEN_LOCAL_YAML=''
+vagrant_integration_test:
+	kitchen converge $(INSTANCE) && kitchen verify $(INSTANCE)
+
+### Testing Cleanup
+.PHONY: clean
+clean: vagrant_clean dokken_clean
+
+.PHONY: dokken_clean
+dokken_clean: export KITCHEN_YAML=.kitchen.yml
+dokken_clean: export KITCHEN_LOCAL_YAML=.kitchen.dokken.yml
+dokken_clean:
+	kitchen destroy
+
+.PHONY: vagrant_clean
+vagrant_clean: export KITCHEN_LOCAL_YAML=''
+vagrant_clean:
+	kitchen destroy

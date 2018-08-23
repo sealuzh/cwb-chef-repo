@@ -4,13 +4,10 @@ DEPENDENCIES
     metadata: true
 
 GRAPH
-  apt (7.0.0)
   build-essential (8.1.1)
     mingw (>= 1.1)
     seven_zip (>= 0.0.0)
   cwb-server (0.6.0)
-    apt (~> 7.0.0)
-    build-essential (~> 8.1.1)
     deploy_resource (~> 1.0.2)
     git (~> 9.0.1)
     ntp (~> 3.6.0)

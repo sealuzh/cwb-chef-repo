@@ -29,7 +29,7 @@ remote_file 'download-ruby' do
   mode '0644'
   source ruby['source_url']
   checksum ruby['checksum'] if ruby['checksum']
-  action :create
+  action :create_if_missing
   notifies :run, "execute[unpack #{ruby_with_version}]", :immediately
 end
 
@@ -49,10 +49,17 @@ end
 # end
 # modify_path.run_action(:run)
 
-bundle_exists = "test -f #{ruby['bin_dir']}/bundle"
+bundle_exist = "test -f #{ruby['bin_dir']}/bundle"
 execute 'install-bundler' do
   command "#{ruby_bin} -S #{ruby['bin_dir']}/gem install bundler"
-  not_if bundle_exists
+  not_if bundle_exist
+  action :run
+end
+
+hooks_exist = "test -f #{ruby['bin_dir']}/ruby_executable_hooks"
+execute 'install-ruby-executable-hooks' do
+  command "#{ruby_bin} -S #{ruby['bin_dir']}/gem install --user-install executable-hooks"
+  not_if hooks_exist
   action :run
 end
 
