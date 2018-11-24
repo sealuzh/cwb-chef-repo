@@ -9,6 +9,7 @@
     "ubuntu": ">= 0.0.0"
   },
   "dependencies": {
+    "apt": "~> 7.1.1",
     "sudo": "~> 5.4.0",
     "git": "~> 9.0.1",
     "timezone_lwrp": "~> 0.2.1",
