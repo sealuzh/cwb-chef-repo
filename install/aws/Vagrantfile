@@ -13,6 +13,8 @@ SSH_KEY_NAME = ENV['SSH_KEY_NAME'] || 'cloud-benchmarking'
 ##########################################################
 CHEF_SERVER_IP = ENV['CHEF_SERVER_IP'] || File.read('chef_server_ip.env').strip
 
+fail "No SSH key found at #{SSH_KEY_PATH}" unless File.exist?(SSH_KEY_PATH)
+
 # Local paths
 FILE_DIR = Pathname.new(__FILE__).parent.expand_path
 REPO_ROOT = FILE_DIR.parent.parent.expand_path
