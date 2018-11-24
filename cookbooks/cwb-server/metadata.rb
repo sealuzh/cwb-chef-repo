@@ -11,6 +11,7 @@ supports         'ubuntu'
 version          '0.6.0'
 
 ### Base utilities
+depends 'apt', '~> 7.1.1'
 depends 'sudo', '~> 5.4.0'
 depends 'git', '~> 9.0.1'
 depends 'timezone_lwrp', '~> 0.2.1'

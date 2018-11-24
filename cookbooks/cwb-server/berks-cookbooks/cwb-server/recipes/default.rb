@@ -1,7 +1,7 @@
 ### Base utilities
 include_recipe 'cwb-server::detect_host'
 include_recipe 'cwb-server::users'
-apt_update
+include_recipe 'apt::default'
 build_essential 'install build essentials' do
   compile_time true
 end
