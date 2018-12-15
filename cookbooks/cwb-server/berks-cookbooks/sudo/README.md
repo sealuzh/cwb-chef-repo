@@ -4,11 +4,13 @@
 
 The default recipe configures the `/etc/sudoers` file. The cookbook also includes a sudo resource to adding and removing individual sudo entries.
 
+NOTE: The `sudo` resource is now built into Chef 14+. When Chef 15 is released (April 2019) this resource will be removed from this cookbook as all users should be on Chef 14+.
+
 ## Requirements
 
 ### Platforms
 
-- AIX  
+- AIX
 - Debian/Ubuntu
 - RHEL/CentOS/Scientific/Amazon/Oracle
 - Amazon Linux
@@ -40,7 +42,7 @@ Use the sudo resource to add or remove individual sudo entries using sudoers.d f
 Property            | Description                                                                                                                                                                                              | Example Value                            | Default Value
 ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- | ---------------
 `filename`          | name of the `/etc/sudoers.d` file                                                                                                                                                                        | restart-tomcat                           | resource's name
-`commands`          | array of commands this sudoer can execute                                                                                                                                                                | ['/etc/init.d/tomcat restart']           | ['ALL']
+`commands`          | array of commands this sudoer can execute, they must contain a full path. Example: use `/usr/bin/tail` over `tail`                                                                                                                                                                | ['/etc/init.d/tomcat restart']           | ['ALL']
 `groups`            | group(s) to provide sudo privileges to. This accepts either an array or a comma separated list. Leading % on group names is optional. This property was named 'group' prior to the 5.1 cookbook release. | %admin,superadmin                        | []
 `nopasswd`          | allow running sudo without specifying a password sudo                                                                                                                                                    | true                                     | false
 `noexec`            | prevents commands from shelling out                                                                                                                                                                      | true                                     | false

@@ -32,9 +32,6 @@ The earliest supported version is currently:
 
 ### Cookbook Dependencies
 
-- `openssl`
-- `build-essential`
-
 ## Resources
 
 ### postgresql_client_install
@@ -55,7 +52,6 @@ Name                | Types             | Description                           
 `ident_file`        | String            |                                                               | `#{conf_dir}/main/pg_ident.conf`          | no
 `external_pid_file` | String            |                                                               | `/var/run/postgresql/#{version}-main.pid` | no
 `password`          | String, nil       | Pass in a password, or have the cookbook generate one for you | 'generate'                                | no
-`port`              | [String, Integer] | Database listen port                                          | 5432                                      | no
 `initdb_locale`     | String            | Locale to initialise the database with                        | 'C'                                       | no
 
 #### Examples
@@ -87,11 +83,11 @@ Name                | Types           | Description                             
 `ident_file`        | String          | Path of pg_ident.conf file                    | `<default_os_path>/pg_ident.conf`                  | no
 `external_pid_file` | String          | Path of PID file                              | `/var/run/postgresql/<version>-main.pid</version>` | no
 `password`          | String, nil     | Set postgresql user password                  | 'generate'                                         | no
-`port`              | String, Integer | Set listen port of postgresql service         | 5432                                               | no
+`port`              | Integer         | Set listen port of postgresql service         | 5432                                               | no
 
 #### Examples
 
-To install PostgreSQL server, set you own postgres password and set another service port.
+To install PostgreSQL server, set you own postgres password using non-default service port.
 
 ```
 postgresql_server_install 'My Postgresql Server install' do
@@ -115,15 +111,16 @@ This resource manages postgresql.conf configuration file.
 
 #### Properties
 
-Name                   | Types  | Description                             | Default                                             | Required?
----------------------- | ------ | --------------------------------------- | --------------------------------------------------- | ---------
-`version`              | String | Version of PostgreSQL to install        | '9.6'                                               | no
-`data_directory`       | String | Path of postgresql data directory       | `<default_os_data_path>`                            | no
-`hba_file`             | String | Path of pg_hba.conf file                | `<default_os_conf_path>/pg_hba.conf`                | no
-`ident_file`           | String | Path of pg_ident.conf file              | `<default_os_conf_path>/pg_ident.conf`              | no
-`external_pid_file`    | String | Path of PID file                        | `/var/run/postgresql/<postgresql_version>-main.pid` | no
-`stats_temp_directory` | String | Path of stats file                      | `/var/run/postgresql/version>-main.pg_stat_tmp`     | no
-`additional_config`    | Hash   | Extra configuration for the config file | {}                                                  | no
+Name                   | Types   | Description                             | Default                                             | Required?
+---------------------- | ------- | --------------------------------------- | --------------------------------------------------- | ---------
+`version`              | String  | Version of PostgreSQL to install        | '9.6'                                               | no
+`data_directory`       | String  | Path of postgresql data directory       | `<default_os_data_path>`                            | no
+`hba_file`             | String  | Path of pg_hba.conf file                | `<default_os_conf_path>/pg_hba.conf`                | no
+`ident_file`           | String  | Path of pg_ident.conf file              | `<default_os_conf_path>/pg_ident.conf`              | no
+`external_pid_file`    | String  | Path of PID file                        | `/var/run/postgresql/<postgresql_version>-main.pid` | no
+`stats_temp_directory` | String  | Path of stats file                      | `/var/run/postgresql/version>-main.pg_stat_tmp`     | no
+`port`                 | Integer | Set listen port of postgresql service   | 5432                                                | no
+`additional_config`    | Hash    | Extra configuration for the config file | {}                                                  | no
 
 #### Examples
 
@@ -152,6 +149,7 @@ Name          | Types  | Description                                            
 ------------- | ------ | -------------------------------------------------------------------------------- | ---------------- | ---------
 `database`    | String | Name of the database to install the extension into                               |                  | yes
 `extension`   | String | Name of the extension to install the database                                    | Name of resource | yes
+`version`     | String | Version of the extension to install                                              |                  | no
 `old_version` | String | Older module name for new extension replacement. Appends FROM to extension query |                  | no
 
 #### Examples
@@ -321,7 +319,7 @@ This resource manage PostgreSQL users.
 
 #### Actions
 
-- `create` - (default) Creates the given user with default or given privileges.
+- `create_user` - (default) Creates the given user with default or given privileges.
 - `update` - Update user privilieges.
 - `drop` - Deletes the given user.
 
