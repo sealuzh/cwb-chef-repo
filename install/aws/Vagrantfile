@@ -4,9 +4,25 @@ require 'securerandom'
 # Username to ssh into VM instances (might be `root` for other images)
 SSH_USERNAME = 'ubuntu'
 
+# Providers
+# Security credentials > Users: https://console.aws.amazon.com/iam/home?#/users
 AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY'] || 'my_aws_access_key'
 AWS_SECRET_KEY = ENV['AWS_SECRET_KEY'] || 'my_aws_secret_key'
 
+# Setup: https://github.com/mitchellh/vagrant-google#google-cloud-platform-setup
+# Credentials: https://console.cloud.google.com/apis/credentials
+# => Click "Manage service accounts" and create a JSON key
+GOOGLE_PROJECT_ID = ENV['GOOGLE_PROJECT_ID'] || 'my_google_project_id'
+GOOGLE_CLIENT_EMAIL = ENV['GOOGLE_CLIENT_EMAIL'] || 'my_google_client_email'
+GOOGLE_JSON_KEY_PATH = ENV['GOOGLE_JSON_KEY_PATH'] || 'my_google_json_key_path'
+
+# Get Azure credentials via Azure CLI: https://github.com/Azure/vagrant-azure#create-an-azure-active-directory-aad-application
+AZURE_TENANT_ID = ENV['AZURE_TENANT_ID'] || 'my_azure_tenant_id'
+AZURE_CLIENT_ID = ENV['AZURE_CLIENT_ID'] || 'my_azure_client_id'
+AZURE_CLIENT_SECRET = ENV['AZURE_CLIENT_SECRET'] || 'my_azure_client_secret'
+AZURE_SUBSCRIPTION_ID = ENV['AZURE_SUBSCRIPTION_ID'] || 'my_azure_subscription_id'
+
+# SSH key
 SSH_KEY_PATH = ENV['SSH_KEY_PATH'] || 'cloud-benchmarking.pem'
 SSH_KEY_NAME = ENV['SSH_KEY_NAME'] || 'cloud-benchmarking'
 
@@ -66,8 +82,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     # AWS instance configuration
     aws.region = 'eu-central-1'
-    # Official Ubuntu 16.04 LTS hvm:ebs-ssd image from Canonical: https://cloud-images.ubuntu.com/locator/ec2/
-    aws.ami = 'ami-027583e616ca104df'
+    # Official Ubuntu 16.04 LTS hvm:ebs-ssd eu-central-1 image from Canonical: https://cloud-images.ubuntu.com/locator/ec2/
+    aws.ami = 'ami-0cfc1cd9ab351357c'
     aws.keypair_name = SSH_KEY_NAME
     override.ssh.private_key_path = SSH_KEY_PATH
     override.ssh.username = SSH_USERNAME
@@ -114,9 +130,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     # Amazon EC2
     config.vm.provider :aws do |aws, override|
+        # NOTICE: Vagrant fails to properly merge tags and thus both instances obtain the same tags
         aws.tags = {
           'Name' => 'cwb-server-production'
-      }
+        }
     end
 
     # Chef solo provisioning via berks-vendored cookbooks
@@ -154,6 +171,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                       'aws' => {
                           'access_key' => AWS_ACCESS_KEY,
                           'secret_key' => AWS_SECRET_KEY
+                      },
+                      'google' => {
+                          'project_id' => GOOGLE_PROJECT_ID,
+                          'client_email' => GOOGLE_CLIENT_EMAIL,
+                          'json_key_FILE' => (File.read(GOOGLE_JSON_KEY_PATH) rescue nil),
+                      },
+                      'azure' => {
+                        'tenant_id' => AZURE_TENANT_ID,
+                        'client_id' => AZURE_CLIENT_ID,
+                        'client_secret' => AZURE_CLIENT_SECRET,
+                        'subscription_id' => AZURE_SUBSCRIPTION_ID
                       }
                   },
                   'env' => {

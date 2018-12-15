@@ -8,7 +8,7 @@
 #
 # Copyright:: 2011-2018, Bryan w. Berry
 # Copyright:: 2012-2018, Seth Vargo
-# Copyright:: 2015-2018, Chef Software, Inc.
+# Copyright:: 2015-2018, Chef Software Inc.
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+chef_version_for_provides '< 14.0' if respond_to?(:chef_version_for_provides)
+resource_name :sudo
 
 # acording to the sudo man pages sudo will ignore files in an include dir that have a `.` or `~`
 # We convert either to `__`
@@ -77,6 +80,24 @@ def platform_config_prefix
   end
 end
 
+# Validates if each element in an array starts with `/` or is in
+# ALL_CAPS. This is helpful for ensuring that the commands
+# passing into the sudoers resource as they need a full path or a
+# `Cmnd_Alias`. This should help people more easily catch issues
+# where the user requested `tail SOME_ARGS SOME_FILE` where they
+# need to use `/usr/bin/tail SOME_ARGS SOME_FILE`.
+# return [TrueClass, FalseClass]
+def validate_commands_path(commands)
+  commands.each do |command|
+    cmd = command.split(' ').first
+    if command.start_with?('/') || cmd.upcase == cmd
+      true
+    else
+      false
+    end
+  end
+end
+
 # Default action - install a single sudoer
 action :create do
   validate_properties
@@ -92,6 +113,10 @@ action :create do
   declare_resource(:directory, target) unless ::File.exist?(target)
 
   Chef::Log.warn("#{new_resource.filename} will be rendered, but will not take effect because the #{new_resource.config_prefix}/sudoers config lacks the includedir directive that loads configs from #{new_resource.config_prefix}/sudoers.d/!") if ::File.readlines("#{new_resource.config_prefix}/sudoers").grep(/includedir/).empty?
+
+  if new_resource.commands && !validate_commands_path(new_resource.commands)
+    Chef::Log.fatal('To restrict sudoer commands you must use absolute paths. For example to use `tail` you must specify `/usr/bin/tail` or whatever the appropriate path is for your system. This is becase someone could create a command called `tail` and put it in their path, sudo does not know which one to allow.')
+  end
 
   if new_resource.template
     Chef::Log.debug('Template property provided, all other properties ignored.')

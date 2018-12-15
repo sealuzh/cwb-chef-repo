@@ -3,12 +3,28 @@ require 'securerandom'
 # For debugging via `binding.pry` http://pryrepl.org/
 begin; require 'pry'; rescue LoadError; end
 
-# Username to ssh into VM instances (might be `root` or `vagrant` for other images)
+# Username to ssh into VM instances (might be `root` for other images)
 SSH_USERNAME = 'ubuntu'
 
+# Providers
+# Security credentials > Users: https://console.aws.amazon.com/iam/home?#/users
 AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY'] || 'my_aws_access_key'
 AWS_SECRET_KEY = ENV['AWS_SECRET_KEY'] || 'my_aws_secret_key'
 
+# Setup: https://github.com/mitchellh/vagrant-google#google-cloud-platform-setup
+# Credentials: https://console.cloud.google.com/apis/credentials
+# => Click "Manage service accounts" and create a JSON key
+GOOGLE_PROJECT_ID = ENV['GOOGLE_PROJECT_ID'] || 'my_google_project_id'
+GOOGLE_CLIENT_EMAIL = ENV['GOOGLE_CLIENT_EMAIL'] || 'my_google_client_email'
+GOOGLE_JSON_KEY_PATH = ENV['GOOGLE_JSON_KEY_PATH'] || 'my_google_json_key_path'
+
+# Get Azure credentials via Azure CLI: https://github.com/Azure/vagrant-azure#create-an-azure-active-directory-aad-application
+AZURE_TENANT_ID = ENV['AZURE_TENANT_ID'] || 'my_azure_tenant_id'
+AZURE_CLIENT_ID = ENV['AZURE_CLIENT_ID'] || 'my_azure_client_id'
+AZURE_CLIENT_SECRET = ENV['AZURE_CLIENT_SECRET'] || 'my_azure_client_secret'
+AZURE_SUBSCRIPTION_ID = ENV['AZURE_SUBSCRIPTION_ID'] || 'my_azure_subscription_id'
+
+# SSH key
 SSH_KEY_PATH = ENV['SSH_KEY_PATH'] || 'cloud-benchmarking.pem'
 SSH_KEY_NAME = ENV['SSH_KEY_NAME'] || 'cloud-benchmarking'
 
@@ -16,6 +32,8 @@ SSH_KEY_NAME = ENV['SSH_KEY_NAME'] || 'cloud-benchmarking'
 # Must be an IP here (used in Virtualbox config)
 CHEF_SERVER_IP = ENV['CHEF_SERVER_IP'] || File.read('chef_server_ip.env').strip
 CWB_SERVER_IP  = '33.33.33.20'
+
+fail "No SSH key found at #{SSH_KEY_PATH}" unless File.exist?(SSH_KEY_PATH)
 
 # Local paths
 FILE_DIR = Pathname.new(__FILE__).parent.expand_path
@@ -131,12 +149,23 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                   'validation_key' => File.read('chef-validator.pem'),
                   'validation_key_name' => 'chef-validator',
                   # VM provisioning
-                  'omnibus_chef_version' => '12.14.60'
+                  'omnibus_chef_version' => '12.22.3'
               },
               'providers' => {
                   'aws' => {
                       'access_key' => AWS_ACCESS_KEY,
                       'secret_key' => AWS_SECRET_KEY
+                  },
+                  'google' => {
+                      'project_id' => GOOGLE_PROJECT_ID,
+                      'client_email' => GOOGLE_CLIENT_EMAIL,
+                      'json_key_FILE' => (File.read(GOOGLE_JSON_KEY_PATH) rescue nil),
+                  },
+                  'azure' => {
+                    'tenant_id' => AZURE_TENANT_ID,
+                    'client_id' => AZURE_CLIENT_ID,
+                    'client_secret' => AZURE_CLIENT_SECRET,
+                    'subscription_id' => AZURE_SUBSCRIPTION_ID
                   }
               },
               'env' => {

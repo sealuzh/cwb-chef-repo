@@ -8,7 +8,7 @@ description      'Installs and configures the Cloud WorkBench server'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 chef_version     '>= 13'
 supports         'ubuntu'
-version          '0.6.0'
+version          '0.7.0'
 
 ### Base utilities
 depends 'apt', '~> 7.1.1'

@@ -28,6 +28,8 @@ default['cwb-server']['nginx']['log_dir'] = '/var/log/nginx'
 # b) Pessimistic (requires manual updating): [{ 'name' => 'vagrant-google',  'version' =>  '0.2.2' }, ...]
 default['cwb-server']['vagrant']['providers'] = [
   { 'name' => 'vagrant-aws', 'version' => '0.7.2' },
+  { 'name' => 'vagrant-google', 'version' => '2.2.1' },
+  { 'name' => 'vagrant-azure', 'version' => '2.0.0' },
 ]
 
 ### Vagrant: https://supermarket.chef.io/cookbooks/vagrant#readme
@@ -131,11 +133,16 @@ default['cwb-server']['providers'] = {}
 # default['cwb-server']['providers']['aws']['access_key'] = ''
 # default['cwb-server']['providers']['aws']['secret_key'] = ''
 
+# Azure (example)
+# default['cwb-server']['providers']['azure']['tenant_id'] = ''
+# default['cwb-server']['providers']['azure']['client_id'] = ''
+# default['cwb-server']['providers']['azure']['client_secret'] = ''
+# default['cwb-server']['providers']['azure']['subscription_id'] = ''
+
 # Google (example)
 # default['cwb-server']['providers']['google']['project_id'] = ''
 # default['cwb-server']['providers']['google']['client_email'] = ''
-# default['cwb-server']['providers']['google']['api_key_name'] = ''
-# default['cwb-server']['providers']['google']['api_key_BASE64_FILE'] = ''
+# default['cwb-server']['providers']['google']['json_key_FILE'] = ''
 
 ### Base utilities
 normal['build-essential']['compile_time'] = true

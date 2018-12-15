@@ -34,13 +34,30 @@ suites:
         db:
           password: cloud
           postgres_password: rootcloud
+        ssh:
+          key: |
+            -----BEGIN OPENSSH PRIVATE KEY-----
+            b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAlwAAAAdzc2gtcn
+            NhAAAAAwEAAQAAAIEA0p7NpZ+pZMwaKQVdTLsQjOvqG2tzl5lu4oUNgY6PG75DFyMG25Pu
+            C/PcVu1+5lOEj5hZJNFnUbdT8UCLIWoRlGBMnW0X11KIHD+qIashdGa8c+f7kX7phf0/Ti
+            yuLED7Rm4fTST5Yx7XHHZIF4gqK+yv2SyJR29i0uBVNsajUjUAAAIIL/3aoS/92qEAAAAH
+            c3NoLXJzYQAAAIEA0p7NpZ+pZMwaKQVdTLsQjOvqG2tzl5lu4oUNgY6PG75DFyMG25PuC/
+            PcVu1+5lOEj5hZJNFnUbdT8UCLIWoRlGBMnW0X11KIHD+qIashdGa8c+f7kX7phf0/Tiyu
+            LED7Rm4fTST5Yx7XHHZIF4gqK+yv2SyJR29i0uBVNsajUjUAAAADAQABAAAAgDt3qwjAc8
+            uJ9Tjv0s//YUTot0jWpeR/5db/SjjyT2W96qN1uFH3CpdFW0kP9WyC2ELS+Rh0J3/jC0hq
+            uN3OXPfMll5xwGwKdvMH6IRyesQqiG4myFSfvXx1eKh3CiZR3SGukJvGZgAcHcm2zHuoMW
+            xFvRd65UUhDPLDVTNreCRhAAAAQQCn2qOZt1hduuBDto1f6vPiXBMzRsdBiVS7/B/iQacb
+            vYhR1HvIRi7u9MgfpLuNT0WvoKw+46/jZCR/eEFGw+G1AAAAQQDy9rZ+ra82KNOmgpRzhz
+            c1arzAV3nh9zxlF3+jL7Zp9NstE9ABW8173hohKKR1jzPyoJvtDypE3JMvWQYbxVXbAAAA
+            QQDd69RyP6/DWFhw7dPmQ7T8BOUY8RPZWQzKcYwiTiFWJbEm5JuzQIY5FQp1k6DUOREcyz
+            XVKOAYO9Hk5NqpKF0vAAAADGN3YkB0ZXN0LmNvbQECAwQFBg==
+            -----END OPENSSH PRIVATE KEY-----
+          key_name: cwb@test.com
         providers:
           aws:
             access_key: my_aws_access_key
           google:
-            api_key_name: google-compute
-            # my_google_compute_key ==base64==> "bXlfZ29vZ2xlX2NvbXB1dGVfa2V5\n"
-            api_key_BASE64_FILE: bXlfZ29vZ2xlX2NvbXB1dGVfa2V5\n
+            project_id: my_google_project_id
+            json_key_FILE: '{"google": "my_google_secret"}'
           azure:
-#            mgmt_certificate_name: certificate_file_name => defaults to provider name: `azure`
-            mgmt_certificate_FILE: my_azure_certificate_file_content
+            tenant_id: my_azure_tenant_id

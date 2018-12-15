@@ -18,7 +18,7 @@
 make install
 # Check outdated dependencies
 make outdated
-# Run integration tests
+# Run integration tests (using Kitchen Dokken) => requires Docker running
 make test
 # Run all tests
 make all_tests
@@ -34,6 +34,11 @@ make syntax
 export KITCHEN_YAML=.kitchen.yml
 export KITCHEN_LOCAL_YAML=.kitchen.dokken.yml
 kitchen verify
+
+# Show status
+kitchen list
+# Destroy instance
+kitchen destroy
 ```
 
 See [kitchen-dokken](https://github.com/someara/kitchen-dokken)

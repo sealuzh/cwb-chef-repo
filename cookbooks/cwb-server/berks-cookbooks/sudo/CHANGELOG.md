@@ -1,9 +1,26 @@
 # sudo Cookbook CHANGELOG
 
 This file is used to list changes made in each version of the sudo cookbook.
-## 5.4.0 (unreleased)
-- add support for aix
 
+## 5.4.4 (2018-10-09)
+
+- Fix the command validation method
+
+## 5.4.3 (2018-10-09)
+
+- adds better validation for commands passed in
+
+## 5.4.2 (2018-09-04)
+
+The `sudo` resource is now built into Chef 14+. When Chef 15 is released (April 2019) this resource will be removed from this cookbook as all users should be on Chef 14+.
+
+## 5.4.1 (2018-08-29)
+
+- Avoid deprecation warnings with Chef 14.3+ by not loading resources that are now built into Chef
+
+## 5.4.0 (2018-04-26)
+
+- Add support for aix
 
 ## 5.3.3 (2018-03-22)
 
