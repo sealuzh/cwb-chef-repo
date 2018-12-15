@@ -1,3 +1,9 @@
+# 0.7.0 (2018-12-15)
+
+* Add config for Google and Azure providers
+* Update dependencies
+* Update integration tests
+
 # 0.6.0 (2018-08-17)
 
 Skip 0.5.x to avoid conflict/confusion with stale branch changes.

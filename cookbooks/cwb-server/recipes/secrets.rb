@@ -1,5 +1,6 @@
 require 'base64'
 require 'securerandom'
+require 'mixlib/shellout'
 
 app_user = node['cwb-server']['app']['user']
 app_user_home = "/home/#{app_user}"
@@ -28,7 +29,7 @@ end
 
 def generate_pub_key(private_key_path, key_name, user)
   file "#{private_key_path}.pub" do
-    content lazy { "#{`ssh-keygen -y -f #{private_key_path}`.strip} #{key_name}" }
+    content lazy { "#{Mixlib::ShellOut.new("ssh-keygen -y -f #{private_key_path}").run_command.stdout.strip} #{key_name}\n" }
     backup false
     owner user
     group user
@@ -57,7 +58,8 @@ if node['cwb-server']['apply_secret_config']
   # SSH
   ssh = node['cwb-server']['ssh']
   ssh_dir = "#{app_user_home}/.ssh"
-  key_path = "#{ssh_dir}/#{ssh['key_name']}.pem"
+  # Hardcode key name to avoid file name conflicts (using ssh['key_name'])
+  key_path = "#{ssh_dir}/cloud-benchmarking.pem"
   create_dir ssh_dir, app_user
   store_key key_path, ssh['key'], app_user
   if ssh['pub_key'].empty?

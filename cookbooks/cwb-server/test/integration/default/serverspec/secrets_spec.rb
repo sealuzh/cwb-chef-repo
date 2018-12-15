@@ -8,7 +8,7 @@ describe 'cwb-server::secrets' do
   end
 
   describe file('/home/apps/.ssh/cloud-benchmarking.pem.pub') do
-    its(:content) { should match(/ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDSns2ln6lkzBopBV1MuxCM6+oba3OXmW7ihQ2Bjo8bvkMXIwbbk+4L89xW7X7mU4SPmFkk0WdRt1PxQIshahGUYEydbRfXUogcP6ohqyF0Zrxz5/uRfumF/T9OLK4sQPtGbh9NJPljHtccdkgXiCor7K/ZLIlHb2LS4FU2xqNSNQ== cwb@test.com/) }
+    its(:content) { should eq "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDSns2ln6lkzBopBV1MuxCM6+oba3OXmW7ihQ2Bjo8bvkMXIwbbk+4L89xW7X7mU4SPmFkk0WdRt1PxQIshahGUYEydbRfXUogcP6ohqyF0Zrxz5/uRfumF/T9OLK4sQPtGbh9NJPljHtccdkgXiCor7K/ZLIlHb2LS4FU2xqNSNQ== cwb@test.com\n" }
     it { should be_mode 600 }
     it { should be_owned_by 'apps' }
   end
