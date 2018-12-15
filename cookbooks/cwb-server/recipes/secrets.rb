@@ -26,6 +26,16 @@ def store_key(path, key, user)
   end
 end
 
+def generate_pub_key(private_key_path, key_name, user)
+  file "#{private_key_path}.pub" do
+    content lazy { "#{`ssh-keygen -y -f #{private_key_path}`.strip} #{key_name}" }
+    backup false
+    owner user
+    group user
+    mode '0600'
+  end
+end
+
 # Use file `/home/apps/.secret_key_base` to cache generated `SECRET_KEY_BASE`
 secret_key_base_path = "#{app_user_home}/.secret_key_base"
 if node['cwb-server']['env']['SECRET_KEY_BASE'].nil?
@@ -50,8 +60,13 @@ if node['cwb-server']['apply_secret_config']
   key_path = "#{ssh_dir}/#{ssh['key_name']}.pem"
   create_dir ssh_dir, app_user
   store_key key_path, ssh['key'], app_user
-  # Storing an empty and thus malformed public key lets Vagrant fail before provisioning
-  store_key("#{key_path}.pub", ssh['pub_key'], app_user) unless ssh['pub_key'].empty?
+  if ssh['pub_key'].empty?
+    # Automatically generate public key from the given private key
+    generate_pub_key(key_path, ssh['key_name'], app_user) unless ssh['key'].empty?
+  else
+    # Can only store non-empty (i.e., well-formed key)
+    store_key("#{key_path}.pub", ssh['pub_key'], app_user)
+  end
   default_env 'SSH_KEY_NAME', ssh['key_name']
   default_env 'SSH_KEY_PATH', key_path
 
