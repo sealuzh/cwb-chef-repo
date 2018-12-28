@@ -1,6 +1,6 @@
 ### Configurable Variables
-# Example: `make all_tests INSTANCE=ubuntu-1804`
-INSTANCE=default-ubuntu-1604
+# Example: `make all_tests INSTANCE=ubuntu-1604`
+INSTANCE=default-ubuntu-1804
 
 ### Default Target
 .PHONY: all
