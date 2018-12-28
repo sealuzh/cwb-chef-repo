@@ -1,3 +1,8 @@
+# 0.7.0 (2018-12-28)
+
+* Fix Postgresql local mismatch for Ubuntu 18.04 compatibility
+* Switch Travis build to Ubuntu 18.04
+
 # 0.7.0 (2018-12-15)
 
 * Add config for Google and Azure providers
