@@ -57,7 +57,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Detect vagrant-omnibus plugin
   if Vagrant.has_plugin?('vagrant-omnibus')
     # Chef client versions: https://github.com/chef/chef/blob/master/CHANGELOG.md
-    config.omnibus.chef_version = '14.3.37' # or :latest
+    config.omnibus.chef_version = '14.8.12' # or :latest
   else
     STDERR.puts 'FATAL: Vagrant-omnibus plugin not detected. Please install the plugin with
                  `vagrant plugin install vagrant-omnibus`.'
@@ -82,8 +82,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     # AWS instance configuration
     aws.region = 'eu-central-1'
-    # Official Ubuntu 16.04 LTS hvm:ebs-ssd eu-central-1 image from Canonical: https://cloud-images.ubuntu.com/locator/ec2/
-    aws.ami = 'ami-0cfc1cd9ab351357c'
+    # Official Ubuntu 18.04 LTS hvm:ebs-ssd eu-central-1 image from Canonical: https://cloud-images.ubuntu.com/locator/ec2/
+    aws.ami = 'ami-080d06f90eb293a27'
     aws.keypair_name = SSH_KEY_NAME
     override.ssh.private_key_path = SSH_KEY_PATH
     override.ssh.username = SSH_USERNAME
