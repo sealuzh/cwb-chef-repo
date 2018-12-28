@@ -17,6 +17,10 @@ def home_dir
   end
 end
 
+# Custom fix of logger spam issue:
+# https://github.com/joe4dev/vagrant-butcher
+# See (issues with the official version due to merge changes):
+# https://github.com/cassianoleal/vagrant-butcher/pull/61
 version = '2.3.1'
 butcher_file_name = "vagrant-butcher-#{version}.gem"
 butcher_path = File.join(home_dir, butcher_file_name)
