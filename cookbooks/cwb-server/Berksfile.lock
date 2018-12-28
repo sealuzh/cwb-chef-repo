@@ -8,7 +8,7 @@ GRAPH
   build-essential (8.2.1)
     mingw (>= 1.1)
     seven_zip (>= 0.0.0)
-  cwb-server (0.7.0)
+  cwb-server (0.7.1)
     apt (~> 7.1.1)
     deploy_resource (~> 1.0.2)
     git (~> 9.0.1)
