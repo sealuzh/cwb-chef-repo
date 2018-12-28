@@ -13,9 +13,9 @@ addons:
 
 env:
   matrix:
-  - INSTANCE=ubuntu-1604
+  - INSTANCE=ubuntu-1804
   # Add on demand:
-  # - INSTANCE=ubuntu-1804
+  # - INSTANCE=ubuntu-1604
 
 before_install:
   - cd cookbooks/cwb-server

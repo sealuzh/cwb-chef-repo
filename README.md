@@ -10,7 +10,7 @@ This Chef repo provides cookbooks to automatically install and configure
 > These 10 steps will setup and configure CWB on AWS for you in less than 30 minutes (tested 2018-08-17).
 
 * [Git](http://git-scm.com/)
-* [Vagrant (2.2.1)](https://www.vagrantup.com/downloads.html)
+* [Vagrant (2.2.2)](https://www.vagrantup.com/downloads.html)
     * [vagrant-omnibus (1.5.0)](https://github.com/chef/vagrant-omnibus) for auto-installation via Chef
     * [vagrant-aws (0.7.2)](https://github.com/mitchellh/vagrant-aws) for deployment in the Amazon EC2 Cloud
       ([alternative providers](https://github.com/mitchellh/vagrant/wiki/Available-Vagrant-Plugins#providers) are available)
@@ -30,7 +30,7 @@ This Chef repo provides cookbooks to automatically install and configure
       In Amazon EC2, you create a [security group](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-network-security.html)
       called `cwb-web`.
       If you do not explicitly specify a security group in your benchmark, make sure the `default` security group allows incoming ssh (22).
-* [ChefDK](https://downloads.chef.io/chef-dk/) for benchmark cookbook development.
+* [ChefDK (3.6.57)](https://downloads.chef.io/chef-dk/) for benchmark cookbook development.
     * Install via the [official installer](https://downloads.chef.io/chefdk)
 
 ## Installation
@@ -151,9 +151,6 @@ Simply reprovision the CWB Server:
 cd $HOME/git/cwb-chef-repo/install/aws/
 vagrant provision cwb-server
 ```
-
-> *Capistrano:* The current configuration needs to be updated
->               for the new installation procedure.
 
 ## Manage VMs
 
