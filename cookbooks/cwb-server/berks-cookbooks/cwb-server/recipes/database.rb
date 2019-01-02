@@ -1,10 +1,11 @@
 db = node['cwb-server']['db']
 # Known issue: https://github.com/sous-chefs/postgresql
 # See: https://github.com/sous-chefs/postgresql/issues/555
-target_locale = 'en_US.UTF-8'
+target_locale = node['cwb-server']['system']['locale']
 
 # Docs: https://github.com/sous-chefs/postgresql
 postgresql_server_install 'Install PostgreSQL' do
+  initdb_locale target_locale
   version db['postgresql_version']
   action :install
 end
