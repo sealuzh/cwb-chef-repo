@@ -1,3 +1,7 @@
+# 0.7.3 (2019-01-02)
+
+* Expose `SSH_PUB_KEY_PATH`
+
 # 0.7.2 (2019-01-02)
 
 * Fix Postgresql locale mismatch in general

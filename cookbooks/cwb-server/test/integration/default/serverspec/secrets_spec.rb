@@ -38,10 +38,16 @@ describe 'cwb-server::secrets' do
   providers_dir = '/home/apps/providers'
   google_file = "#{providers_dir}/google/google.pem"
   describe file('/etc/systemd/system/cloud-workbench-job@.service') do
+    # SSH
+    its(:content) { should match(/Environment="SSH_KEY_NAME=cwb@test.com"/) }
+    its(:content) { should match(%r{Environment="SSH_KEY_PATH=/home/apps/.ssh/cloud-benchmarking.pem"}) }
+    its(:content) { should match(%r{Environment="SSH_PUB_KEY_PATH=/home/apps/.ssh/cloud-benchmarking.pem.pub"}) }
+    # Provider credentials
     its(:content) { should match(/Environment="AWS_ACCESS_KEY=my_aws_access_key"/) }
     its(:content) { should match(/Environment="GOOGLE_PROJECT_ID=my_google_project_id"/) }
     its(:content) { should match(/Environment="GOOGLE_JSON_KEY_PATH=#{google_file}"/) }
     its(:content) { should match(/Environment="AZURE_TENANT_ID=my_azure_tenant_id"/) }
+    # Chef config
     its(:content) { should match(%r{Environment="CHEF_SERVER_URL=https://33.33.33.10:443/organizations/chef"}) }
     its(:content) { should match(/Environment="CWB_SERVER_HOST=\d+\.\d+\.\d+.\d+"/) }
     # Contains Ruby PATH
