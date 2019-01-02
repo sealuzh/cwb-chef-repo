@@ -27,8 +27,8 @@ def store_key(path, key, user)
   end
 end
 
-def generate_pub_key(private_key_path, key_name, user)
-  file "#{private_key_path}.pub" do
+def generate_pub_key(private_key_path, key_name, user, pub_key_path = "#{private_key_path}.pub")
+  file pub_key_path do
     content lazy { "#{Mixlib::ShellOut.new("ssh-keygen -y -f #{private_key_path}").run_command.stdout.strip} #{key_name}\n" }
     backup false
     owner user
@@ -62,15 +62,17 @@ if node['cwb-server']['apply_secret_config']
   key_path = "#{ssh_dir}/cloud-benchmarking.pem"
   create_dir ssh_dir, app_user
   store_key key_path, ssh['key'], app_user
+  pub_key_path = "#{key_path}.pub"
   if ssh['pub_key'].empty?
     # Automatically generate public key from the given private key
-    generate_pub_key(key_path, ssh['key_name'], app_user) unless ssh['key'].empty?
+    generate_pub_key(key_path, ssh['key_name'], app_user, pub_key_path) unless ssh['key'].empty?
   else
     # Can only store non-empty (i.e., well-formed key)
-    store_key("#{key_path}.pub", ssh['pub_key'], app_user)
+    store_key(pub_key_path, ssh['pub_key'], app_user)
   end
   default_env 'SSH_KEY_NAME', ssh['key_name']
   default_env 'SSH_KEY_PATH', key_path
+  default_env 'SSH_PUB_KEY_PATH', pub_key_path
 
   # Chef
   chef = node['cwb-server']['chef']
