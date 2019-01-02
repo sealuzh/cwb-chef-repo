@@ -1,11 +1,6 @@
-# Attempt to fix failure on some Ubuntu 18.04 with
-# incompatible locales during DB setup.
-# See: https://github.com/sous-chefs/postgresql/issues/555
-# Ensure same local in DB config instead:
-# https://github.com/sous-chefs/postgresql
+# This also works in test environment vs the broken `locale`
+# Chef built-in resource, which fails in containerized Ubuntu 16.04
 target_locale = node['cwb-server']['system']['locale']
-locale target_locale do
-  lang        target_locale
-  lc_all      target_locale
-  action      :update
+execute 'Set default locale' do
+  command "update-locale LANG=#{target_locale}"
 end
