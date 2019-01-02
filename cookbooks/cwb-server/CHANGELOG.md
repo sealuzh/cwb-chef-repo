@@ -1,6 +1,11 @@
-# 0.7.0 (2018-12-28)
+# 0.7.2 (2019-01-02)
 
-* Fix Postgresql local mismatch for Ubuntu 18.04 compatibility
+* Fix Postgresql locale mismatch in general
+* Switch Travis build to Ubuntu 16.04 + Ubuntu 18.04
+
+# 0.7.1 (2018-12-28)
+
+* Fix Postgresql locale mismatch for Ubuntu 18.04 compatibility
 * Switch Travis build to Ubuntu 18.04
 
 # 0.7.0 (2018-12-15)

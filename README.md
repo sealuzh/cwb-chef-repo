@@ -7,7 +7,7 @@ This Chef repo provides cookbooks to automatically install and configure
 ## Requirements
 
 > Interested in your own Cloud WorkBench (CWB) installation?<br>
-> These 10 steps will setup and configure CWB on AWS for you in less than 30 minutes (tested 2018-08-17).
+> These 10 steps will setup and configure CWB on AWS for you in less than 30 minutes (tested 2019-01-02).
 
 * [Git](http://git-scm.com/)
 * [Vagrant (2.2.2)](https://www.vagrantup.com/downloads.html)
