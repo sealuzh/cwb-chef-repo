@@ -6,9 +6,9 @@ issues_url       'https://github.com/sealuzh/cwb-chef-repo/issues'
 license          'Apache-2.0'
 description      'Installs and configures the Cloud WorkBench server'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-chef_version     '>= 13'
+chef_version     '>= 14'
 supports         'ubuntu'
-version          '0.7.1'
+version          '0.7.2'
 
 ### Base utilities
 depends 'apt', '~> 7.1.1'

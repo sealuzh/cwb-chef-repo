@@ -9,12 +9,12 @@ driver:
   - /sys/fs/cgroup:/sys/fs/cgroup:ro # required by systemd
   intermediate_instructions:
     # For setting timezone via `/usr/bin/timedatectl`: dbus tzdata
-    # For PostgreSQL en_US.UTF-8 locals: locales
+    # For PostgreSQL en_US.utf8 locals: locales
     # For sudo in deploy#export systemd templates: sudo
     # For integration tests using wget
     - RUN apt-get update && apt-get install -y apt-transport-https net-tools dbus tzdata locales sudo wget
-    # Setup en_US.UTF-8 local for PostgreSQL server installation => builds `/usr/share/locale-langpack/en_US.UTF-8/LC_MESSAGES/pgscripts-9.6.mo`
-    - RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && echo 'LANG="en_US.UTF-8"'>/etc/default/locale && dpkg-reconfigure --frontend=noninteractive locales && update-locale LANG=en_US.UTF-8
+    # Ensure that the default locale exists
+    - RUN locale-gen en_US.utf8
 
 platforms:
 - name: ubuntu-16.04

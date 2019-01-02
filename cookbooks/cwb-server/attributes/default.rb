@@ -1,3 +1,6 @@
+### System
+default['cwb-server']['system']['locale'] = 'en_US.utf8'
+
 ### Devtools
 # Must be available via package manager
 default['cwb-server']['dev']['tools'] = %w(vim curl)

@@ -1,7 +1,7 @@
 {
   "name": "cwb-server",
   "description": "Installs and configures the Cloud WorkBench server",
-  "long_description": "# cwb-server cookbook\n\n[![Build Status](https://travis-ci.org/sealuzh/cwb-chef-repo.svg?branch=master)](https://travis-ci.org/sealuzh/cwb-chef-repo)\n\nInstalls and configures the Cloud WorkBench server.\n\n\n## Supported Platforms\n\n* Ubuntu 18.04 64bit (tested 2018-12-28)\n* Ubuntu 16.04 64bit (tested 2018-12-28)\n\n## Attributes\n\nSee `attributes` directory.\n\n## Usage\n\n### cwb-server::default\n\nInclude `cwb-server` in your node's `run_list`:\n\n```json\n{\n  \"run_list\": [\n    \"recipe[cwb-server]\"\n  ]\n}\n```\n\n```ruby\nchef.run_list = ['recipe[cwb-server]']\n```\n\n```ruby\nchef.add_recipe 'cwb-server'\n```\n",
+  "long_description": "# cwb-server cookbook\n\n[![Build Status](https://travis-ci.org/sealuzh/cwb-chef-repo.svg?branch=master)](https://travis-ci.org/sealuzh/cwb-chef-repo)\n\nInstalls and configures the Cloud WorkBench server.\n\n## Supported Platforms\n\n* Ubuntu 18.04 64bit (tested 2019-01-02)\n* Ubuntu 16.04 64bit (tested 2019-01-02)\n\nEnsure that the default locale `en_US.utf8` exists or configure via the attribute `cwb-server.system.locale`\n\n## Attributes\n\nSee `attributes` directory.\n\n## Usage\n\n### cwb-server::default\n\nInclude `cwb-server` in your node's `run_list`:\n\n```json\n{\n  \"run_list\": [\n    \"recipe[cwb-server]\"\n  ]\n}\n```\n\n```ruby\nchef.run_list = ['recipe[cwb-server]']\n```\n\n```ruby\nchef.add_recipe 'cwb-server'\n```\n",
   "maintainer": "Joel Scheuner",
   "maintainer_email": "joel.scheuner.dev@gmail.com",
   "license": "Apache-2.0",
@@ -27,13 +27,13 @@
   "recipes": {
 
   },
-  "version": "0.7.1",
+  "version": "0.7.2",
   "source_url": "https://github.com/sealuzh/cwb-chef-repo",
   "issues_url": "https://github.com/sealuzh/cwb-chef-repo/issues",
   "privacy": false,
   "chef_versions": [
     [
-      ">= 13"
+      ">= 14"
     ]
   ],
   "ohai_versions": [

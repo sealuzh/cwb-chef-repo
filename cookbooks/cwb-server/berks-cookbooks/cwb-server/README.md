@@ -4,11 +4,12 @@
 
 Installs and configures the Cloud WorkBench server.
 
-
 ## Supported Platforms
 
-* Ubuntu 18.04 64bit (tested 2018-12-28)
-* Ubuntu 16.04 64bit (tested 2018-12-28)
+* Ubuntu 18.04 64bit (tested 2019-01-02)
+* Ubuntu 16.04 64bit (tested 2019-01-02)
+
+Ensure that the default locale `en_US.utf8` exists or configure via the attribute `cwb-server.system.locale`
 
 ## Attributes
 
