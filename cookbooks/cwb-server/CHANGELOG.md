@@ -1,6 +1,8 @@
-# 0.7.3 (2019-01-02)
+# 0.7.3 (2019-01-03)
 
 * Expose `SSH_PUB_KEY_PATH`
+* Fix locale: `en_US.utf8` => `en_US.UTF-8`
+* Fix outdated RubyGems
 
 # 0.7.2 (2019-01-02)
 

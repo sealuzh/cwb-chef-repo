@@ -9,7 +9,7 @@ Installs and configures the Cloud WorkBench server.
 * Ubuntu 18.04 64bit (tested 2019-01-02)
 * Ubuntu 16.04 64bit (tested 2019-01-02)
 
-Ensure that the default locale `en_US.utf8` exists or configure via the attribute `cwb-server.system.locale`
+Ensure that the default locale `en_US.UTF-8` exists (e.g., install via `sudo locale-gen en_US.UTF-8`) or configure via the attribute `cwb-server.system.locale`
 
 ## Attributes
 

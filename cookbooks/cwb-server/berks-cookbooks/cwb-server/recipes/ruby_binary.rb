@@ -1,6 +1,13 @@
 ruby = node['cwb-server']['ruby']
 ruby_with_version = "ruby-#{ruby['version']}"
 ruby_tar_file = "#{ruby_with_version}.tar.bz2"
+def ruby_bin(ruby)
+  File.join(ruby['bin_dir'], 'ruby')
+end
+
+def ruby_cmd(ruby, cmd)
+  "#{ruby_bin(ruby)} -S #{ruby['bin_dir']}/#{cmd}"
+end
 
 # Required for Ruby (see dependency list: https://gorails.com/setup/ubuntu/16.04)
 # Fixes the missing `libyaml` dependency causing the error:
@@ -33,10 +40,18 @@ remote_file 'download-ruby' do
   notifies :run, "execute[unpack #{ruby_with_version}]", :immediately
 end
 
-ruby_bin = File.join(ruby['bin_dir'], 'ruby')
+ruby_bin = ruby_bin(ruby)
 execute "unpack #{ruby_with_version}" do
   command "tar xvjf #{cache_file} -C #{ruby['dir']}"
   creates ruby_bin
+  action :nothing
+  notifies :run, 'execute[update-ruby-gems]', :immediately
+end
+
+# Only update once whenever notified from a newly unpacked ruby
+update_ruby_gems_cmd = ruby_cmd(ruby, 'gem update --system')
+execute 'update-ruby-gems' do
+  command update_ruby_gems_cmd
   action :nothing
 end
 
@@ -50,15 +65,17 @@ end
 # modify_path.run_action(:run)
 
 bundle_exist = "test -f #{ruby['bin_dir']}/bundle"
+install_bundler_cmd = ruby_cmd(ruby, 'gem install bundler')
 execute 'install-bundler' do
-  command "#{ruby_bin} -S #{ruby['bin_dir']}/gem install bundler"
+  command install_bundler_cmd
   not_if bundle_exist
   action :run
 end
 
 hooks_exist = "test -f #{ruby['bin_dir']}/ruby_executable_hooks"
+install_ruby_hooks_cmd = ruby_cmd(ruby, 'gem install --user-install executable-hooks')
 execute 'install-ruby-executable-hooks' do
-  command "#{ruby_bin} -S #{ruby['bin_dir']}/gem install --user-install executable-hooks"
+  command install_ruby_hooks_cmd
   not_if hooks_exist
   action :run
 end
