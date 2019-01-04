@@ -7,10 +7,8 @@ provisioner:
   name: chef_zero
   log_level: info
 
-# Uncomment the following verifier to leverage Inspec instead of Busser (the
-# default verifier)
-# verifier:
-#   name: inspec
+verifier:
+  name: inspec
 
 platforms:
 # Node attributes: cat /tmp/kitchen/nodes/default-ubuntu-1604.json
