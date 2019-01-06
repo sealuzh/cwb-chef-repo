@@ -1,3 +1,12 @@
+# Usage:
+# Set as environment variable: export CHEF_PASSWORD=my_chef_password
+# Set as make variable: make target CHEF_PASSWORD=my_chef_password
+CHEF_USER?=cwb-server
+CHEF_ORG?=chef
+CHEF_EMAIL?=cwb@server.com
+# MUST be >= 6 characters
+CHEF_PASSWORD?=chefadmin
+
 all: status
 
 status:
@@ -18,9 +27,13 @@ stop:
 	vagrant halt
 
 setup_chef: query_chef_ip
-	vagrant ssh chef-server --command 'sudo chef-server-ctl user-create cwb-server CWB Server cwb@server.com chefadmin' | tee cwb-server.pem
-	vagrant ssh chef-server --command 'sudo chef-server-ctl org-create chef "CWB Chef" --association cwb-server' | tee chef-validator.pem
+	vagrant ssh chef-server --command 'sudo chef-server-ctl user-create $(CHEF_USER) CWB Server $(CHEF_EMAIL) $(CHEF_PASSWORD)' | tee cwb-server.pem && \
+	vagrant ssh chef-server --command 'sudo chef-server-ctl org-create $(CHEF_ORG) "CWB Chef" --association $(CHEF_USER)' | tee chef-validator.pem && \
 	chmod 600 cwb-server.pem
+
+destroy_chef:
+	vagrant ssh chef-server --command 'sudo chef-server-ctl org-delete $(CHEF_ORG) --yes'
+	vagrant ssh chef-server --command 'sudo chef-server-ctl user-delete $(CHEF_USER) --yes'
 
 deploy:
 	provision_cwb

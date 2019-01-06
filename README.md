@@ -35,6 +35,8 @@ This Chef repo provides cookbooks to automatically install and configure
 
 ## Installation
 
+> NOTE: Checkout the Makefile which automates many of these steps if you are familiar with the configuration.
+
 1. Checkout repository.
 
     ```bash
@@ -46,6 +48,7 @@ This Chef repo provides cookbooks to automatically install and configure
     ```bash
     cd install/aws          # Amazon EC2 Cloud
     cd install/virtualbox   # Virtualbox (only for local testing, unless you have public IPs)
+    cd install/openstack    # Feel free to contact us for the latest Vagrantfile
     ```
 
 3. Configure `Vagrantfile` and
