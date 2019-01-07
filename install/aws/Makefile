@@ -35,8 +35,7 @@ destroy_chef:
 	vagrant ssh chef-server --command 'sudo chef-server-ctl org-delete $(CHEF_ORG) --yes'
 	vagrant ssh chef-server --command 'sudo chef-server-ctl user-delete $(CHEF_USER) --yes'
 
-deploy:
-	provision_cwb
+deploy: provision_cwb
 
 provision_cwb:
 	vagrant provision cwb-server

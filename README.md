@@ -206,7 +206,11 @@ Refer to [Vagrant CLI](https://www.vagrantup.com/docs/cli/index.html) for furthe
 
 ## Reconfiguration on IP Address Change
 
-This might be required after restarting an instance.
+```bash
+make config_cwb
+```
+
+This make target automates the following steps:
 
 1. Update *chef-server* IP
 
