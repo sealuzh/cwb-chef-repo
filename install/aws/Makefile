@@ -19,36 +19,45 @@ CWB_BACKUP_FILES:={$(shell bak=$(CWB_BACKUP) && [ ! -z "$${bak}" ] && (find $(CW
 
 all: status
 
+### High-level targets
+
 status:
 	vagrant status
 
-# Setup and configure CWB
+# Setup and configure CWB initially
 setup: run setup_chef config_cwb print_cwb_ip
+
+logs: cwb_logs
 
 start: run
 
 # Re-start an already setup CWB instance
 run: vagrant_up config_cwb print_cwb_ip
 
-vagrant_up:
-	vagrant up
+# Re-configuration on IP address change
+config_cwb: query_chef_ip provision_cwb
+
+deploy: provision_cwb
 
 stop:
 	vagrant halt
 
-setup_chef: query_chef_ip
-	vagrant ssh chef-server --command 'sudo chef-server-ctl user-create $(CHEF_USER) CWB Server $(CHEF_EMAIL) $(CHEF_PASSWORD)' | tee cwb-server.pem && \
-	vagrant ssh chef-server --command 'sudo chef-server-ctl org-create $(CHEF_ORG) "CWB Chef" --association $(CHEF_USER)' | tee chef-validator.pem && \
-	chmod 600 cwb-server.pem
+# Creates and downloads a backup into ./backups
+# NOTE: This temporarily stops the server (while creating the backup!)
+backup: cwb_stop cwb_backup cwb_start download_backup
 
-destroy_chef:
-	vagrant ssh chef-server --command 'sudo chef-server-ctl org-delete $(CHEF_ORG) --yes'
-	vagrant ssh chef-server --command 'sudo chef-server-ctl user-delete $(CHEF_USER) --yes'
+# Check logs for errors! via: make logs
+# DANGER: This will erase the current data and restore a previous dump!!!
+restore: upload_backup cwb_move_backup cwb_stop cwb_restore cwb_start
 
-deploy: provision_cwb
+# DANGER: This will destroy both instances!!!
+clean:
+	vagrant destroy
 
-provision_cwb:
-	vagrant provision cwb-server
+### Vagrant
+
+vagrant_up:
+	vagrant up
 
 login_cwb:
 	vagrant ssh
@@ -56,10 +65,11 @@ login_cwb:
 login_chef:
 	vagrant ssh chef-server
 
-config_cwb: query_chef_ip provision_cwb
+provision_chef:
+	vagrant provision chef-server
 
-sync_cookbooks:
-	vagrant rsync
+provision_cwb:
+	vagrant provision cwb-server
 
 query_chef_ip:
 	vagrant ssh chef-server --command 'wget -qO- http://ipecho.net/plain; echo' | tee $(CHEF_IP_FILE)
@@ -79,14 +89,44 @@ open_chef: query_chef_ip
 open_cwb: query_cwb_ip
 	open "http://$(shell cat $(CWB_IP_FILE))"
 
-cwb_stop:
-	vagrant ssh cwb-server --command 'sudo systemctl stop cloud-workbench.target'
+### chef-server
+
+setup_chef: query_chef_ip
+	vagrant ssh chef-server --command 'sudo chef-server-ctl user-create $(CHEF_USER) CWB Server $(CHEF_EMAIL) $(CHEF_PASSWORD)' | tee cwb-server.pem && \
+	vagrant ssh chef-server --command 'sudo chef-server-ctl org-create $(CHEF_ORG) "CWB Chef" --association $(CHEF_USER)' | tee chef-validator.pem && \
+	chmod 600 cwb-server.pem
+
+destroy_chef:
+	vagrant ssh chef-server --command 'sudo chef-server-ctl org-delete $(CHEF_ORG) --yes'
+	vagrant ssh chef-server --command 'sudo chef-server-ctl user-delete $(CHEF_USER) --yes'
+
+### cwb-server
+
+cwb_console:
+	vagrant ssh cwb-server --command "sudo su - apps -c 'cd /var/www/cloud-workbench/current && RAILS_ENV=production bin/rails console'"
+
+cwb_logs:
+	vagrant ssh cwb-server --command 'sudo journalctl -u cloud-workbench* -f'
+
+cwb_status:
+	vagrant ssh cwb-server --command 'sudo systemctl status cloud-workbench.target'
 
 cwb_start:
 	vagrant ssh cwb-server --command 'sudo systemctl start cloud-workbench.target'
 
+cwb_stop:
+	vagrant ssh cwb-server --command 'sudo systemctl stop cloud-workbench.target'
+
 cwb_restart:
 	vagrant ssh cwb-server --command 'sudo systemctl restart cloud-workbench.target'
+
+sync_cookbooks:
+	vagrant rsync
+
+ssh_config:
+	vagrant ssh-config cwb-server > ssh_config
+
+### cwb-server - BACKUP
 
 # Highly recommended to `cwb_stop` before!
 cwb_backup:
@@ -98,6 +138,8 @@ download_backup: ssh_config
 	# Download CWB_BACKUP if specified or the latest one by default
 	bak=$(CWB_BACKUP) && scp -F ssh_config cwb-server:/var/www/cloud-workbench/shared/backups/$${bak:-$(LATEST_BACKUP)} ./backups
 
+### cwb-server - RESTORE
+
 upload_backup: ssh_config
 	bak=$(CWB_BACKUP) && [ ! -z "$${bak}" ] || (echo "Variable CWB_BACKUP undefined!"; exit 1)
 	scp -F ssh_config $(CWB_BACKUP) cwb-server:/home/ubuntu
@@ -107,20 +149,3 @@ cwb_move_backup:
 
 cwb_restore:
 	vagrant ssh cwb-server --command "sudo su - apps -c 'cd /var/www/cloud-workbench/current && RAILS_ENV=production bin/rake data:restore[$(CWB_BACKUP_FILES)]'"
-
-backup: cwb_stop cwb_backup cwb_start download_backup
-
-# Check logs for errors! via: make logs
-restore: upload_backup cwb_move_backup cwb_stop cwb_restore cwb_start
-
-cwb_console:
-	vagrant ssh cwb-server --command "sudo su - apps -c 'cd /var/www/cloud-workbench/current && RAILS_ENV=production bin/rails console'"
-
-logs:
-	vagrant ssh cwb-server --command 'sudo journalctl -u cloud-workbench* -f'
-
-ssh_config:
-	vagrant ssh-config cwb-server > ssh_config
-
-clean:
-	vagrant destroy
