@@ -15,3 +15,8 @@ end
 describe file('/etc/nginx/sites-enabled/cloud-workbench') do
   it { should exist }
 end
+
+# Block php files (often used in brute force attacks)
+describe http('http://localhost/login.php') do
+  its('status') { should cmp 403 }
+end
