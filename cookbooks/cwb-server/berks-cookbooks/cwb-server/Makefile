@@ -23,6 +23,9 @@ vendor: install
 .PHONY: all_tests
 all_tests: lint syntax unit_test integration_test
 
+.PHONY: quick_test
+quick_test: lint syntax unit_test
+
 .PHONY: lint
 lint:
 	cookstyle
