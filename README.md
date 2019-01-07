@@ -145,10 +145,13 @@ This Chef repo provides cookbooks to automatically install and configure
 > 1) Run a sample benchmark: https://github.com/sealuzh/cwb-benchmarks#execute-a-basic-cli-benchmark
 > 2) Write your own benchmark: https://github.com/sealuzh/cwb-benchmarks
 
-
 ## Deployment
 
-Simply reprovision the CWB Server:
+```bash
+make deploy
+```
+
+Automates reprovisioning of the cwb-server for triggering deployment:
 
 ```bash
 cd $HOME/git/cwb-chef-repo/install/aws/
@@ -232,7 +235,7 @@ This make target automates the following steps:
 
 ## Manage Services
 
-Precondition: SSH'ed into the *cwb-server* instance
+Precondition: SSH'ed into the *cwb-server* instance (if not using a make target locally)
 
 ### Systemd
 
@@ -250,19 +253,26 @@ cloud-workbench-job@3101.service
 ...
 ```
 
-#### Status
+#### Status, Start, Stop, Restart
+
+```bash
+make cwb_status
+make cwb_start
+make cwb_stop
+make cwb_restart
+```
+
+Automates the following `cloud-workbench.target` commands:
 
 ```bash
 sudo systemctl status cloud-workbench.target
-```
-
-#### Stop, Start, Restart
-
-```bash
 sudo systemctl start cloud-workbench.target
-sudo systemctl restart cloud-workbench-web.target
+sudo systemctl stop cloud-workbench.target
+sudo systemctl restart cloud-workbench.target
+# Further examples
 sudo systemctl stop cloud-workbench-job.target
 sudo systemctl start cloud-workbench-job@3100.service
+sudo systemctl restart cloud-workbench-web.target
 ```
 
 For further detail see: https://www.digitalocean.com/community/tutorials/how-to-use-systemctl-to-manage-systemd-services-and-units
@@ -274,7 +284,13 @@ Precondition: SSH'ed into the target instance
 #### Cloud WorkBench
 
 ```bash
-# Real-time
+make logs
+```
+
+Automates attaching to the cwb-server logs:
+
+```bash
+# Real-time (make logs)
 journalctl -u cloud-workbench* -f
 # Recent
 journalctl -u cloud-workbench* -n 20
@@ -300,16 +316,28 @@ tail -f /var/log/nginx/cloud-workbench-access.log
 tail -f /var/log/nginx/cloud-workbench-error.log
 ```
 
-### Installation directories
+### Installation directories (cwb-server)
 
 ```bash
-cd  /var/www/cloud-workbench
-ls -l /etc/systemd/system/cloud-workbench*
+# Rails app
+cd /var/www/cloud-workbench/current
+# Storage directory (where materialized Vagrantfiles are stored)
+cd /var/www/cloud-workbench/shared/storage/production
+# NGING proxy
 cat /etc/nginx/sites-available/cloud-workbench
-cd  /var/www/cloud-workbench/shared/storage/production
+# PostgreSQL database (sudo su postgres)
+ls /var/lib/postgresql/9.6/main
+# Systemd service
+ls -l /etc/systemd/system/cloud-workbench*
 ```
 
 ### Rails Console
+
+```bash
+make cwb_console
+```
+
+Automates attaching to the cwb-server logs:
 
 ```bash
 sudo su - apps
@@ -317,6 +345,12 @@ cd /var/www/cloud-workbench/current && RAILS_ENV=production bin/rails c
 ```
 
 ### Backup
+
+```bash
+make backup
+```
+
+Automates the following backup process:
 
 ```bash
 # Login into cwb-server
@@ -334,16 +368,22 @@ sudo systemctl start cloud-workbench.target
 
 # Download from cwb-server
 exit
-vagrant ssh-config cwb-server > ssh-config
-scp -F ssh-config cwb-server:/var/www/cloud-workbench/shared/backups/*_cloud_workbench_production.* .
+vagrant ssh-config cwb-server > ssh_config
+scp -F ssh_config cwb-server:/var/www/cloud-workbench/shared/backups/*_cloud_workbench_production.* .
 ```
 
 ### Restore
 
 ```bash
+make restore CWB_BACKUP=backups/2019-01-07-18*cloud_workbench_production*
+```
+
+Automates the following restore process:
+
+```bash
 # Upload to cwb-server
-vagrant ssh-config cwb-server > ssh-config
-scp -F ssh-config *_cloud_workbench_production.* cwb-server:/home/ubuntu
+vagrant ssh-config cwb-server > ssh_config
+scp -F ssh_config *_cloud_workbench_production.* cwb-server:/home/ubuntu
 
 # Login into cwb-server
 vagrant ssh cwb-server
