@@ -1,3 +1,6 @@
+# Using rate limits for login page (every 2 seconds)
+limit_req_zone $binary_remote_addr zone=mylimit:10m rate=30r/m;
+
 upstream <%= @app['name'] %> {
   server localhost:<%= @app['port'] %> fail_timeout=0;
 }
@@ -16,12 +19,23 @@ server {
   rewrite_log on;
 
   # use the application's 500.html page
-  error_page 500 502 503 504 /500.html;
+  error_page 500 /500.html;
 
   # allow clients to upload large files (`4G` if necessary)
   client_max_body_size 256m;
 
   keepalive_timeout 15;
+
+  # Block all php requests
+  location ~\.php$ {
+    deny all;
+  }
+
+  # Rate-limit login page
+  location /users/sign_in {
+    limit_req zone=mylimit burst=10;
+    proxy_pass        http://cloud-workbench;
+  }
 
   location / {
     try_files /system/maintenance.html
@@ -37,7 +51,7 @@ server {
   }
 
 #  location = /favicon.ico {
-#    alias    /home/apps/cloud_benchmarking/current/public/favicon.ico;
+#    alias    /var/www/cloud_benchmarking/current/public/favicon.ico;
 #  }
 
   location ~ ^/(assets)/ {
