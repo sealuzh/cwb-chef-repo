@@ -325,7 +325,7 @@ tail -f /var/log/nginx/cloud-workbench-error.log
 cd /var/www/cloud-workbench/current
 # Storage directory (where materialized Vagrantfiles are stored)
 cd /var/www/cloud-workbench/shared/storage/production
-# NGING proxy
+# NGING proxy (sudo nginx -s reload)
 cat /etc/nginx/sites-available/cloud-workbench
 # PostgreSQL database (sudo su postgres)
 ls /var/lib/postgresql/9.6/main
