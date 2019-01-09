@@ -33,6 +33,8 @@ server {
 
   # Rate-limit login page
   location /users/sign_in {
+    try_files $uri $uri.html
+              @app;
     limit_req zone=mylimit burst=10;
     proxy_pass        http://cloud-workbench;
   }
