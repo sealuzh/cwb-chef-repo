@@ -24,6 +24,8 @@ all: status
 status:
 	vagrant status
 
+login: login_cwb
+
 # Setup and configure CWB initially
 setup: run setup_chef config_cwb print_cwb_ip
 
