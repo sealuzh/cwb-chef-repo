@@ -135,7 +135,7 @@ cwb_backup:
 	vagrant ssh cwb-server --command 'sudo su - apps -c "cd /var/www/cloud-workbench/current && RAILS_ENV=production bin/rake data:backup"'
 
 download_backup: ssh_config
-	$(eval LATEST_BACKUP:="{$(shell vagrant ssh cwb-server --command 'cd /var/www/cloud-workbench/current/db/backups/ && find * | sort | head -3 | tail -2 | paste -sd "," -')}")
+	$(eval LATEST_BACKUP:="{$(shell vagrant ssh cwb-server --command 'cd /var/www/cloud-workbench/current/db/backups/ && find * | sort | tail -2 | paste -sd "," -')}")
 	mkdir -p ./backups
 	# Download CWB_BACKUP if specified or the latest one by default
 	bak=$(CWB_BACKUP) && scp -F ssh_config cwb-server:/var/www/cloud-workbench/shared/backups/$${bak:-$(LATEST_BACKUP)} ./backups
