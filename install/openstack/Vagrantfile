@@ -11,6 +11,9 @@ require 'vagrant-openstack-provider'
 # 1) Load credentials: source .env
 # 2) Follow the docs: https://github.com/sealuzh/cwb-chef-repo
 
+# Number of web editor instances configured for CWB
+NUM_WORKSTATIONS = 0
+
 ##########################################################
 CHEF_SERVER_IP = ENV['CHEF_SERVER_IP'] || File.read('chef_server_ip.env').strip
 
@@ -20,6 +23,7 @@ REPO_ROOT = FILE_DIR.parent.parent.expand_path
 COOKBOOKS = File.join(REPO_ROOT, 'cookbooks')
 CWB_SERVER = File.join(COOKBOOKS, 'cwb-server')
 CWB_CHEF_SERVER = File.join(COOKBOOKS, 'cwb-chef-server')
+CWB_WORKSTATION = File.join(COOKBOOKS, 'cwb-workstation')
 
 # Read content from files and silently ignores errors for optional (i.e., non-required) files
 # Example: read_file('SSH_USERNAME', required=true)
@@ -194,4 +198,40 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           }
     end
   end
-end
+
+  NUM_WORKSTATIONS.times do |i|
+    ### CWB-Workstation
+    name = "cwb-workstation#{i+1}"
+    config.vm.define name do |cwb_workstation|
+      # VM
+      cwb_workstation.vm.hostname = name # MUST not contain spaces
+
+      # OpenStack
+      config.vm.provider :openstack do |os, override|
+        os.flavor = 'c2m2'
+      end
+
+      # Chef solo provisioning via berks-vendored cookbooks
+      # Run `vendor_berks_cookbooks.sh` to pick up changes in the `cwb-workstation` cookbook
+      cwb_workstation.vm.provision :chef_solo do |chef|
+        chef.cookbooks_path = "#{CWB_WORKSTATION}/berks-cookbooks"
+        chef.add_recipe 'cwb-workstation'
+        # Refer to `cookbooks/cwb-workstation/attributes/default.rb` for an
+        # extensive list of configurable attributes
+        chef.json = {
+          'cwb-workstation' => {
+            'chef' => {
+              'server_host' => CHEF_SERVER_IP,
+              'client_key' => File.read('cwb-server.pem'),
+              'validation_key' => File.read('chef-validator.pem'),
+            },
+            # Optional (for cwb_ssh utility)
+            'ssh_key' => File.read(SSH_KEY_PATH),
+            # Extra public key to provide SSH access for the `cwb` user:
+            # 'pub_key' => 'ssh-rsa pub_key_goes_here my_key_name'
+          }
+        }
+      end
+    end
+  end
+end # Vagrantfile.configure
