@@ -145,6 +145,15 @@ This Chef repo provides cookbooks to automatically install and configure
 > 1) Run a sample benchmark: https://github.com/sealuzh/cwb-benchmarks#execute-a-basic-cli-benchmark
 > 2) Write your own benchmark: https://github.com/sealuzh/cwb-benchmarks
 
+## Workstation
+
+This option automatically configures configures the browser-based IDE [theia](https://github.com/theia-ide/theia) with the [theia-ruby-extension](https://github.com/theia-ide/theia-ruby-extension) for authoring CWB benchmark cookbooks.
+Notice that authentication is NOT supported for this optional component.
+
+1. Configure the desired number of editor instances via `NUM_WORKSTATIONS = 1` in the Vagrantfile
+2. Setup everything via `vagrant up`
+3. Access the web-editor via http://WORKSTATION_IP
+
 ## Deployment
 
 ```bash
