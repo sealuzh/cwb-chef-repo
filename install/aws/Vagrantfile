@@ -110,7 +110,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       chef.json = {
           'chef-server' => {
               # Chef-server versions: https://downloads.chef.io/chef-server/
-              'version' => '12.18.14', # or nil for latest (2019-01-02)
+              'version' => '12.18.14', # as of 2019-01-02 or nil for latest
               # Provide if cookbook service is not working correctly (i.e. cookbooks cannot be uploaded).
               # Attempts to automatically detect public IP via Ohai/What's my ip query
               # 'api_fqdn' => CHEF_SERVER_IP

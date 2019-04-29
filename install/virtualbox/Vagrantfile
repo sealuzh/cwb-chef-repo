@@ -1,3 +1,8 @@
+### DISCLAIMER
+# This configuration supports local development of CWB.
+# CWB will not work properly within Virtualbox because
+# it requires public IPs to support full functionality!
+
 require 'pathname'
 require 'securerandom'
 # For debugging via `binding.pry` http://pryrepl.org/
@@ -60,7 +65,7 @@ VAGRANTFILE_API_VERSION = '2'
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Detect vagrant-omnibus plugin
   if Vagrant.has_plugin?('vagrant-omnibus')
-    config.omnibus.chef_version = '14.3.37' # or :latest
+    config.omnibus.chef_version = '14.8.12' # or :latest
   else
     STDERR.puts 'FATAL: Vagrant-omnibus plugin not detected. Please install the plugin with
                  `vagrant plugin install vagrant-omnibus`.'
@@ -72,12 +77,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.cache.scope       = :box
     config.cache.auto_detect = true
   else
-    STDERR.puts 'WARN:  Vagrant-cachier plugin not detected. Continuing unoptimized.
+    STDERR.puts 'WARN: Vagrant-cachier plugin not detected. Continuing unoptimized.
                  You may want to install it with: `vagrant plugin install vagrant-cachier`.'
   end
 
   # Box
-  config.vm.box = 'bento/ubuntu-16.04'
+  config.vm.box = 'bento/ubuntu-18.04'
 
   # VM
   config.ssh.forward_agent = true
@@ -101,8 +106,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       chef.add_recipe 'cwb-chef-server'
       chef.json = {
           'chef-server' => {
-              # 12.17.33 as of 2018-08-16
-              'version' => '12.17.33', # or nil for latest
+              'version' => '12.18.14', # as of 2019-01-02 or nil for latest
               # Provide if cookbook service is not working correctly (i.e. cookbooks cannot be uploaded).
               # Attempts to automatically detect public IP via Ohai/What's my ip query
               # 'api_fqdn' => CHEF_SERVER_IP
@@ -149,6 +153,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                   'validation_key' => File.read('chef-validator.pem'),
                   'validation_key_name' => 'chef-validator',
                   # VM provisioning
+                  # Chef versions: https://docs.chef.io/release_notes.html
+                  # Notice that CWB is currently not yet compatible with Chef 13 and 14
+                  # https://github.com/sealuzh/cwb-benchmarks/issues/20
                   'omnibus_chef_version' => '12.22.3'
               },
               'providers' => {
