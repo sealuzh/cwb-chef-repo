@@ -1,0 +1,14 @@
+# Docs: https://docs.chef.io/config_rb_knife.html
+
+CHEF_SERVER_IP = ENV['CHEF_SERVER_IP'] || '<%= @server_host %>'
+
+log_level                :info
+log_location             STDOUT
+node_name                '<%= @node_name %>'
+client_key               '/home/cwb/.chef/cwb-server.pem'
+validation_client_name   '<%= @validation_key_name %>'
+validation_key           '/home/cwb/.chef/chef-validator.pem'
+chef_server_url          "https://#{CHEF_SERVER_IP}:443/organizations/chef"
+syntax_check_cache_path  '/home/cwb/.chef/syntax_check_cache'
+cookbook_path            '/home/cwb/benchmarks'
+ssl_verify_mode          :verify_none # or load certificate `knife ssl fetch`

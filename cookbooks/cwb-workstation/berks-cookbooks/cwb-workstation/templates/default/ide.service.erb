@@ -1,0 +1,22 @@
+[Unit]
+Description=Theia Web IDE
+After=network.target
+
+[Service]
+User=cwb
+Type=simple
+WorkingDirectory=<%= @working_dir %>
+ExecStart=/usr/bin/yarn start --port 3000 --hostname 0.0.0.0 <%= @project_dir %>
+Restart=on-failure
+Restart=always
+Environment="NODE_ENV=production"
+Environment="PATH=<%= @path %>"
+StandardInput=null
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=%n
+KillMode=mixed
+TimeoutStopSec=5
+
+[Install]
+WantedBy=multi-user.target
