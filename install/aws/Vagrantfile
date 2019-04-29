@@ -87,7 +87,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     aws.keypair_name = SSH_KEY_NAME
     override.ssh.private_key_path = SSH_KEY_PATH
     override.ssh.username = SSH_USERNAME
-    aws.instance_type = 't2.small'
+    aws.instance_type = 't3.small'
     aws.security_groups = ['cwb-web']
   end
 
