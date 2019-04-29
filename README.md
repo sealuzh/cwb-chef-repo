@@ -11,27 +11,27 @@ This Chef repo provides cookbooks to automatically install and configure
 
 * [Git](http://git-scm.com/)
 * [Vagrant (2.2.4)](https://www.vagrantup.com/downloads.html)
-    * [vagrant-omnibus (1.5.0)](https://github.com/chef/vagrant-omnibus) for auto-installation via Chef
-    * [vagrant-aws (0.7.2)](https://github.com/mitchellh/vagrant-aws) for deployment in the Amazon EC2 Cloud
-      ([alternative providers](https://github.com/mitchellh/vagrant/wiki/Available-Vagrant-Plugins#providers) are available)
-    * Install Vagrant with the [official installer](https://www.vagrantup.com/downloads.html) or with [Homebrew Cask](https://github.com/Homebrew/homebrew-cask) via `brew cask install vagrant`
-    * Install Vagrant plugins via
+  * [vagrant-omnibus (1.5.0)](https://github.com/chef/vagrant-omnibus) for auto-installation via Chef
+  * [vagrant-aws (0.7.2)](https://github.com/mitchellh/vagrant-aws) for deployment in the Amazon EC2 Cloud
+    ([alternative providers](https://github.com/mitchellh/vagrant/wiki/Available-Vagrant-Plugins#providers) are available)
+  * Install Vagrant with the [official installer](https://www.vagrantup.com/downloads.html) or with [Homebrew Cask](https://github.com/Homebrew/homebrew-cask) via `brew cask install vagrant`
+  * Install Vagrant plugins via
 
-        ```bash
-        vagrant plugin install vagrant-omnibus vagrant-aws;
-        ```
+      ```bash
+      vagrant plugin install vagrant-omnibus vagrant-aws;
+      ```
 
 * [Amazon EC2](https://aws.amazon.com/ec2/) account. Alternative providers are available (see [cwb-benchmarks#Providers](https://github.com/sealuzh/cwb-benchmarks#providers)).
   We have also deployed a CWB instance to OpenStack.
-    * Both VMs (chef-server + cwb-server) must have a public IP address
-    * Make sure you have created a private SSH key called `cloud-benchmarking` to
+  * Both VMs (chef-server + cwb-server) must have a public IP address
+  * Make sure you have created a private SSH key called `cloud-benchmarking` to
       log into cloud VMs and uploaded the corresponding public key to the cloud provider.
-    * Ensure that incoming and outgoing traffic is allowed for ssh (22), http (80), and https (433).
+  * Ensure that incoming and outgoing traffic is allowed for ssh (22), http (80), and https (433).
       In Amazon EC2, you create a [security group](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-network-security.html)
       called `cwb-web`.
       If you do not explicitly specify a security group in your benchmark, make sure the `default` security group allows incoming ssh (22).
-* [ChefDK (3.6.57)](https://downloads.chef.io/chef-dk/) for benchmark cookbook development.
-    * Install via the [official installer](https://downloads.chef.io/chefdk)
+* [ChefDK (3.9.0)](https://downloads.chef.io/chef-dk/) for benchmark cookbook development.
+  * Install via the [official installer](https://downloads.chef.io/chefdk)
 
 ## Installation
 
