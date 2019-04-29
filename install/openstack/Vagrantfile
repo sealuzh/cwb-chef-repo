@@ -1,0 +1,197 @@
+require 'pathname'
+require 'securerandom'
+
+require 'vagrant-openstack-provider'
+
+### Setup
+# 1) Copy credentials (ignored by git): cp .env.example .env
+# 2) Adjust credentials: vim .env
+
+### Usage
+# 1) Load credentials: source .env
+# 2) Follow the docs: https://github.com/sealuzh/cwb-chef-repo
+
+##########################################################
+CHEF_SERVER_IP = ENV['CHEF_SERVER_IP'] || File.read('chef_server_ip.env').strip
+
+# Local paths
+FILE_DIR = Pathname.new(__FILE__).parent.expand_path
+REPO_ROOT = FILE_DIR.parent.parent.expand_path
+COOKBOOKS = File.join(REPO_ROOT, 'cookbooks')
+CWB_SERVER = File.join(COOKBOOKS, 'cwb-server')
+CWB_CHEF_SERVER = File.join(COOKBOOKS, 'cwb-chef-server')
+
+# Read content from files and silently ignores errors for optional (i.e., non-required) files
+# Example: read_file('SSH_USERNAME', required=true)
+def read_file(env_path, required=false)
+  path = ENV[env_path]
+  fail "No environment variable provided for #{env_path}" if path.nil? && required
+  File.read(path).strip
+rescue Errno::ENOENT => e
+  raise "File #{path} does not exist for key #{env_path}" if required
+end
+
+# @param file [String] the path of the cache file
+# @param new_content [String] the content that should be cached into `file`
+# @return [String] if `file` exists: the content of the file
+#                  otherwise: `new_content` (will be saved to `file`)
+def read_or_cache(file, new_content)
+  content = File.read(file).strip # Ignore whitespace
+  if content.empty?
+    File.write(file, new_content)
+    new_content
+  else
+    content
+  end
+end
+
+VAGRANTFILE_API_VERSION = '2'
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  # Detect vagrant-omnibus plugin
+  if Vagrant.has_plugin?('vagrant-omnibus')
+    # Chef client versions: https://github.com/chef/chef/blob/master/CHANGELOG.md
+    config.omnibus.chef_version = '14.8.12' # or :latest
+  else
+    STDERR.puts 'FATAL: Vagrant-omnibus plugin not detected. Please install the plugin with
+                 `vagrant plugin install vagrant-omnibus`.'
+    exit
+  end
+
+  # VM
+  config.ssh.username = ENV['SSH_USERNAME']
+  config.ssh.private_key_path = ENV['SSH_KEY_PATH']
+  config.ssh.forward_agent = false
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+  # Fix SMB username promt: https://github.com/mitchellh/vagrant-aws/issues/365
+  config.vm.allowed_synced_folder_types = :rsync
+
+  # OpenStack
+  config.vm.provider :openstack do |os|
+    os.openstack_auth_url = ENV['OPENSTACK_AUTH_URL']
+    os.openstack_network_url = ENV['OPENSTACK_NETWORK_URL']
+    os.username           = ENV['OPENSTACK_USERNAME']
+    os.password           = ENV['OPENSTACK_PASSWORD']
+    os.flavor             = 'c3m3'
+    os.image              = 'Ubuntu 18.04'
+    os.floating_ip_pool   = 'internet'
+
+    os.keypair_name = ENV['SSH_KEY_NAME']
+    os.identity_api_version = '3'
+    os.domain_name = 'xerces'
+    os.project_name = ENV['OPENSTACK_PROJECT']
+
+    # 1) Need to create net with subnet + router
+    # 2) Need to create allow SSH rule
+    os.networks = ['my-net']
+  end
+
+  ### Chef-Server
+  config.vm.define 'chef-server' do |chef_server|
+    # VM
+    chef_server.vm.hostname = 'chef-server' # MUST not contain spaces
+
+    # OpenStack
+    config.vm.provider :openstack do |os, override|
+      os.flavor = 'c2m2'
+    end
+
+    # Chef solo provisioning via berks-vendored cookbooks
+    chef_server.vm.provision :chef_solo do |chef|
+      chef.cookbooks_path = "#{CWB_CHEF_SERVER}/berks-cookbooks"
+      chef.add_recipe 'cwb-chef-server'
+      chef.json = {
+          'chef-server' => {
+              # Chef-server versions: https://downloads.chef.io/chef-server/
+              'version' => '12.18.14', # as of 2019-01-02 or nil for latest
+              # Provide if cookbook service is not working correctly (i.e. cookbooks cannot be uploaded).
+              # Attempts to automatically detect public IP via Ohai/What's my ip query
+              # 'api_fqdn' => CHEF_SERVER_IP
+              # List of commercial addons: https://github.com/chef-cookbooks/chef-server#attributes
+              # The management console (mange) is free up to 25 nodes
+              'addons' => %w(manage),
+              'accept_license' => true
+          }
+      }
+    end
+  end
+
+  ### CWB-Server
+  config.vm.define 'cwb-server', primary: true do |cwb_server|
+    # VM
+    cwb_server.vm.hostname = 'cwb-server' # MUST not contain spaces
+
+    # OpenStack
+    config.vm.provider :openstack do |os, override|
+      os.flavor = 'c3m3'
+    end
+
+    # Chef solo provisioning via berks-vendored cookbooks
+    # Run `vendor_berks_cookbooks.sh` to pick up changes in the `cwb-server` cookbook
+    cwb_server.vm.provision :chef_solo do |chef|
+      chef.cookbooks_path = "#{CWB_SERVER}/berks-cookbooks"
+      chef.provisioning_path = '/etc/chef'
+      chef.add_recipe 'cwb-server'
+      # Refer to `cookbooks/cwb-server/attributes/default.rb` for an
+      # extensive list of configurable attributes
+      chef.json =
+          {
+              'cwb-server' => {
+                  'dev' => {
+                      'tools' => %w(vim curl)
+                  },
+                  'ssh' => {
+                      'key' => read_file('SSH_KEY_PATH', required=true),
+                      'key_name' => ENV['SSH_KEY_NAME']
+                  },
+                  'chef' => {
+                      'server_host' => CHEF_SERVER_IP,
+                      'node_name' => 'cwb-server',
+                      'client_key' => File.read('cwb-server.pem'),
+                      'client_key_name' => 'cwb-server',
+                      'validation_key' => File.read('chef-validator.pem'),
+                      'validation_key_name' => 'chef-validator',
+                      # VM provisioning
+                      # Chef versions: https://docs.chef.io/release_notes.html
+                      # Notice that CWB is currently not yet compatible with Chef 13 and 14
+                      # https://github.com/sealuzh/cwb-benchmarks/issues/20
+                      'omnibus_chef_version' => '12.22.3'
+                  },
+                  'providers' => {
+                      'aws' => {
+                          'access_key' => ENV['AWS_ACCESS_KEY'],
+                          'secret_key' => ENV['AWS_SECRET_KEY'],
+                      },
+                      'google' => {
+                          'project_id' => ENV['GOOGLE_PROJECT_ID'],
+                          'client_email' => ENV['GOOGLE_CLIENT_EMAIL'],
+                          'json_key_FILE' => read_file('GOOGLE_JSON_KEY_PATH', required=false),
+                      },
+                      'azure' => {
+                        'tenant_id' => ENV['AZURE_TENANT_ID'],
+                        'client_id' => ENV['AZURE_CLIENT_ID'],
+                        'client_secret' => ENV['AZURE_CLIENT_SECRET'],
+                        'subscription_id' => ENV['AZURE_SUBSCRIPTION_ID'],
+                      }
+                  },
+                  'env' => {
+                      'SECRET_KEY_BASE' => read_or_cache('secret_key_base.env', SecureRandom.hex(64)),
+                      'LOG_LEVEL' => 'info' # Rails log levels: debug, info, warn, error, fatal, unknown
+                  },
+                  'app' => {
+                      'branch' => 'master',
+                      'user_password' => ENV['APP_USER_PASSWORD'],
+                      # Determines how many benchmarks can be prepared, started, or released in parallel.
+                      # Keep in mind that workers are memory-intensive because the currently load the entire Rails environment.
+                      'num_workers' => 2,
+                  },
+                  'db' => {
+                    'password' => ENV['DB_PASSWORD'],
+                    'postgres_password' => ENV['DB_POSTGRES_PASSWORD'],
+                  },
+              },
+              # For a list of time zones see: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+              'tz' => 'Europe/Zurich',
+          }
+    end
+  end
+end
