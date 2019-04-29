@@ -1,10 +1,16 @@
 require 'pathname'
 require 'securerandom'
 
+# Number of web editor instances configured for CWB
+NUM_WORKSTATIONS = 0
+
+# SSH
+SSH_KEY_PATH = ENV['SSH_KEY_PATH'] || 'cloud-benchmarking.pem'
+SSH_KEY_NAME = ENV['SSH_KEY_NAME'] || 'cloud-benchmarking'
 # Username to ssh into VM instances (might be `root` for other images)
 SSH_USERNAME = 'ubuntu'
 
-# Providers
+# Cloud Providers
 # Security credentials > Users: https://console.aws.amazon.com/iam/home?#/users
 AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY'] || 'my_aws_access_key'
 AWS_SECRET_KEY = ENV['AWS_SECRET_KEY'] || 'my_aws_secret_key'
@@ -22,10 +28,6 @@ AZURE_CLIENT_ID = ENV['AZURE_CLIENT_ID'] || 'my_azure_client_id'
 AZURE_CLIENT_SECRET = ENV['AZURE_CLIENT_SECRET'] || 'my_azure_client_secret'
 AZURE_SUBSCRIPTION_ID = ENV['AZURE_SUBSCRIPTION_ID'] || 'my_azure_subscription_id'
 
-# SSH key
-SSH_KEY_PATH = ENV['SSH_KEY_PATH'] || 'cloud-benchmarking.pem'
-SSH_KEY_NAME = ENV['SSH_KEY_NAME'] || 'cloud-benchmarking'
-
 ##########################################################
 CHEF_SERVER_IP = ENV['CHEF_SERVER_IP'] || File.read('chef_server_ip.env').strip
 
@@ -37,6 +39,7 @@ REPO_ROOT = FILE_DIR.parent.parent.expand_path
 COOKBOOKS = File.join(REPO_ROOT, 'cookbooks')
 CWB_SERVER = File.join(COOKBOOKS, 'cwb-server')
 CWB_CHEF_SERVER = File.join(COOKBOOKS, 'cwb-chef-server')
+CWB_WORKSTATION = File.join(COOKBOOKS, 'cwb-workstation')
 
 # @param file [String] the path of the cache file
 # @param new_content [String] the content that should be cached into `file`
@@ -208,4 +211,43 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           }
     end
   end
-end
+
+  NUM_WORKSTATIONS.times do |i|
+    ### CWB-Workstation
+    name = "cwb-workstation#{i+1}"
+    config.vm.define name do |cwb_workstation|
+      # VM
+      cwb_workstation.vm.hostname = name # MUST not contain spaces
+
+      # Amazon EC2
+      config.vm.provider :aws do |aws, override|
+        aws.instance_type = 't3.small'
+        aws.tags = {
+            'Name' => name
+        }
+      end
+
+      # Chef solo provisioning via berks-vendored cookbooks
+      # Run `vendor_berks_cookbooks.sh` to pick up changes in the `cwb-workstation` cookbook
+      cwb_workstation.vm.provision :chef_solo do |chef|
+        chef.cookbooks_path = "#{CWB_WORKSTATION}/berks-cookbooks"
+        chef.add_recipe 'cwb-workstation'
+        # Refer to `cookbooks/cwb-workstation/attributes/default.rb` for an
+        # extensive list of configurable attributes
+        chef.json = {
+          'cwb-workstation' => {
+            'chef' => {
+              'server_host' => CHEF_SERVER_IP,
+              'client_key' => File.read('cwb-server.pem'),
+              'validation_key' => File.read('chef-validator.pem'),
+            },
+            # Optional (for cwb_ssh utility)
+            'ssh_key' => File.read(SSH_KEY_PATH),
+            # Extra public key to provide SSH access for the `cwb` user:
+            # 'pub_key' => 'ssh-rsa pub_key_goes_here my_key_name'
+          }
+        }
+      end
+    end
+  end
+end # Vagrantfile.configure
