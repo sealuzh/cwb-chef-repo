@@ -46,7 +46,11 @@ file '/usr/local/bin/cwb_ssh' do
 end
 
 ### Chef
-chef_dk 'cwb_chef_dk'
+chef_dk_version = (node['chef_dk']['version'] rescue 'latest')
+chef_dk 'cwb_chef_dk' do
+    version chef_dk_version
+    action :install
+end
 
 chef_dir = '/home/cwb/.chef'
 directory chef_dir do
