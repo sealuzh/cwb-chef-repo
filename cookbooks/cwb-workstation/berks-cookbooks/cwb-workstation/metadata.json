@@ -1,7 +1,7 @@
 {
   "name": "cwb-workstation",
   "description": "Installs/Configures cwb-workstation",
-  "long_description": "# cwb-workstation\n\nSets up a demo chef workstation with all Chef utils configured.\nConfigures the browser-based IDE [theia](https://github.com/theia-ide/theia) with the [theia-ruby-extension](https://github.com/theia-ide/theia-ruby-extension)\n\n## Theia Requirements\n\n* Source [Build your own IDE](https://www.theia-ide.org/doc/Composing_Applications.html)\n* Node v8\n* Yarn\n\n* Ruby 2.4.4 (for solargraph)\n* solargraph gem\n",
+  "long_description": "# cwb-workstation\n\nSets up a demo chef workstation with all Chef utils configured.\nConfigures the browser-based IDE [theia](https://github.com/theia-ide/theia) with the [theia-ruby-extension](https://github.com/theia-ide/theia-ruby-extension)\n\n## Attributes\n\nNotice that `server_host`, `client_key`, and `validation_key` are REQUIRED.\nIt is highly recommened to pin the `chef_dk` version.\n\nCheck [attributes/default.rb](./attributes/default.rb) for more details.\n\n## Theia Requirements\n\n* Source [Build your own IDE](https://www.theia-ide.org/doc/Composing_Applications.html)\n* Node v8\n* Yarn\n\n* Ruby 2.4.4 (for solargraph)\n* solargraph gem\n",
   "maintainer": "Joel Scheuner",
   "maintainer_email": "joel.scheuner.dev@gmail.com",
   "license": "Apache-2.0",
@@ -21,7 +21,7 @@
   "recipes": {
 
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "source_url": "",
   "issues_url": "",
   "privacy": false,
