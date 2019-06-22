@@ -31,7 +31,8 @@ before_script:
   - chef --version
   - cookstyle --version
   - foodcritic --version
-  - chef exec gem list
+  # Accepting Chef licence is required from version >15
+  - CHEF_LICENSE=accept chef exec gem list
 
 script:
   # Run all test stages: lint, syntax, unit_test, integration_test
