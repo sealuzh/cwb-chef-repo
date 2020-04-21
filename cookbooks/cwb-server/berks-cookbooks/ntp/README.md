@@ -9,13 +9,13 @@ Installs and configures ntp. On Windows systems it uses the Meinberg port of the
 ### Platforms
 
 - Debian-family Linux Distributions
-- RedHat-family Linux Distributions
+- RedHat-family Linux Distributions 5-7 (8 does not contain NTP client)
 - Fedora
 - Gentoo Linux
-- openSUSE
+- openSUSE / SLES 12+
 - FreeBSD
 - Windows 2008 R2+
-- Mac OS X 10.11+
+- macOS 10.11+
 
 ### Chef
 
@@ -281,7 +281,7 @@ Windows only. Apply on a Windows host to install the Meinberg NTPd client.
 
 ### mac_os_x_client recipe
 
-Mac OS X only. Apply on a Mac OS X host to configure NTP.
+macOS only. Apply on a macOS host to configure NTP.
 
 ## License & Authors
 

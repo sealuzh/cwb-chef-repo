@@ -149,7 +149,7 @@ deploy app['name'] do
   # NOTE: `log` needs to be symlinked before any Rails commands writes to it (see before_migrate)
   # NOTE: Target directory is not created if non-existent
   symlinks(
-    '.env' => '.env',
+    '.env' => '.env'
     # 'pids' => 'tmp/pids'
     # CWB old
     # 'tmp/pids tmp/cache tmp/sockets vendor/bundle public/system storage chef-repo'

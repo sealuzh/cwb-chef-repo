@@ -9,19 +9,16 @@
     "ubuntu": ">= 0.0.0"
   },
   "dependencies": {
-    "apt": "~> 7.1.1",
+    "apt": "~> 7.2.0",
     "sudo": "~> 5.4.0",
-    "git": "~> 9.0.1",
+    "git": "~> 10.0.0",
     "timezone_lwrp": "~> 0.2.1",
-    "ntp": "~> 3.6.0",
+    "ntp": "~> 3.7.0",
     "deploy_resource": "~> 1.0.2",
     "postgresql": "~> 7.1.0",
-    "vagrant": "~> 0.9.1"
+    "vagrant": "~> 2.0.1"
   },
   "providing": {
-
-  },
-  "attributes": {
 
   },
   "recipes": {

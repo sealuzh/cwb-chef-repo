@@ -17,11 +17,11 @@ include_recipe 'cwb-server::database'
 include_recipe 'cwb-server::ruby_binary'
 include_recipe 'cwb-server::nodejs'
 
-### Runtime dependencies
+# ### Runtime dependencies
 include_recipe 'cwb-server::nginx'
 include_recipe 'vagrant::default'
 # Workaround for #37 and #59 (merged): https://github.com/cassianoleal/vagrant-butcher
-# include_recipe 'cwb-server::vagrant'
+include_recipe 'cwb-server::vagrant'
 
 include_recipe 'cwb-server::secrets'
 include_recipe 'cwb-server::deploy'
