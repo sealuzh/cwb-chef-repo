@@ -13,7 +13,7 @@ def create_dir(path, user)
   directory path do
     owner user
     group user
-    mode 00755
+    mode '00755'
   end
 end
 
@@ -41,11 +41,11 @@ end
 secret_key_base_path = "#{app_user_home}/.secret_key_base"
 if node['cwb-server']['env']['SECRET_KEY_BASE'].nil?
   if File.exist?(secret_key_base_path)
-    node.normal['cwb-server']['env']['SECRET_KEY_BASE'] = File.read(secret_key_base_path)
+    node.default['cwb-server']['env']['SECRET_KEY_BASE'] = File.read(secret_key_base_path)
   else
     new_key = SecureRandom.hex(64)
     store_key secret_key_base_path, new_key, app_user
-    node.normal['cwb-server']['env']['SECRET_KEY_BASE'] = new_key
+    node.default['cwb-server']['env']['SECRET_KEY_BASE'] = new_key
   end
 end
 
@@ -99,7 +99,7 @@ if node['cwb-server']['apply_secret_config']
   directory providers_dir do
     owner app_user
     group app_user
-    mode 00755
+    mode '00755'
   end
 
   BASE64_SUFFIX = '_BASE64'.freeze
@@ -147,7 +147,7 @@ if node['cwb-server']['apply_secret_config']
     backup false
     owner app_user
     group app_user
-    mode 0600
+    mode '0600'
     variables(env: node['cwb-server']['env'])
   end
 else # Delete secrets if `apply_secret_config` is set to false

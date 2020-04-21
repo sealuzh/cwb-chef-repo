@@ -7,7 +7,6 @@ end
 
 apt_repository 'nginx' do
   uri 'ppa:nginx/stable'
-  distribution node['lsb']['codename']
 end
 
 package 'nginx' do
