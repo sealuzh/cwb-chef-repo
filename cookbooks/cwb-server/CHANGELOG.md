@@ -3,6 +3,7 @@
 * Add workaround for broken `vagrant-aws` installation (see [vagrant issue](https://github.com/hashicorp/vagrant/issues/11518))
 * Fix unpinned bundler version
 * Update cookbook dependencies
+* Remove workaround for merged vagrant-butcher logger spam
 
 # 0.7.3 (2019-01-03)
 
