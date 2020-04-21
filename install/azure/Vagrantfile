@@ -1,0 +1,262 @@
+require 'pathname'
+require 'securerandom'
+
+# Number of web editor instances configured for CWB
+NUM_WORKSTATIONS = 0
+
+# SSH
+SSH_KEY_PATH = ENV['SSH_KEY_PATH'] || 'cloud-benchmarking.pem'
+SSH_KEY_NAME = ENV['SSH_KEY_NAME'] || 'cloud-benchmarking'
+# Username to ssh into VM instances (might be `root` for other images)
+SSH_USERNAME = 'ubuntu'
+
+# Cloud Providers
+# Security credentials > Users: https://console.aws.amazon.com/iam/home?#/users
+AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY'] || 'my_aws_access_key'
+AWS_SECRET_KEY = ENV['AWS_SECRET_KEY'] || 'my_aws_secret_key'
+
+# Setup: https://github.com/mitchellh/vagrant-google#google-cloud-platform-setup
+# Credentials: https://console.cloud.google.com/apis/credentials
+# => Click "Manage service accounts" and create a JSON key
+GOOGLE_PROJECT_ID = ENV['GOOGLE_PROJECT_ID'] || 'my_google_project_id'
+GOOGLE_CLIENT_EMAIL = ENV['GOOGLE_CLIENT_EMAIL'] || 'my_google_client_email'
+GOOGLE_JSON_KEY_PATH = ENV['GOOGLE_JSON_KEY_PATH'] || 'my_google_json_key_path'
+
+# Get Azure credentials via Azure CLI: https://github.com/Azure/vagrant-azure#create-an-azure-active-directory-aad-application
+AZURE_TENANT_ID = ENV['AZURE_TENANT_ID'] || 'my_azure_tenant_id'
+AZURE_CLIENT_ID = ENV['AZURE_CLIENT_ID'] || 'my_azure_client_id'
+AZURE_CLIENT_SECRET = ENV['AZURE_CLIENT_SECRET'] || 'my_azure_client_secret'
+AZURE_SUBSCRIPTION_ID = ENV['AZURE_SUBSCRIPTION_ID'] || 'my_azure_subscription_id'
+
+##########################################################
+CHEF_SERVER_IP = ENV['CHEF_SERVER_IP'] || File.read('chef_server_ip.env').strip
+
+fail "No SSH key found at #{SSH_KEY_PATH}" unless File.exist?(SSH_KEY_PATH)
+
+# Local paths
+FILE_DIR = Pathname.new(__FILE__).parent.expand_path
+REPO_ROOT = FILE_DIR.parent.parent.expand_path
+COOKBOOKS = File.join(REPO_ROOT, 'cookbooks')
+CWB_SERVER = File.join(COOKBOOKS, 'cwb-server')
+CWB_CHEF_SERVER = File.join(COOKBOOKS, 'cwb-chef-server')
+CWB_WORKSTATION = File.join(COOKBOOKS, 'cwb-workstation')
+
+# @param file [String] the path of the cache file
+# @param new_content [String] the content that should be cached into `file`
+# @return [String] if `file` exists: the content of the file
+#                  otherwise: `new_content` (will be saved to `file`)
+def read_or_cache(file, new_content)
+  content = File.read(file).strip # Ignore whitespace
+  if content.empty?
+    File.write(file, new_content)
+    new_content
+  else
+    content
+  end
+end
+
+VAGRANTFILE_API_VERSION = '2'
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  # Detect vagrant-omnibus plugin
+  if Vagrant.has_plugin?('vagrant-omnibus')
+    # Chef client versions: https://github.com/chef/chef/blob/master/CHANGELOG.md
+    config.omnibus.chef_version = '14.8.12' # or :latest
+  else
+    STDERR.puts 'FATAL: Vagrant-omnibus plugin not detected. Please install the plugin with
+                 `vagrant plugin install vagrant-omnibus`.'
+    exit
+  end
+
+  # Box
+  config.vm.box     = 'azure'
+  config.vm.box_url = 'https://github.com/azure/vagrant-azure/raw/v2.0/dummy.box'
+
+  # VM
+  config.ssh.forward_agent = false
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+  # Fix SMB username promt: https://github.com/mitchellh/vagrant-aws/issues/365
+  config.vm.allowed_synced_folder_types = :rsync
+
+  # Azure
+  config.vm.provider :azure do |azure, override|
+    # Azure authentication
+    azure.tenant_id = AZURE_TENANT_ID
+    azure.client_id = AZURE_CLIENT_ID
+    azure.client_secret = AZURE_CLIENT_SECRET
+    azure.subscription_id = AZURE_SUBSCRIPTION_ID
+
+    # SSH key
+    override.ssh.private_key_path = SSH_KEY_PATH
+    override.ssh.username = SSH_USERNAME
+
+    # Security group
+    # Alternatively via CLI:
+    # az vm open-port -g cwb -n cwb-server-production --port 80
+    # az vm open-port -g cwb -n chef-server-production --port 443
+    azure.virtual_network_name = 'cwb-network'
+    azure.nsg_name = 'allow-http'
+    azure.subnet_name = 'cwb-subnet'
+    azure.tcp_endpoints = ['80', '443']
+
+    # Azure instance configuration
+    azure.resource_group_name = 'cwb'
+    # azure.vm_name = ''
+    azure.location = 'westeurope'
+    # az vm image list --output table
+    # az vm image list --output table --publisher Canonical --all
+    azure.vm_image_urn = 'Canonical:UbuntuServer:18.04-LTS:18.04.202004080'
+    # az vm list-sizes --location westeurope
+    # https://azureprice.net/?region=westeurope
+    azure.vm_size = 'Standard_B2s'
+    azure.instance_ready_timeout = 300 # default 120s
+  end
+
+  ### Chef-Server
+  config.vm.define 'chef-server' do |chef_server|
+    # VM
+    chef_server.vm.hostname = 'chef-server' # MUST not contain spaces
+
+    # Azure
+    config.vm.provider :azure do |azure, override|
+      azure.vm_name = 'chef-server-production'
+    end
+
+    # Chef solo provisioning via berks-vendored cookbooks
+    chef_server.vm.provision :chef_solo do |chef|
+      chef.cookbooks_path = "#{CWB_CHEF_SERVER}/berks-cookbooks"
+      chef.add_recipe 'cwb-chef-server'
+      chef.json = {
+          'chef-server' => {
+              # Chef-server versions: https://downloads.chef.io/chef-server/
+              'version' => '12.18.14', # as of 2019-01-02 or nil for latest
+              # Provide if cookbook service is not working correctly (i.e. cookbooks cannot be uploaded).
+              # Attempts to automatically detect public IP via Ohai/What's my ip query
+              # 'api_fqdn' => CHEF_SERVER_IP
+              # List of commercial addons: https://github.com/chef-cookbooks/chef-server#attributes
+              # The management console (mange) is free up to 25 nodes
+              # 'addons' => %w(manage),
+              # 'accept_license' => true
+          }
+      }
+    end
+  end
+
+  ### CWB-Server
+  config.vm.define 'cwb-server', primary: true do |cwb_server|
+    # VM
+    cwb_server.vm.hostname = 'cwb-server' # MUST not contain spaces
+
+    # Azure
+    config.vm.provider :azure do |azure, override|
+      azure.vm_name = 'cwb-server-production'
+    end
+
+    # Chef solo provisioning via berks-vendored cookbooks
+    # Run `vendor_berks_cookbooks.sh` to pick up changes in the `cwb-server` cookbook
+    cwb_server.vm.provision :chef_solo do |chef|
+      chef.cookbooks_path = "#{CWB_SERVER}/berks-cookbooks"
+      chef.provisioning_path = '/etc/chef'
+      chef.add_recipe 'cwb-server'
+      # Refer to `cookbooks/cwb-server/attributes/default.rb` for an
+      # extensive list of configurable attributes
+      chef.json =
+          {
+              'cwb-server' => {
+                  'dev' => {
+                      'tools' => %w(vim curl)
+                  },
+                  'ssh' => {
+                      'key' => File.read(SSH_KEY_PATH),
+                      'key_name' => SSH_KEY_NAME
+                  },
+                  'chef' => {
+                      'server_host' => CHEF_SERVER_IP,
+                      'node_name' => 'cwb-server',
+                      'client_key' => File.read('cwb-server.pem'),
+                      'client_key_name' => 'cwb-server',
+                      'validation_key' => File.read('chef-validator.pem'),
+                      'validation_key_name' => 'chef-validator',
+                      # VM provisioning
+                      # Chef versions: https://docs.chef.io/release_notes.html
+                      # Notice that CWB is currently not yet compatible with Chef 13 and 14
+                      # https://github.com/sealuzh/cwb-benchmarks/issues/20
+                      'omnibus_chef_version' => '12.22.3'
+                  },
+                  'providers' => {
+                      'aws' => {
+                          'access_key' => AWS_ACCESS_KEY,
+                          'secret_key' => AWS_SECRET_KEY
+                      },
+                      'google' => {
+                          'project_id' => GOOGLE_PROJECT_ID,
+                          'client_email' => GOOGLE_CLIENT_EMAIL,
+                          'json_key_FILE' => (File.read(GOOGLE_JSON_KEY_PATH) rescue nil),
+                      },
+                      'azure' => {
+                        'tenant_id' => AZURE_TENANT_ID,
+                        'client_id' => AZURE_CLIENT_ID,
+                        'client_secret' => AZURE_CLIENT_SECRET,
+                        'subscription_id' => AZURE_SUBSCRIPTION_ID
+                      }
+                  },
+                  'env' => {
+                      'SECRET_KEY_BASE' => read_or_cache('secret_key_base.env', SecureRandom.hex(64)),
+                      'LOG_LEVEL' => 'info' # Rails log levels: debug, info, warn, error, fatal, unknown
+                  },
+                  'app' => {
+                      'branch' => 'master',
+                      'user_password' => 'demo',
+                      # Determines how many benchmarks can be prepared, started, or released in parallel.
+                      # Keep in mind that workers are memory-intensive because the currently load the entire Rails environment.
+                      'num_workers' => 2
+                  },
+                  'db' => {
+                    'password' => 'cloud',
+                    'postgres_password' => 'rootcloud'
+                  },
+                  'nginx' => {
+                      # 'hostname' => 'PUBLIC_HOST_OR_IP'
+                  }
+              },
+              # For a list of time zones see: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+              'tz' => 'Europe/Zurich',
+          }
+    end
+  end
+
+  NUM_WORKSTATIONS.times do |i|
+    ### CWB-Workstation
+    name = "cwb-workstation#{i+1}"
+    config.vm.define name do |cwb_workstation|
+      # VM
+      cwb_workstation.vm.hostname = name # MUST not contain spaces
+
+      # Azure
+      config.vm.provider :azure do |azure, override|
+        azure.vm_name = name
+      end
+
+      # Chef solo provisioning via berks-vendored cookbooks
+      # Run `vendor_berks_cookbooks.sh` to pick up changes in the `cwb-workstation` cookbook
+      cwb_workstation.vm.provision :chef_solo do |chef|
+        chef.cookbooks_path = "#{CWB_WORKSTATION}/berks-cookbooks"
+        chef.add_recipe 'cwb-workstation'
+        # Refer to `cookbooks/cwb-workstation/attributes/default.rb` for an
+        # extensive list of configurable attributes
+        chef.json = {
+          'cwb-workstation' => {
+            'chef' => {
+              'server_host' => CHEF_SERVER_IP,
+              'client_key' => File.read('cwb-server.pem'),
+              'validation_key' => File.read('chef-validator.pem'),
+            },
+            # Optional (for cwb_ssh utility)
+            'ssh_key' => File.read(SSH_KEY_PATH),
+            # Extra public key to provide SSH access for the `cwb` user:
+            # 'pub_key' => 'ssh-rsa pub_key_goes_here my_key_name'
+          }
+        }
+      end
+    end
+  end
+end # Vagrantfile.configure
