@@ -43,10 +43,9 @@ default['vagrant']['user'] = node['cwb-server']['app']['user']
 default['vagrant']['plugins'] = [
   # Ensure that Chef is installed within a VM
   { 'name' => 'vagrant-omnibus', 'version' => '1.5.0' },
-  # Delete Chef client and node when destroying a VM
-  # Issue with 2.3.0: https://github.com/cassianoleal/vagrant-butcher/issues/37
-  # => See custom fix in cwb-server::vagrant
-  # { 'name' => 'vagrant-butcher', 'version' => '2.3.1' },
+  # Hashie loggerspam is not actually fixed although merged PR:
+  # https://github.com/c10l/vagrant-butcher/issues/59
+  { 'name' => 'vagrant-butcher', 'version' => '2.3.1' },
 ] + node['cwb-server']['vagrant']['providers']
 
 ### Ruby

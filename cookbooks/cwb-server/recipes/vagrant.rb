@@ -17,30 +17,29 @@ def home_dir
   end
 end
 
-# Custom fix of logger spam issue:
-# https://github.com/joe4dev/vagrant-butcher
-# See (issues with the official version due to merge changes):
-# https://github.com/cassianoleal/vagrant-butcher/pull/61
-version = '2.3.1'
-butcher_file_name = "vagrant-butcher-#{version}.gem"
-butcher_path = File.join(home_dir, butcher_file_name)
-cookbook_file butcher_path do
-  source butcher_file_name
-  owner node['cwb-server']['user']
-  group node['cwb-server']['user']
-  mode '0755'
-  action :create
-end
+# Skip because this custom fix still somehow still doesn't work (maybe require hashie fails)?!
+# Hashie loggerspam is not actually fixed although merged PR:
+# https://github.com/c10l/vagrant-butcher/issues/59
+# version = '2.3.1'
+# butcher_file_name = "vagrant-butcher-#{version}.gem"
+# butcher_path = File.join(home_dir, butcher_file_name)
+# cookbook_file butcher_path do
+#   source butcher_file_name
+#   owner node['cwb-server']['user']
+#   group node['cwb-server']['user']
+#   mode '0755'
+#   action :create
+# end
 
-vagrant_home_var = vagrant_home
-plugin_exists_cmd = "vagrant plugin list | grep 'vagrant-butcher (#{version})'"
-execute 'install vagrant-butcher plugin' do
-  command "#{plugin_exists_cmd} || vagrant plugin install #{butcher_path}"
-  user node['vagrant']['user'] if node['vagrant']['user']
-  environment('VAGRANT_HOME' => vagrant_home_var) if vagrant_home_var
-end
+# vagrant_home_var = vagrant_home
+# plugin_exists_cmd = "vagrant plugin list | grep 'vagrant-butcher (#{version})'"
+# execute 'install vagrant-butcher plugin' do
+#   command "#{plugin_exists_cmd} || vagrant plugin install #{butcher_path}"
+#   user node['vagrant']['user'] if node['vagrant']['user']
+#   environment('VAGRANT_HOME' => vagrant_home_var) if vagrant_home_var
+# end
 
-# Custom fix for vagrant-aws installation issue:
+# Custom fix for broken vagrant-aws installation:
 # https://github.com/hashicorp/vagrant/issues/11518
 # => Should be fixed after release of Vagrant 2.2.8 but then the following kicks in:
 # https://github.com/mitchellh/vagrant-aws/issues/566
