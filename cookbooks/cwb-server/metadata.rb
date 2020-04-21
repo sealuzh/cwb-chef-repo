@@ -22,4 +22,4 @@ depends 'deploy_resource', '~> 1.0.2'
 depends 'postgresql', '~> 7.1.0'
 
 ### Runtime dependencies
-depends 'vagrant', '~> 0.9.1'
+depends 'vagrant', '~> 2.0.1'

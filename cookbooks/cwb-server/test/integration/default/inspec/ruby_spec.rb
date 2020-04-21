@@ -8,6 +8,6 @@ describe command("#{bin_dir}/ruby --version") do
   its(:stdout) { should eq "ruby 2.5.1p57 (2018-03-29 revision 63029) [x86_64-linux]\n" }
 end
 
-describe command("#{bin_dir}/bundle --version") do
-  its('stdout') { should match /Bundler version 1\./ }
+describe command("#{bin_dir}/gem list | grep bundle") do
+  its('stdout') { should match /1\.17\.2/ }
 end

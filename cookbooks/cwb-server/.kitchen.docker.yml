@@ -1,4 +1,6 @@
 ---
+# This is a legacy configuration for test kitchen used with slow kitchen-docker
+# => Use kitchen-dokken instead
 driver:
   name: docker
   privileged: true

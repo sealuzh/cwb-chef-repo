@@ -14,5 +14,5 @@ describe command(cmd_as_user('vagrant plugin list')) do
 end
 
 describe command(cmd_as_user('vagrant plugin list')) do
-  its(:stdout) { should match(/vagrant-butcher\ \(2.3.1\)/) }
+  its(:stdout) { should match(/vagrant-butcher\ \(2.3.1/) }
 end
