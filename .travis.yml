@@ -1,15 +1,17 @@
-# Chef Travis CI config based on https://github.com/chef-cookbooks/enterprise-chef-common/blob/master/.travis.yml
+# Initially based on (switched to full Docker config by 2020-04-21) https://github.com/chef-cookbooks/enterprise-chef-common/blob/master/.travis.yml
+# Updated based on: https://gitlab.openminds.be/mirror/ark/blob/master/.travis.yml
+# kitchen-in-travis-native: https://github.com/zuazo/kitchen-in-travis-native
 # Use Travis's container-based infrastructure
 sudo: required
-dist: trusty
+dist: xenial
 services: docker
 
 addons:
   apt:
     sources:
-      - chef-current-trusty
+      - chef-current-xenial
     packages:
-      - chefdk
+      - chef-workstation
 
 env:
   matrix:

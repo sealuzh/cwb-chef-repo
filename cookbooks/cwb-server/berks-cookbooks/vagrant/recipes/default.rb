@@ -1,7 +1,7 @@
-# Cookbook Name:: vagrant
+# Cookbook:: vagrant
 # Recipe:: default
 #
-# Copyright 2013, Joshua Timberman
+# Copyright:: 2013, Joshua Timberman
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 
 vagrant 'Vagrant' do
   version node['vagrant']['version']
+  appimage node['vagrant']['appimage']
+  appimage_file node['vagrant']['appimage_file']
 end
 
 include_recipe "#{cookbook_name}::install_plugins" unless node['vagrant']['plugins'].empty?

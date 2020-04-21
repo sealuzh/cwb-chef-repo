@@ -1,4 +1,4 @@
-# Cookbook Name:: vagrant
+# Cookbook:: vagrant
 # Library:: helpers
 
 # Author:: Joshua Timberman <opensource@housepub.org>
@@ -47,11 +47,12 @@ module Vagrant
 
     def package_extension
       extension = value_for_platform_family(
-        'mac_os_x' =>  mac_os_x_extension,
+        'mac_os_x' => mac_os_x_extension,
         'windows' => windows_extension,
         'debian' => '_x86_64.deb',
         %w(rhel suse fedora amazon) => '_x86_64.rpm'
       )
+      extension = '_linux_amd64.zip' if @appimage
       raise ArgumentError "HashiCorp doesn't provide a Vagrant package for the #{node['platform']} platform." if extension.nil?
 
       extension
@@ -64,6 +65,7 @@ module Vagrant
 
     def extract_checksum(sha256sums)
       raise "SHA 256 sum not found for the Vagrant package #{package_name}" unless sha256sums.grep(/#{package_name}/)[0].respond_to?(:split)
+
       sha256sums.grep(/#{package_name}/)[0].split.first
     end
 

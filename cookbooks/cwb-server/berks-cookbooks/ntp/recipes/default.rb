@@ -4,7 +4,7 @@
 # Author:: Joshua Timberman (<joshua@chef.io>)
 # Author:: Tim Smith (<tsmith@chef.io>)
 #
-# Copyright:: 2009-2017, Chef Software, Inc.
+# Copyright:: 2009-2019, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +17,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+if platform_family?('rhel') && node['platform_version'].to_i >= 8
+  Chef::Log.warn('The NTP cookbook is not suupported on RHEL 8+ as NTP no longer ships in the OS')
+  return
+end
 
 ::Chef::Resource.send(:include, Opscode::Ntp::Helper)
 
@@ -37,7 +42,7 @@ when 'windows'
   include_recipe 'ntp::windows_client'
 when 'mac_os_x'
   include_recipe 'ntp::mac_os_x_client'
-  # On OS X we only support simple client config and nothing more
+  # On macOS we only support simple client config and nothing more
   return 0
 else
 
@@ -46,14 +51,14 @@ else
       source node['ntp']['pkg_source']
       action :install
       # Non-interactive package install fails on Solaris10 so we need to manually the ntp package
-      not_if { node['platform_family'] == 'solaris2' && node['platform_version'].to_f <= 5.10 }
+      not_if { platform_family?('solaris2') && node['platform_version'].to_f <= 5.10 }
     end
   end
 
   package 'Remove ntpdate' do
     package_name 'ntpdate'
     action :remove
-    only_if { node['platform_family'] == 'debian' && node['platform_version'].to_i >= 16 }
+    only_if { platform_family?('debian') && node['platform_version'].to_i >= 16 }
   end
 
   [node['ntp']['varlibdir'], node['ntp']['statsdir']].each do |ntpdir|
@@ -109,7 +114,7 @@ end
 
 if node['ntp']['sync_clock'] && !platform_family?('windows')
   execute "Stop #{node['ntp']['service']} in preparation for ntpdate" do
-    command node['platform_family'] == 'freebsd' ? '/usr/bin/true' : '/bin/true'
+    command platform_family?('freebsd') ? '/usr/bin/true' : '/bin/true'
     action :run
     notifies :stop, "service[#{node['ntp']['service']}]", :immediately
   end

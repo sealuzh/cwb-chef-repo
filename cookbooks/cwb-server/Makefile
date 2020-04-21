@@ -1,6 +1,7 @@
 ### Configurable Variables
 # Example: `make all_tests INSTANCE=ubuntu-1604`
 INSTANCE=default-ubuntu-1804
+LOG_LEVEL=info # or debug
 
 ### Default Target
 .PHONY: all
@@ -49,7 +50,7 @@ integration_test: dokken_integration_test
 dokken_integration_test: export KITCHEN_YAML=.kitchen.yml
 dokken_integration_test: export KITCHEN_LOCAL_YAML=.kitchen.dokken.yml
 dokken_integration_test:
-	kitchen converge $(INSTANCE) && kitchen verify $(INSTANCE)
+	kitchen converge -l $(LOG_LEVEL) $(INSTANCE) && kitchen verify -l $(LOG_LEVEL) $(INSTANCE)
 
 .PHONY: login
 login: export KITCHEN_YAML=.kitchen.yml

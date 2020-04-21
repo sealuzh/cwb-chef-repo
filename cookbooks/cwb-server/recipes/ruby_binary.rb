@@ -64,11 +64,14 @@ end
 # end
 # modify_path.run_action(:run)
 
-bundle_exist = "test -f #{ruby['bin_dir']}/bundle"
-install_bundler_cmd = ruby_cmd(ruby, 'gem install bundler')
+bundle_version = ruby['bundler_version']
+# bundle_exist = "test -f #{ruby['bin_dir']}/bundle"
+# Problem: checks against updated bundle (which is 2.x)
+# bundle_match_version = "[[ $(bundle version | awk '{print $3}') == '#{bundle_version}' ]] && true"
+install_bundler_cmd = ruby_cmd(ruby, "gem install bundler:#{bundle_version}")
 execute 'install-bundler' do
   command install_bundler_cmd
-  not_if bundle_exist
+  # not_if bundle_match_version
   action :run
 end
 

@@ -30,19 +30,19 @@ default['cwb-server']['nginx']['log_dir'] = '/var/log/nginx'
 # a) Optimistic (might break on newer releases): ['vagrant-google', ...]
 # b) Pessimistic (requires manual updating): [{ 'name' => 'vagrant-google',  'version' =>  '0.2.2' }, ...]
 default['cwb-server']['vagrant']['providers'] = [
-  { 'name' => 'vagrant-aws', 'version' => '0.7.2' },
+  # See custom fix in cwb-servers::vagrant:
+  # { 'name' => 'vagrant-aws', 'version' => '0.7.2' },
   { 'name' => 'vagrant-google', 'version' => '2.2.1' },
   { 'name' => 'vagrant-azure', 'version' => '2.0.0' },
 ]
 
 ### Vagrant: https://supermarket.chef.io/cookbooks/vagrant#readme
-default['vagrant']['version'] = '2.1.2'
+# vagrant-aws fails to install with 2.2.7 due to Hash.except(): https://github.com/mitchellh/vagrant-aws/issues/566
+default['vagrant']['version'] = '2.2.7'
 default['vagrant']['user'] = node['cwb-server']['app']['user']
 default['vagrant']['plugins'] = [
   # Ensure that Chef is installed within a VM
   { 'name' => 'vagrant-omnibus', 'version' => '1.5.0' },
-  # Delete Chef client and node when destroying a VM
-  # Issue with 2.3.0: https://github.com/cassianoleal/vagrant-butcher/issues/37
   { 'name' => 'vagrant-butcher', 'version' => '2.3.1' },
 ] + node['cwb-server']['vagrant']['providers']
 
@@ -60,6 +60,8 @@ default_source_url = File.join(node['cwb-server']['ruby']['base_url'], node['pla
 default['cwb-server']['ruby']['source_url'] = default_source_url
 # Unchecked if not provided
 default['cwb-server']['ruby']['checksum'] = nil
+# See BUNDLED WITH in Gemfile.lock: https://github.com/sealuzh/cloud-workbench/blob/master/Gemfile.lock
+default['cwb-server']['ruby']['bundler_version'] = '1.17.2'
 
 ### Nodejs
 # Nodejs versions: https://github.com/nodesource/distributions#installation-instructions

@@ -1,4 +1,5 @@
 ---
+# This is the specialized configuration for fast Docker-based testing.
 # Example: https://github.com/sous-chefs/postgresql/blob/master/.kitchen.dokken.yml
 driver:
   name: dokken
