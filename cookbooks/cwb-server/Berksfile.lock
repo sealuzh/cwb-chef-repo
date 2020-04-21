@@ -4,9 +4,7 @@ DEPENDENCIES
     metadata: true
 
 GRAPH
-  apt (7.2.0)
   cwb-server (0.7.3)
-    apt (~> 7.2.0)
     deploy_resource (~> 1.0.2)
     git (~> 10.0.0)
     ntp (~> 3.7.0)
