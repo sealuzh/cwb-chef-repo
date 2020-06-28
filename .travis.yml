@@ -2,8 +2,9 @@
 # Updated based on: https://gitlab.openminds.be/mirror/ark/blob/master/.travis.yml
 # kitchen-in-travis-native: https://github.com/zuazo/kitchen-in-travis-native
 # Use Travis's container-based infrastructure
-sudo: required
+os: linux
 dist: xenial
+language: ruby
 services: docker
 
 addons:
@@ -14,7 +15,7 @@ addons:
       - chef-workstation
 
 env:
-  matrix:
+  jobs:
   - INSTANCE=ubuntu-1804
   # Add on demand:
   - INSTANCE=ubuntu-1604
