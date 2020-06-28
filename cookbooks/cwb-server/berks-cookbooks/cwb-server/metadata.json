@@ -9,13 +9,13 @@
     "ubuntu": ">= 0.0.0"
   },
   "dependencies": {
-    "sudo": "~> 5.4.0",
+    "sudo": "~> 5.4.4",
     "git": "~> 10.0.0",
     "timezone_lwrp": "~> 0.2.1",
     "ntp": "~> 3.7.0",
-    "deploy_resource": "~> 1.0.2",
-    "postgresql": "~> 7.1.0",
-    "vagrant": "~> 2.0.1"
+    "deploy_resource": "~> 1.0.3",
+    "postgresql": "~> 7.1.9",
+    "vagrant": "~> 2.0.2"
   },
   "providing": {
 

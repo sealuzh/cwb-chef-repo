@@ -1,6 +1,5 @@
 require 'base64'
 require 'securerandom'
-require 'mixlib/shellout'
 
 app_user = node['cwb-server']['app']['user']
 app_user_home = "/home/#{app_user}"
@@ -29,7 +28,7 @@ end
 
 def generate_pub_key(private_key_path, key_name, user, pub_key_path = "#{private_key_path}.pub")
   file pub_key_path do
-    content lazy { "#{Mixlib::ShellOut.new("ssh-keygen -y -f #{private_key_path}").run_command.stdout.strip} #{key_name}\n" }
+    content lazy { "#{shell_out("ssh-keygen -y -f #{private_key_path}").stdout.strip} #{key_name}\n" }
     backup false
     owner user
     group user
