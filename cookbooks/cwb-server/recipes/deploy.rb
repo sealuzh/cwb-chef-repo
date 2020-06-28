@@ -1,4 +1,4 @@
-include CwbServer::Helpers
+Chef::Recipe.include CwbServer::Helpers
 
 # Filters out all groups that do not match the specified Rails environment (e.g., production)
 # Example: `only_rails_env_list(env)` => 'development test staging doc'
