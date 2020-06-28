@@ -7,7 +7,7 @@ license          'Apache-2.0'
 description      'Installs and configures the Cloud WorkBench server'
 chef_version     '>= 14'
 supports         'ubuntu'
-version          '0.7.3'
+version          '0.7.5'
 
 ### Base utilities
 # depends 'apt', '~> 7.2.0'

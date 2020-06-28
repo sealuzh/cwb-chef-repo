@@ -4,7 +4,7 @@ DEPENDENCIES
     metadata: true
 
 GRAPH
-  cwb-server (0.7.3)
+  cwb-server (0.7.5)
     deploy_resource (~> 1.0.3)
     git (~> 10.0.0)
     ntp (~> 3.7.0)

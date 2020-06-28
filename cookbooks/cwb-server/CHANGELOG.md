@@ -1,3 +1,8 @@
+# 0.7.5 (2020-06-28)
+
+* Fix new linter warnings
+* Fix dependency incompatibility with newer Chef Client Infra version
+
 # 0.7.4 (2020-04-21)
 
 * Add workaround for broken `vagrant-aws` installation (see [vagrant issue](https://github.com/hashicorp/vagrant/issues/11518))
