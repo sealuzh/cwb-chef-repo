@@ -5,13 +5,13 @@ DEPENDENCIES
 
 GRAPH
   cwb-server (0.7.3)
-    deploy_resource (~> 1.0.2)
+    deploy_resource (~> 1.0.3)
     git (~> 10.0.0)
     ntp (~> 3.7.0)
-    postgresql (~> 7.1.0)
-    sudo (~> 5.4.0)
+    postgresql (~> 7.1.9)
+    sudo (~> 5.4.4)
     timezone_lwrp (~> 0.2.1)
-    vagrant (~> 2.0.1)
+    vagrant (~> 2.0.2)
   deploy_resource (1.0.3)
   git (10.0.0)
   ntp (3.7.0)
