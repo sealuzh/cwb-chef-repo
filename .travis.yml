@@ -18,7 +18,7 @@ env:
   jobs:
   - INSTANCE=ubuntu-1804
   # Add on demand:
-  - INSTANCE=ubuntu-1604
+  - INSTANCE=ubuntu-2004
 
 before_install:
   - cd cookbooks/cwb-server

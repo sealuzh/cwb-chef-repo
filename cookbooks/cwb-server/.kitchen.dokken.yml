@@ -18,13 +18,12 @@ driver:
     - RUN locale-gen en_US.UTF-8
 
 platforms:
-- name: ubuntu-16.04
-  driver:
-    image: dokken/ubuntu-16.04
-
 - name: ubuntu-18.04
   driver:
     image: dokken/ubuntu-18.04
+- name: ubuntu-20.04
+  driver:
+    image: dokken/ubuntu-20.04
 
 transport:
   name: dokken
