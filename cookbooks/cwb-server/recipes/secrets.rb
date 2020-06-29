@@ -32,8 +32,8 @@ def generate_pub_key(private_key_path, key_name, user, pub_key_path = "#{private
       gen_pub_key_cmd = "ssh-keygen -y -f #{private_key_path}"
       pub_key = shell_out(gen_pub_key_cmd).stdout.strip
       # NOTE: Ubuntu 20.04 automatically appends a key name via ssh-keygen
-      pub_key.concat(key_name) unless pub_key.include? key_name
-      pub_key.concat("\n")
+      (pub_key << ' ' << key_name) unless pub_key.include? key_name
+      pub_key << "\n"
       pub_key
     }
     backup false
