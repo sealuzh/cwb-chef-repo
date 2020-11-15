@@ -1,5 +1,5 @@
 # include CwbServer::Helpers
-require_relative '../../../libraries/helpers.rb'
+require_relative '../../../libraries/helpers'
 describe CwbServer::Helpers do
   describe 'env_pairs' do
     let(:helper) { Object.new.extend(CwbServer::Helpers) }
