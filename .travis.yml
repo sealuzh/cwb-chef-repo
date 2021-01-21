@@ -33,7 +33,6 @@ before_script:
   - eval "$(chef shell-init bash)"
   - chef --version
   - cookstyle --version
-  - foodcritic --version
   # Accepting Chef licence is required from version >15
   - CHEF_LICENSE=accept chef exec gem list
 
