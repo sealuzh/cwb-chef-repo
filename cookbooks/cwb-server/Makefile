@@ -22,18 +22,14 @@ vendor: install
 
 ### Testing stages
 .PHONY: all_tests
-all_tests: lint syntax unit_test integration_test
+all_tests: lint unit_test integration_test
 
 .PHONY: quick_test
-quick_test: lint syntax unit_test
+quick_test: lint unit_test
 
 .PHONY: lint
 lint:
 	cookstyle
-
-.PHONY: syntax
-syntax:
-	foodcritic . --exclude spec -f any  -t ~FC101
 
 .PHONY: unit_test
 unit_test:
